@@ -35,7 +35,7 @@ echo '#BSUB -W 4:00' >> "${prodir}"/bash/jobs/"${SRRnum}"_sradump.job
 #--split-files for paired reads
 echo 'echo' "This is the SRA file being downloaded and converted to .fastq format $SRRnum" >> "${prodir}"/bash/jobs/"${SRRnum}"_sradump.job
 echo ${mcs}/programs/sratoolkit.2.9.0-ubuntu64/bin/fastq-dump \
---outdir ${prodir}/data/srareads/projectname/fastqs \
+--outdir ${prodir}/data/srareads/ \
 --gzip \
 ${SRRnum} >> "${prodir}"/bash/jobs/"${SRRnum}"_sradump.job
 echo 'echo' "$SRRnum acquired and converted to .fastq format" >> "${prodir}"/bash/jobs/"${SRRnum}"_sradump.job
