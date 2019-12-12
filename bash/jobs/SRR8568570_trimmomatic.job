@@ -1,0 +1,16 @@
+#!/bin/bash
+#BSUB -q general
+#BSUB -J SRR8568570_trimmomatic
+#BSUB -o /scratch/projects/transcriptomics/mikeconnelly/projects/MetaPocillopora/outputs/logfiles/SRR8568570trim%J.out
+#BSUB -e /scratch/projects/transcriptomics/mikeconnelly/projects/MetaPocillopora/outputs/errorfiles/SRR8568570trim%J.err
+module load java/1.8.0_60
+module load trimmomatic/0.36
+echo Unzipping SRR8568570
+gunzip /scratch/projects/transcriptomics/mikeconnelly/projects/MetaPocillopora/data/srareads/SRR8568570.fastq.gz
+echo Trimming SRR8568570
+/share/opt/java/jdk1.8.0_60/bin/java -jar /share/apps/trimmomatic/0.36/trimmomatic-0.36.jar \
+SE \
+-phred33 \
+-trimlog /scratch/projects/transcriptomics/mikeconnelly/projects/MetaPocillopora/outputs/logfiles/SRR8568570_trim.log /scratch/projects/transcriptomics/mikeconnelly/projects/MetaPocillopora/data/srareads/SRR8568570.fastq /scratch/projects/transcriptomics/mikeconnelly/projects/MetaPocillopora/outputs/trimmomaticreads/SRR8568570_trimmed.fastq.gz ILLUMINACLIP:/scratch/projects/transcriptomics/mikeconnelly/programs/Trimmomatic-0.36/adapters/TruSeq3-SE.fa:2:30:10 LEADING:3 TRAILING:3 SLIDINGWINDOW:4:15 MINLEN:36
+echo SRR8568570 trimmed
+gzip /scratch/projects/transcriptomics/mikeconnelly/projects/MetaPocillopora/data/srareads/SRR8568570.fastq
