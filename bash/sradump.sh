@@ -40,7 +40,7 @@ echo '#BSUB -e '"${prodir}"/outputs/errorfiles/"$SRRnum"sradump%J.err'' >> "${pr
 echo '#BSUB -n 8' >> "${prodir}"/bash/jobs/"${SRRnum}"_sradump.job
 echo '#BSUB -W 4:00' >> "${prodir}"/bash/jobs/"${SRRnum}"_sradump.job
 #--split-files for paired reads
-echo "This is the SRA file being downloaded and converted to .fastq format $SRRnum" >> "${prodir}"/bash/jobs/"${SRRnum}"_sradump.job
+echo 'echo' "This is the SRA file being downloaded and converted to .fastq format $SRRnum" >> "${prodir}"/bash/jobs/"${SRRnum}"_sradump.job
 echo ${mcs}/programs/sratoolkit.2.8.2-1-mac64/bin/fastq-dump \
 --outdir ${prodir}/data/srareads/projectname/fastqs \
 --gzip \
