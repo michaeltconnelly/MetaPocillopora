@@ -1,0 +1,10 @@
+#!/bin/bash
+#BSUB -q bigmem
+#BSUB -J SRR3727374_sradump
+#BSUB -o /scratch/projects/transcriptomics/mikeconnelly/projects/MetaPocillopora/outputs/logfiles/SRR3727374sradump%J.out
+#BSUB -e /scratch/projects/transcriptomics/mikeconnelly/projects/MetaPocillopora/outputs/errorfiles/SRR3727374sradump%J.err
+#BSUB -n 8
+#BSUB -W 4:00
+This is the SRA file being downloaded and converted to .fastq format SRR3727374
+/scratch/projects/transcriptomics/mikeconnelly/programs/sratoolkit.2.8.2-1-mac64/bin/fastq-dump --outdir /scratch/projects/transcriptomics/mikeconnelly/projects/MetaPocillopora/data/srareads/projectname/fastqs --gzip SRR3727374
+echo SRR3727374 acquired and converted to .fastq format

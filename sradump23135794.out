@@ -1,0 +1,104 @@
+Sender: LSF System <lsfadmin@n287>
+Subject: Job 23135794: <sradump> in cluster <mk2> Done
+
+Job <sradump> was submitted from host <n313> by user <m.connelly> in cluster <mk2>.
+Job was executed on host(s) <8*n287>, in queue <general>, as user <m.connelly> in cluster <mk2>.
+</nethome/m.connelly> was used as the home directory.
+</scratch/projects/transcriptomics/mikeconnelly/projects/MetaPocillopora> was used as the working directory.
+Started at Thu Dec 12 15:35:55 2019
+Results reported on Thu Dec 12 15:35:56 2019
+
+Your job looked like:
+
+------------------------------------------------------------
+# LSBATCH: User input
+#!/bin/bash
+#./bash/sradump.sh
+#purpose:
+#To start this job from the MetaPocillopora directory, use:
+#bsub -P transcriptomics < ./bash/sradump.sh
+
+#BSUB -J sradump
+#BSUB -q general
+#BSUB -P transcriptomics
+#BSUB -o sradump%J.out
+#BSUB -e sradump%J.err
+#BSUB -n 8
+#BSUB -u m.connelly1@umiami.edu
+
+#specify variable containing sequence file prefixes and directory paths
+mcs="/scratch/projects/transcriptomics/mikeconnelly"
+prodir="/scratch/projects/transcriptomics/mikeconnelly/projects/MetaPocillopora"
+#Yuan et al. 2017 (12), Boston University (8),
+SRRnums="SRR3727281 SRR3727374 SRR3727379 SRR3727380 SRR3727383 SRR3727387 SRR3727388 SRR3727390 SRR3727400 SRR3727418 SRR3727424 SRR3727425 SRR8568563 SRR8568564 SRR8568567 SRR8568568 SRR8568569 SRR8568565 SRR8568566 SRR8568570"
+
+#Make project primary directory
+mkdir ${prodir}/bash/jobs
+mkdir ${prodir}/outputs/logfiles
+mkdir ${prodir}/outputs/errorfiles
+#Make directory for SRA output .fastq files
+mkdir ${prodir}/data/srareads
+
+#Run SRA acquisition command by specifying variable containing sequence file prefixes
+#Download from NCBI and convert SRA files into .fastq format in output directories
+#fastq-dump [options] <accession>
+#For loop to automatic .fastq conversion
+for SRRnum in $SRRnums
+do \
+#   input BSUB commands
+echo '#!/bin/bash' > "${prodir}"/bash/jobs/"${SRRnum}"_sradump.job
+echo '#BSUB -q bigmem' >> "${prodir}"/bash/jobs/"${SRRnum}"_sradump.job
+echo '#BSUB -J '"${SRRnum}"_sradump'' >> "${prodir}"/bash/jobs/"${SRRnum}"_sradump.job
+echo '#BSUB -o '"${prodir}"/outputs/logfiles/"$SRRnum"sradump%J.out'' >> "${prodir}"/bash/jobs/"${SRRnum}"_sradump.job
+echo '#BSUB -e '"${prodir}"/outputs/errorfiles/"$SRRnum"sradump%J.err'' >> "${prodir}"/bash/jobs/"${SRRnum}"_sradump.job
+echo '#BSUB -n 8' >> "${prodir}"/bash/jobs/"${SRRnum}"_sradump.job
+echo '#BSUB -W 4:00' >> "${prodir}"/bash/jobs/"${SRRnum}"_sradump.job
+#--split-files for paired reads
+echo "This is the SRA file being downloaded and converted to .fastq format $SRRnum" >> "${prodir}"/bash/jobs/"${SRRnum}"_sradump.job
+echo ${mcs}/programs/sratoolkit.2.8.2-1-mac64/bin/fastq-dump \
+--outdir ${prodir}/data/srareads/projectname/fastqs \
+--gzip \
+${SRRnum} >> "${prodir}"/bash/jobs/"${SRRnum}"_sradump.job
+echo 'echo' "$SRRnum acquired and converted to .fastq format" >> "${prodir}"/bash/jobs/"${SRRnum}"_sradump.job
+#   submit generated sra script to job queue
+bsub < "${prodir}"/bash/jobs/"${SRRnum}"_sradump.job
+
+(... more ...)
+------------------------------------------------------------
+
+Successfully completed.
+
+Resource usage summary:
+
+    CPU time :                                   0.54 sec.
+    Total Requested Memory :                     12000.00 MB
+    Delta Memory :                               -
+
+The output (if any) follows:
+
+Job <23135795> is submitted to queue <bigmem>.
+Job <23135796> is submitted to queue <bigmem>.
+Job <23135797> is submitted to queue <bigmem>.
+Job <23135798> is submitted to queue <bigmem>.
+Job <23135799> is submitted to queue <bigmem>.
+Job <23135800> is submitted to queue <bigmem>.
+Job <23135801> is submitted to queue <bigmem>.
+Job <23135802> is submitted to queue <bigmem>.
+Job <23135803> is submitted to queue <bigmem>.
+Job <23135804> is submitted to queue <bigmem>.
+Job <23135805> is submitted to queue <bigmem>.
+Job <23135806> is submitted to queue <bigmem>.
+Job <23135807> is submitted to queue <bigmem>.
+Job <23135808> is submitted to queue <bigmem>.
+Job <23135809> is submitted to queue <bigmem>.
+Job <23135810> is submitted to queue <bigmem>.
+Job <23135811> is submitted to queue <bigmem>.
+Job <23135812> is submitted to queue <bigmem>.
+Job <23135813> is submitted to queue <bigmem>.
+Job <23135814> is submitted to queue <bigmem>.
+
+
+PS:
+
+Read file <sradump23135794.err> for stderr output of this job.
+
