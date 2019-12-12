@@ -1,19 +1,4 @@
 #!/bin/bash
-<<<<<<< HEAD
-#NOTE: To run bash scripts, change modifications using chmod755 /path/script.sh
-#Then call script using bash /path/script.sh
-
-#Make project primary directory
-mkdir ~/computing/sequences/srareads/#projectname
-#Make directory for SRA output .fastq files
-mkdir ~/computing/sequences/srareads/#projectname/fastqs
-#General SRA acquisition script
-#Change directory to sratoolkit for access to programs for sequence acquisition
-cd ~/computing/programs/sratoolkit.2.8.2-1-mac64/bin
-#Run SRA acquisition command by specifying variable containing sequence file prefixes
-#Yuan et al. 2016 only
-SRRnums="SRR3727281 SRR3727374 SRR3727379 SRR3727380 SRR3727383 SRR3727387 SRR3727388 SRR3727390 SRR3727400 SRR3727418 SRR3727424 SRR3727425"
-=======
 #./bash/sradump.sh
 #purpose:
 #To start this job from the MetaPocillopora directory, use:
@@ -35,27 +20,17 @@ SRRnums="SRR3727281 SRR3727374 SRR3727379 SRR3727380 SRR3727383 SRR3727387 SRR37
 
 #Make project primary directory
 mkdir ${prodir}/bash/jobs
+mkdir ${prodir}/outputs/logfiles
+mkdir ${prodir}/outputs/errorfiles
 #Make directory for SRA output .fastq files
 mkdir ${prodir}/data/srareads
 
 #Run SRA acquisition command by specifying variable containing sequence file prefixes
->>>>>>> 66ca5facf3164069b2d9be3ccd5f6dc8c5f1f3ee
 #Download from NCBI and convert SRA files into .fastq format in output directories
 #fastq-dump [options] <accession>
 #For loop to automatic .fastq conversion
 for SRRnum in $SRRnums
 do \
-<<<<<<< HEAD
-echo "This is the SRA file being downloaded and converted to .fastq format"
-echo $SRRnum
-./fastq-dump --split-files \
---outdir ~/computing/sequences/srareads/#projectname/fastqs \
-${SRRnum}
-echo "$SRRnum acquired and converted to .fastq format"
-done
-
-# efetch command for acquiring sequences and generating .csv file with variable names?
-=======
 #   input BSUB commands
 echo '#!/bin/bash' > "${prodir}"/bash/jobs/"${EAPSIsample}"_sradump.job
 echo '#BSUB -q bigmem' >> "${prodir}"/bash/jobs/"${EAPSIsample}"_sradump.job
@@ -69,9 +44,8 @@ echo "This is the SRA file being downloaded and converted to .fastq format $SRRn
 echo ${mcs}/programs/sratoolkit.2.8.2-1-mac64/bin/fastq-dump --split-files \
 --outdir ${prodir}/data/srareads/projectname/fastqs \
 --gzip \
-${SRRnum}
-echo 'echo' "$SRRnum acquired and converted to .fastq format"
+${SRRnum} >> "${prodir}"/bash/jobs/"${EAPSIsample}"_sradump.job
+echo 'echo' "$SRRnum acquired and converted to .fastq format" >> "${prodir}"/bash/jobs/"${EAPSIsample}"_sradump.job
 #   submit generated sra script to job queue
 bsub < "${prodir}"/bash/jobs/"${EAPSIsample}"_sradump.job
 done
->>>>>>> 66ca5facf3164069b2d9be3ccd5f6dc8c5f1f3ee
