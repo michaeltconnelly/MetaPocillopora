@@ -21,5 +21,5 @@ SRRnums="SRR3727281 SRR3727374 SRR3727379 SRR3727380 SRR3727383 SRR3727387 SRR37
 
 module load java/1.8.0_60
 ${mcs}/programs/FastQC/fastqc \
-${prodir}/data/sradreads/*.fastq.gz \
+${prodir}/data/srareads/*.fastq.gz \
 --outdir ${prodir}/outputs/fastqcs/

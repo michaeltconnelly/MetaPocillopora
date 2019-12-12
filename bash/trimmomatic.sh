@@ -41,7 +41,7 @@ echo 'module load trimmomatic/0.36' >> "${prodir}"/bash/jobs/"${SRRnum}"_trimmom
 
 #   input command to unzip raw reads before trimming
 echo 'echo 'Unzipping "${SRRnum}"'' >> "${prodir}"/bash/jobs/"${SRRnum}"_trimmomatic.job
-echo 'gunzip '"${prodir}"/data/zippedreads/"${SRRnum}".fastq.gz >> "${prodir}"/bash/jobs/"${SRRnum}"_trimmomatic.job
+echo 'gunzip '"${prodir}"/data/srareads/"${SRRnum}".fastq.gz >> "${prodir}"/bash/jobs/"${SRRnum}"_trimmomatic.job
 
 #   input command to trim raw reads
 echo 'echo 'Trimming "${SRRnum}"'' >> "${prodir}"/bash/jobs/"${SRRnum}"_trimmomatic.job
@@ -49,7 +49,7 @@ echo '/share/opt/java/jdk1.8.0_60/bin/java -jar /share/apps/trimmomatic/0.36/tri
 SE \
 -phred33 \
 -trimlog '"${prodir}"/outputs/logfiles/"${SRRnum}"_trim.log \
-"${prodir}"/data/zippedreads/"${SRRnum}".fastq \
+"${prodir}"/data/srareads/"${SRRnum}".fastq \
 "${prodir}"/outputs/trimmomaticreads/"${SRRnum}"_trimmed.fastq.gz \
 ILLUMINACLIP:"${mcs}"/programs/Trimmomatic-0.36/adapters/TruSeq3-SE.fa:2:30:10 \
 LEADING:3 \
@@ -59,7 +59,7 @@ MINLEN:36 >> "${prodir}"/bash/jobs/"${SRRnum}"_trimmomatic.job
 echo 'echo '"$SRRnum" trimmed''  >> "${prodir}"/bash/jobs/"${SRRnum}"_trimmomatic.job
 
 #   input command to zip raw reads after trimming
-echo 'gzip '"${prodir}"/data/zippedreads/"${SRRnum}".fastq  >> "${prodir}"/bash/jobs/"${SRRnum}"_trimmomatic.job
+echo 'gzip '"${prodir}"/data/srareads/"${SRRnum}".fastq  >> "${prodir}"/bash/jobs/"${SRRnum}"_trimmomatic.job
 
 #   submit generated trimming script to job queue
 bsub < "${prodir}"/bash/jobs/"${SRRnum}"_trimmomatic.job
