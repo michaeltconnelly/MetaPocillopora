@@ -32,20 +32,20 @@ mkdir ${prodir}/data/srareads
 for SRRnum in $SRRnums
 do \
 #   input BSUB commands
-echo '#!/bin/bash' > "${prodir}"/bash/jobs/"${EAPSIsample}"_sradump.job
-echo '#BSUB -q bigmem' >> "${prodir}"/bash/jobs/"${EAPSIsample}"_sradump.job
-echo '#BSUB -J '"${EAPSIsample}"_sradump'' >> "${prodir}"/bash/jobs/"${EAPSIsample}"_sradump.job
-echo '#BSUB -o '"${prodir}"/outputs/logfiles/"$EAPSIsample"sradump%J.out'' >> "${prodir}"/bash/jobs/"${EAPSIsample}"_sradump.job
-echo '#BSUB -e '"${prodir}"/outputs/errorfiles/"$EAPSIsample"sradump%J.err'' >> "${prodir}"/bash/jobs/"${EAPSIsample}"_sradump.job
-echo '#BSUB -n 8' >> "${prodir}"/bash/jobs/"${EAPSIsample}"_sradump.job
-echo '#BSUB -W 4:00' >> "${prodir}"/bash/jobs/"${EAPSIsample}"_sradump.job
-
-echo "This is the SRA file being downloaded and converted to .fastq format $SRRnum" >> "${prodir}"/bash/jobs/"${EAPSIsample}"_sradump.job
-echo ${mcs}/programs/sratoolkit.2.8.2-1-mac64/bin/fastq-dump --split-files \
+echo '#!/bin/bash' > "${prodir}"/bash/jobs/"${SRRnum}"_sradump.job
+echo '#BSUB -q bigmem' >> "${prodir}"/bash/jobs/"${SRRnum}"_sradump.job
+echo '#BSUB -J '"${SRRnum}"_sradump'' >> "${prodir}"/bash/jobs/"${SRRnum}"_sradump.job
+echo '#BSUB -o '"${prodir}"/outputs/logfiles/"$SRRnum"sradump%J.out'' >> "${prodir}"/bash/jobs/"${SRRnum}"_sradump.job
+echo '#BSUB -e '"${prodir}"/outputs/errorfiles/"$SRRnum"sradump%J.err'' >> "${prodir}"/bash/jobs/"${SRRnum}"_sradump.job
+echo '#BSUB -n 8' >> "${prodir}"/bash/jobs/"${SRRnum}"_sradump.job
+echo '#BSUB -W 4:00' >> "${prodir}"/bash/jobs/"${SRRnum}"_sradump.job
+#--split-files for paired reads
+echo "This is the SRA file being downloaded and converted to .fastq format $SRRnum" >> "${prodir}"/bash/jobs/"${SRRnum}"_sradump.job
+echo ${mcs}/programs/sratoolkit.2.8.2-1-mac64/bin/fastq-dump \
 --outdir ${prodir}/data/srareads/projectname/fastqs \
 --gzip \
-${SRRnum} >> "${prodir}"/bash/jobs/"${EAPSIsample}"_sradump.job
-echo 'echo' "$SRRnum acquired and converted to .fastq format" >> "${prodir}"/bash/jobs/"${EAPSIsample}"_sradump.job
+${SRRnum} >> "${prodir}"/bash/jobs/"${SRRnum}"_sradump.job
+echo 'echo' "$SRRnum acquired and converted to .fastq format" >> "${prodir}"/bash/jobs/"${SRRnum}"_sradump.job
 #   submit generated sra script to job queue
-bsub < "${prodir}"/bash/jobs/"${EAPSIsample}"_sradump.job
+bsub < "${prodir}"/bash/jobs/"${SRRnum}"_sradump.job
 done
