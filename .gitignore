@@ -3,3 +3,4 @@ outputs/
 data/srareads/
 core*
 hs_err*
+.RProj*
