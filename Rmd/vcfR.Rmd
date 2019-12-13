@@ -7,6 +7,7 @@ output: html_document
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
+knitr::opts_knit$set(root.dir = "/Users/mikeconnelly/computing/projects/EAPSI_Pocillopora_AxH/")
 ```
 ```{r}
 library(tidyverse)
@@ -15,6 +16,7 @@ library(SNPRelate)
 library(phangorn)
 library(poppr)
 library(ape)
+library(dendextend)
 ```
 ```{r}
 colshapes <- c(16, 17, 15, 18)
@@ -24,56 +26,46 @@ theme_set(theme_bw())
 
 vcfR section
 ```{r}
-pdam_genome <- ape::read.dna("/Users/mikeconnelly/computing/sequences/genomes/coral/pocillopora/pdam/pdam_genome.fasta", format = "fasta")
+#pdam_genome <- ape::read.dna("/Users/mikeconnelly/computing/sequences/genomes/coral/pocillopora/pdam/pdam_genome.fasta", format = "fasta")
 ```
 ```{r}
 #pdam_gff <- read.table("/Users/mikeconnelly/computing/sequences/genomes/coral/pocillopora/pdam/pdam_genome.gff", sep="\t", quote="")
 ```
 ```{r}
-vcf_Hw1a <- vcfR::read.vcfR(file = "/Users/mikeconnelly/computing/scripts/EAPSI_HW-WT_v2-master/EAPSI-phylotrans/Hw1-6a.filtered.vcf.gz")
-vcf_Hw2b <- vcfR::read.vcfR(file = "/Users/mikeconnelly/computing/scripts/EAPSI_HW-WT_v2-master/EAPSI-phylotrans/Hw2-6b.filtered.vcf.gz")
-vcf_Wt1a <- vcfR::read.vcfR(file = "/Users/mikeconnelly/computing/scripts/EAPSI_HW-WT_v2-master/EAPSI-phylotrans/Wt1-6a.filtered.vcf.gz")
-vcf_Wt2a <- vcfR::read.vcfR(file = "/Users/mikeconnelly/computing/scripts/EAPSI_HW-WT_v2-master/EAPSI-phylotrans/Wt2-6a.filtered.vcf.gz")
+#vcf_Hw1a <- vcfR::read.vcfR(file = "./Hw1-6a.filtered.vcf.gz")
+#vcf_Hw2b <- vcfR::read.vcfR(file = "./Hw2-6b.filtered.vcf.gz")
+#vcf_Wt1a <- vcfR::read.vcfR(file = "./Wt1-6a.filtered.vcf.gz")
+#vcf_Wt2a <- vcfR::read.vcfR(file = "./Wt2-6a.filtered.vcf.gz")
 ```
 ```{r}
-chrom <- create.chromR(name='Supercontig', vcf=vcf_Hw1a, seq=pdam_genome, ann=pdam_gff)
+#chrom <- create.chromR(name='Supercontig', vcf=vcf_Hw1a, seq=pdam_genome, ann=pdam_gff)
 ```
 
-SNPrelate section
+## SNPrelate
+Read in vcf files 
 ```{r}
-Hw1a <- "/Users/mikeconnelly/computing/scripts/EAPSI_HW-WT_v2-master/EAPSI-phylotrans/Hw1-6a.filtered.vcf"
-Hw1b <- "/Users/mikeconnelly/computing/scripts/EAPSI_HW-WT_v2-master/EAPSI-phylotrans/Hw1-6b.filtered.vcf"
-Hw1c <- "/Users/mikeconnelly/computing/scripts/EAPSI_HW-WT_v2-master/EAPSI-phylotrans/Hw1-6c.filtered.vcf"
-Hw2b <- "/Users/mikeconnelly/computing/scripts/EAPSI_HW-WT_v2-master/EAPSI-phylotrans/Hw2-6b.filtered.vcf"
-Hw2c <- "/Users/mikeconnelly/computing/scripts/EAPSI_HW-WT_v2-master/EAPSI-phylotrans/Hw2-6c.filtered.vcf"
-Wt1a <- "/Users/mikeconnelly/computing/scripts/EAPSI_HW-WT_v2-master/EAPSI-phylotrans/Wt1-6a.filtered.vcf"
-Wt1b <- "/Users/mikeconnelly/computing/scripts/EAPSI_HW-WT_v2-master/EAPSI-phylotrans/Wt1-6b.filtered.vcf"
-Wt1c <- "/Users/mikeconnelly/computing/scripts/EAPSI_HW-WT_v2-master/EAPSI-phylotrans/Wt1-6c.filtered.vcf"
-Wt2a <- "/Users/mikeconnelly/computing/scripts/EAPSI_HW-WT_v2-master/EAPSI-phylotrans/Wt2-6a.filtered.vcf"
-Wt2b <- "/Users/mikeconnelly/computing/scripts/EAPSI_HW-WT_v2-master/EAPSI-phylotrans/Wt2-6b.filtered.vcf"
-Wt2c <- "/Users/mikeconnelly/computing/scripts/EAPSI_HW-WT_v2-master/EAPSI-phylotrans/Wt2-6c.filtered.vcf"
+vcfs <- list.files("./outputs/phylotrans_Pdam/", pattern=".vcf$")
+samples <- gsub(".filtered.vcf", "", vcfs)
+vcfs.list <- list()
+for (i in 1:length(vcfs)) {
+ vcfs.list[[i]] <- snpgdsVCF2GDS(vcf.fn = paste('./outputs/phylotrans_Pdam/', vcfs[i], sep = ''), out.fn = paste('./outputs/phylotrans_Pdam/', vcfs[i], '.gds', sep = ''), method = "biallelic.only")
+}
+names(vcfs.list) <- samples
+vcfs.list[[37]]
 ```
 
 ```{r}
-#snpgdsVCF2GDS() to read in each VCF
-Hw1a_gds <- snpgdsVCF2GDS(Hw1a, "out_Hw1a", method = "biallelic.only")
-Hw1b_gds <- snpgdsVCF2GDS(Hw1b, "out_Hw1b", method = "biallelic.only")
-Hw1c_gds <- snpgdsVCF2GDS(Hw1c, "out_Hw1c", method = "biallelic.only")
-Hw2b_gds <- snpgdsVCF2GDS(Hw2b, "out_Hw2b", method = "biallelic.only")
-Hw2c_gds <- snpgdsVCF2GDS(Hw2c, "out_Hw2c", method = "biallelic.only")
-Wt1a_gds <- snpgdsVCF2GDS(Wt1a, "out_Wt1a", method = "biallelic.only")
-Wt1b_gds <- snpgdsVCF2GDS(Wt1b, "out_Wt1b", method = "biallelic.only")
-Wt1c_gds <- snpgdsVCF2GDS(Wt1c, "out_Wt1c", method = "biallelic.only")
-Wt2a_gds <- snpgdsVCF2GDS(Wt2a, "out_Wt2a", method = "biallelic.only")
-Wt2b_gds <- snpgdsVCF2GDS(Wt2b, "out_Wt2b", method = "biallelic.only")
-Wt2c_gds <- snpgdsVCF2GDS(Wt2c, "out_Wt2c", method = "biallelic.only")
+gdss <- list.files("./outputs/phylotrans_Pdam/", pattern=".gds$")
+gdsss <- gsub('^', './outputs/phylotrans_Pdam/', gdss)
+gdsfile <- snpgdsCombineGeno(gds.fn = gdsss, out.fn ='./outputs/phylo/genofile.gds', method = "position", verbose = TRUE)
 ```
 ```{r}
-#then merge in R using snpgdsCombineGeno()
-stable_gds <- snpgdsCombineGeno(gds.fn = c(Hw1a_gds, Hw1b_gds, Hw1c_gds, Hw2b_gds, Hw2c_gds, Wt1a_gds, Wt1b_gds, Wt1c_gds, Wt2a_gds, Wt2b_gds, Wt2c_gds), out.fn = "stable.gds", method = "position", verbose = TRUE)
+snpgdsSummary("./outputs/phylo/genofile.gds")
 ```
 ```{r}
-snpgdsSummary("/Users/mikeconnelly/computing/scripts/EAPSI_HW-WT_v2-master/EAPSI-phylotrans/stable.gds")
+genofile <- snpgdsOpen('./outputs/phylo/genofile.gds', allow.duplicate = TRUE)
+snpgdsClose(genofile)
+samp_id <- read.gdsn(index.gdsn(genofile, "sample.id"))
 ```
 ```{r}
 # Try different LD thresholds for sensitivity analysis
@@ -81,7 +73,8 @@ snpset <- snpgdsLDpruning(genofile, ld.threshold=0.2)
 ```
 ```{r}
 # Run PCA
-pca <- snpgdsPCA(genofile, snp.id=snpset.id, num.thread=2)
+pca <- snpgdsPCA(genofile, num.thread=2)
+# snp.id=snpset.id,
 # variance proportion (%)
 pc.percent <- pca$varprop*100
 head(round(pc.percent, 2))
@@ -114,7 +107,7 @@ tab <- data.frame(sample.id = pca$sample.id,
 head(tab)
 ```
 ```{r}
-genofile <- snpgdsOpen("/Users/mikeconnelly/computing/scripts/EAPSI_HW-WT_v2-master/EAPSI-phylotrans/stable.gds")
+genofile <- snpgdsOpen("./simple2.gds")
 ```
 ```{r}
 #pca
@@ -131,7 +124,7 @@ tab <- data.frame(sample.id = pca$sample.id,
                   stringsAsFactors = FALSE)
 ```
 ```{r}
-pdf("./EAPSI_SNP_PCA.pdf", width = 6, height = 4.5)
+pdf("./outputs/phylotrans_Pdam/EAPSI_AxH_SNP_PCA.pdf", width = 6, height = 6)
 tab %>% ggplot(aes(EV1, EV2)) +
   geom_point(aes(shape = genotype, color = genotype), size = 6) + 
   scale_shape_manual(values = colshapes) + 
@@ -144,8 +137,14 @@ ibs.hc<-snpgdsHCluster(snpgdsIBS(genofile,num.thread=2, autosome.only=FALSE))
 rv <- snpgdsCutTree(ibs.hc)
 ```
 ```{r}
-pdf("./EAPSI_SNP_tree.pdf", width = 6, height = 4.5)
-plot(rv$dendrogram, main = "Taiwan Pocillopora SNP clustering tree")
+dend <- rv$dendrogram
+```
+
+```{r}
+pdf("./outputs/phylotrans_Pdam/EAPSI_SNP_tree.pdf", width = 11, height = 8.5)
+plot(dend,
+     horiz = TRUE,
+     main = "Taiwan Pocillopora AxH samples SNP clustering tree")
 ```
 
 ```{r}

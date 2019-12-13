@@ -1,6 +1,8 @@
 .DS_Store
 outputs/
 data/srareads/
-.R*
+*.Rhi*
 *.Rproj
 output/
+core*
+hs_err*

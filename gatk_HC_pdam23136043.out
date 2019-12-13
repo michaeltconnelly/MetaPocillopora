@@ -1,0 +1,145 @@
+Sender: LSF System <lsfadmin@n212>
+Subject: Job 23136043: <gatk_HCwrapper_pdam> in cluster <mk2> Done
+
+Job <gatk_HCwrapper_pdam> was submitted from host <n196> by user <m.connelly> in cluster <mk2>.
+Job was executed on host(s) <8*n212>, in queue <general>, as user <m.connelly> in cluster <mk2>.
+</nethome/m.connelly> was used as the home directory.
+</scratch/projects/transcriptomics/mikeconnelly/projects/MetaPocillopora> was used as the working directory.
+Started at Fri Dec 13 08:46:54 2019
+Results reported on Fri Dec 13 08:46:56 2019
+
+Your job looked like:
+
+------------------------------------------------------------
+# LSBATCH: User input
+#!/bin/bash
+#./bash/gatk_HCwrapper_Pdam.sh
+#purpose: call haplotype variants for EAPSI SNP phylotranscriptomics analysis
+#To start this job from the MetaPocillopora directory, use:
+#bsub -P transcriptomics < ./bash/gatk_HCwrapper_Pdam.sh
+
+#BSUB -J gatk_HCwrapper_pdam
+#BSUB -q general
+#BSUB -P transcriptomics
+#BSUB -o gatk_HC_pdam%J.out
+#BSUB -e gatk_HC_pdam%J.err
+#BSUB -n 8
+#BSUB -u m.connelly1@umiami.edu
+
+#specify variable containing sequence file prefixes and directory paths
+mcs="/scratch/projects/transcriptomics/mikeconnelly"
+prodir="/scratch/projects/transcriptomics/mikeconnelly/projects/MetaPocillopora"
+#Yuan et al. 2017 (12), Boston University (8),
+SRRnums="SRR3727281 SRR3727374 SRR3727379 SRR3727380 SRR3727383 SRR3727387 SRR3727388 SRR3727390 SRR3727400 SRR3727418 SRR3727424 SRR3727425 SRR8568563 SRR8568564 SRR8568567 SRR8568568 SRR8568569 SRR8568565 SRR8568566 SRR8568570"
+
+#lets me know which files are being processed
+echo "These are the bam files to be processed : $SRRnums"
+
+#loop to automate generation of scripts to direct sample variant calling
+for SRRnum in $SRRnums
+do \
+echo "Calling variants in ${SRRnum}"
+#   input BSUB commands
+echo '#!/bin/bash' > "${prodir}"/bash/jobs/"${SRRnum}"_gatkHC_pdam.job
+echo '#BSUB -q bigmem' >> "${prodir}"/bash/jobs/"${SRRnum}"_gatkHC_pdam.job
+echo '#BSUB -J '"${SRRnum}"_gatkHC_pdam'' >> "${prodir}"/bash/jobs/"${SRRnum}"_gatkHC_pdam.job
+echo '#BSUB -o '"${prodir}"/outputs/logfiles/"$SRRnum"gatkHC_pdam%J.out'' >> "${prodir}"/bash/jobs/"${SRRnum}"_gatkHC_pdam.job
+echo '#BSUB -e '"${prodir}"/outputs/errorfiles/"$SRRnum"gatkHC_pdam%J.err'' >> "${prodir}"/bash/jobs/"${SRRnum}"_gatkHC_pdam.job
+echo '#BSUB -n 8' >> "${prodir}"/bash/jobs/"${SRRnum}"_gatkHC_pdam.job
+echo '#BSUB -W 4:00' >> "${prodir}"/bash/jobs/"${SRRnum}"_gatkHC_pdam.job
+
+#input command to run GATK HaplotypeCaller
+#-ERC GVCF \
+#-variant_index_type LINEAR -variant_index_parameter 128000 \
+#-G Standard
+echo java \
+-jar /share/apps/GATK/3.4.0/GenomeAnalysisTK.jar \
+-T HaplotypeCaller \
+-I ${prodir}/outputs/phylotrans_Pdam/${SRRnum}_PdamAligned.sorted.out.md.rg.splitN.bam \
+-o ${prodir}/outputs/phylotrans_Pdam/${SRRnum}.g.vcf.gz \
+-R ${mcs}/sequences/genomes/coral/pocillopora/pdam_genome.fasta \
+-stand_call_conf 20.0 \
+-dontUseSoftClippedBases >> "${prodir}"/bash/jobs/"${SRRnum}"_gatkHC_pdam.job
+
+#lets me know file is done
+
+(... more ...)
+------------------------------------------------------------
+
+Successfully completed.
+
+Resource usage summary:
+
+    CPU time :                                   0.44 sec.
+    Total Requested Memory :                     12000.00 MB
+    Delta Memory :                               -
+
+The output (if any) follows:
+
+These are the bam files to be processed : SRR3727281 SRR3727374 SRR3727379 SRR3727380 SRR3727383 SRR3727387 SRR3727388 SRR3727390 SRR3727400 SRR3727418 SRR3727424 SRR3727425 SRR8568563 SRR8568564 SRR8568567 SRR8568568 SRR8568569 SRR8568565 SRR8568566 SRR8568570
+Calling variants in SRR3727281
+GATK HaplotypeCaller script of SRR3727281 submitted
+Job <23136046> is submitted to queue <bigmem>.
+Calling variants in SRR3727374
+GATK HaplotypeCaller script of SRR3727374 submitted
+Job <23136047> is submitted to queue <bigmem>.
+Calling variants in SRR3727379
+GATK HaplotypeCaller script of SRR3727379 submitted
+Job <23136048> is submitted to queue <bigmem>.
+Calling variants in SRR3727380
+GATK HaplotypeCaller script of SRR3727380 submitted
+Job <23136049> is submitted to queue <bigmem>.
+Calling variants in SRR3727383
+GATK HaplotypeCaller script of SRR3727383 submitted
+Job <23136050> is submitted to queue <bigmem>.
+Calling variants in SRR3727387
+GATK HaplotypeCaller script of SRR3727387 submitted
+Job <23136051> is submitted to queue <bigmem>.
+Calling variants in SRR3727388
+GATK HaplotypeCaller script of SRR3727388 submitted
+Job <23136052> is submitted to queue <bigmem>.
+Calling variants in SRR3727390
+GATK HaplotypeCaller script of SRR3727390 submitted
+Job <23136053> is submitted to queue <bigmem>.
+Calling variants in SRR3727400
+GATK HaplotypeCaller script of SRR3727400 submitted
+Job <23136054> is submitted to queue <bigmem>.
+Calling variants in SRR3727418
+GATK HaplotypeCaller script of SRR3727418 submitted
+Job <23136055> is submitted to queue <bigmem>.
+Calling variants in SRR3727424
+GATK HaplotypeCaller script of SRR3727424 submitted
+Job <23136056> is submitted to queue <bigmem>.
+Calling variants in SRR3727425
+GATK HaplotypeCaller script of SRR3727425 submitted
+Job <23136057> is submitted to queue <bigmem>.
+Calling variants in SRR8568563
+GATK HaplotypeCaller script of SRR8568563 submitted
+Job <23136058> is submitted to queue <bigmem>.
+Calling variants in SRR8568564
+GATK HaplotypeCaller script of SRR8568564 submitted
+Job <23136059> is submitted to queue <bigmem>.
+Calling variants in SRR8568567
+GATK HaplotypeCaller script of SRR8568567 submitted
+Job <23136060> is submitted to queue <bigmem>.
+Calling variants in SRR8568568
+GATK HaplotypeCaller script of SRR8568568 submitted
+Job <23136061> is submitted to queue <bigmem>.
+Calling variants in SRR8568569
+GATK HaplotypeCaller script of SRR8568569 submitted
+Job <23136062> is submitted to queue <bigmem>.
+Calling variants in SRR8568565
+GATK HaplotypeCaller script of SRR8568565 submitted
+Job <23136063> is submitted to queue <bigmem>.
+Calling variants in SRR8568566
+GATK HaplotypeCaller script of SRR8568566 submitted
+Job <23136064> is submitted to queue <bigmem>.
+Calling variants in SRR8568570
+GATK HaplotypeCaller script of SRR8568570 submitted
+Job <23136065> is submitted to queue <bigmem>.
+
+
+PS:
+
+Read file <gatk_HC_pdam23136043.err> for stderr output of this job.
+
