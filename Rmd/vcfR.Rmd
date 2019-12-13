@@ -1,5 +1,5 @@
 ---
-title: "EAPSI_vcfR"
+title: "MetaPocillopora_vcfR"
 author: "Mike Connelly"
 date: "11/14/2019"
 output: html_document
@@ -7,7 +7,7 @@ output: html_document
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
-knitr::opts_knit$set(root.dir = "/Users/mikeconnelly/computing/projects/EAPSI_Pocillopora_AxH/")
+knitr::opts_knit$set(root.dir = "/Users/mikeconnelly/computing/projects/pocillopora_meta/")
 ```
 ```{r}
 library(tidyverse)
@@ -19,9 +19,9 @@ library(ape)
 library(dendextend)
 ```
 ```{r}
-colshapes <- c(16, 17, 15, 18)
-colcolors <- c("olivedrab3", "springgreen", "deepskyblue", "skyblue")
-theme_set(theme_bw())
+#colshapes <- c(16, 17, 15, 18)
+#colcolors <- c("olivedrab3", "springgreen", "deepskyblue", "skyblue")
+#theme_set(theme_bw())
 ```
 
 vcfR section
@@ -44,7 +44,7 @@ vcfR section
 ## SNPrelate
 Read in vcf files 
 ```{r}
-vcfs <- list.files("./outputs/phylotrans_Pdam/", pattern=".vcf$")
+vcfs <- list.files("./outputs/vcfs/", pattern=".vcf$")
 samples <- gsub(".filtered.vcf", "", vcfs)
 vcfs.list <- list()
 for (i in 1:length(vcfs)) {

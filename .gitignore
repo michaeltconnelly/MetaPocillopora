@@ -6,3 +6,4 @@ data/srareads/
 output/
 core*
 hs_err*
+.Rproj.user*
