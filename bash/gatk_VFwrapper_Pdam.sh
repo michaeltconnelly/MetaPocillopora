@@ -1,7 +1,7 @@
 #!/bin/bash
 #./bash/gatk_VFwrapper_Pdam.sh
 #purpose: hard-filter variants for EAPSI SNP phylotranscriptomics analysis
-#To start this job from the EAPSI_Pocillopora_AxH directory, use:
+#To start this job from the MetaPocillopora directory, use:
 #bsub -P transcriptomics < ./bash/gatk_VFwrapper_Pdam.sh
 
 #BSUB -J gatk_VFwrapper_pdam
