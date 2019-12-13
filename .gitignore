@@ -7,3 +7,5 @@ output/
 core*
 hs_err*
 .Rproj.user*
+.Rproj.user/
+.RData

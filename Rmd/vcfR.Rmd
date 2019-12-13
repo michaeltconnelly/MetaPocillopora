@@ -48,22 +48,22 @@ vcfs <- list.files("./outputs/vcfs/", pattern=".vcf$")
 samples <- gsub(".filtered.vcf", "", vcfs)
 vcfs.list <- list()
 for (i in 1:length(vcfs)) {
- vcfs.list[[i]] <- snpgdsVCF2GDS(vcf.fn = paste('./outputs/phylotrans_Pdam/', vcfs[i], sep = ''), out.fn = paste('./outputs/phylotrans_Pdam/', vcfs[i], '.gds', sep = ''), method = "biallelic.only")
+ vcfs.list[[i]] <- snpgdsVCF2GDS(vcf.fn = paste('./outputs/vcfs/', vcfs[i], sep = ''), out.fn = paste('./outputs/vcfs/', vcfs[i], '.gds', sep = ''), method = "biallelic.only")
 }
 names(vcfs.list) <- samples
-vcfs.list[[37]]
+vcfs.list[[15]]
 ```
 
 ```{r}
-gdss <- list.files("./outputs/phylotrans_Pdam/", pattern=".gds$")
-gdsss <- gsub('^', './outputs/phylotrans_Pdam/', gdss)
-gdsfile <- snpgdsCombineGeno(gds.fn = gdsss, out.fn ='./outputs/phylo/genofile.gds', method = "position", verbose = TRUE)
+gdss <- list.files("./outputs/vcfs/", pattern=".gds$")
+gdsss <- gsub('^', './outputs/vcfs/', gdss)
+gdsfile <- snpgdsCombineGeno(gds.fn = gdsss[2:17], out.fn ='./outputs/vcfs/genofile.gds', method = "position", verbose = TRUE)
 ```
 ```{r}
-snpgdsSummary("./outputs/phylo/genofile.gds")
+snpgdsSummary("./outputs/vcfs/genofile.gds")
 ```
 ```{r}
-genofile <- snpgdsOpen('./outputs/phylo/genofile.gds', allow.duplicate = TRUE)
+genofile <- snpgdsOpen('./outputs/vcfs/genofile.gds', allow.duplicate = TRUE)
 snpgdsClose(genofile)
 samp_id <- read.gdsn(index.gdsn(genofile, "sample.id"))
 ```
@@ -124,11 +124,9 @@ tab <- data.frame(sample.id = pca$sample.id,
                   stringsAsFactors = FALSE)
 ```
 ```{r}
-pdf("./outputs/phylotrans_Pdam/EAPSI_AxH_SNP_PCA.pdf", width = 6, height = 6)
+#pdf("./outputs/vcfs/Meta_SNP_PCA.pdf", width = 6, height = 6)
 tab %>% ggplot(aes(EV1, EV2)) +
-  geom_point(aes(shape = genotype, color = genotype), size = 6) + 
-  scale_shape_manual(values = colshapes) + 
-  scale_color_manual(values = colcolors)
+  geom_point(aes(color = sample.id), size = 6) 
 ```
 ```{r}
 ibs.hc<-snpgdsHCluster(snpgdsIBS(genofile,num.thread=2, autosome.only=FALSE))
@@ -141,10 +139,10 @@ dend <- rv$dendrogram
 ```
 
 ```{r}
-pdf("./outputs/phylotrans_Pdam/EAPSI_SNP_tree.pdf", width = 11, height = 8.5)
+pdf("./outputs/vcfs/Meta_SNP_tree.pdf", width = 11, height = 8.5)
 plot(dend,
      horiz = TRUE,
-     main = "Taiwan Pocillopora AxH samples SNP clustering tree")
+     main = "Pocillopora SRA samples SNP clustering tree")
 ```
 
 ```{r}
