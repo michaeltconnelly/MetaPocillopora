@@ -1,0 +1,9 @@
+#!/bin/bash
+#BSUB -q bigmem
+#BSUB -J SRR3727388_gatkHC_pdam
+#BSUB -o /scratch/projects/transcriptomics/mikeconnelly/projects/MetaPocillopora/outputs/logfiles/SRR3727388gatkHC_pdam%J.out
+#BSUB -e /scratch/projects/transcriptomics/mikeconnelly/projects/MetaPocillopora/outputs/errorfiles/SRR3727388gatkHC_pdam%J.err
+#BSUB -n 8
+#BSUB -W 4:00
+java -jar /share/apps/GATK/3.4.0/GenomeAnalysisTK.jar -T HaplotypeCaller -I /scratch/projects/transcriptomics/mikeconnelly/projects/MetaPocillopora/outputs/phylotrans_Pdam/SRR3727388_PdamAligned.sorted.out.md.rg.splitN.bam -o /scratch/projects/transcriptomics/mikeconnelly/projects/MetaPocillopora/outputs/phylotrans_Pdam/SRR3727388.g.vcf.gz -R /scratch/projects/transcriptomics/mikeconnelly/sequences/genomes/coral/pocillopora/pdam_genome.fasta -stand_call_conf 20.0 -dontUseSoftClippedBases
+echo Variant calling of SRR3727388 complete
