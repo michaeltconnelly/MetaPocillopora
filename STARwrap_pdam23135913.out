@@ -1,0 +1,150 @@
+Sender: LSF System <lsfadmin@n254>
+Subject: Job 23135913: <starwrap_pdam> in cluster <mk2> Done
+
+Job <starwrap_pdam> was submitted from host <n313> by user <m.connelly> in cluster <mk2>.
+Job was executed on host(s) <8*n254>, in queue <general>, as user <m.connelly> in cluster <mk2>.
+</nethome/m.connelly> was used as the home directory.
+</scratch/projects/transcriptomics/mikeconnelly/projects/MetaPocillopora> was used as the working directory.
+Started at Thu Dec 12 19:17:00 2019
+Results reported on Thu Dec 12 19:17:03 2019
+
+Your job looked like:
+
+------------------------------------------------------------
+# LSBATCH: User input
+#!/bin/bash
+#./bash/STARalignwrapper_Pdam_v2.sh
+#purpose: align trimmed RNAseq reads against the Pocillopora damicornis genome using STAR on the Pegasus bigmem queue
+#version 2: two-pass alignment for improved splice junction detection accuracy, downstream SNP calling and phylotranscriptomics, output non-aligning reads for Symbiodinaceae analysis
+#To start this job from the EAPSI_Pocillopora_AxH directory, use:
+#bsub -P transcriptomics < /scratch/projects/transcriptomics/mikeconnelly/projects/EAPSI_Pocillopora_AxH/bash/STARalignwrapper_Pdam_v2.sh
+
+#BSUB -J starwrap_pdam
+#BSUB -q general
+#BSUB -P transcriptomics
+#BSUB -o STARwrap_pdam%J.out
+#BSUB -e STARwrap_pdam%J.err
+#BSUB -n 8
+#BSUB -u m.connelly1@umiami.edu
+
+#specify variable containing sequence file prefixes and directory paths
+mcs="/scratch/projects/transcriptomics/mikeconnelly"
+prodir="/scratch/projects/transcriptomics/mikeconnelly/projects/MetaPocillopora"
+#Yuan et al. 2017 (12), Boston University (8),
+SRRnums="SRR3727281 SRR3727374 SRR3727379 SRR3727380 SRR3727383 SRR3727387 SRR3727388 SRR3727390 SRR3727400 SRR3727418 SRR3727424 SRR3727425 SRR8568563 SRR8568564 SRR8568567 SRR8568568 SRR8568569 SRR8568565 SRR8568566 SRR8568570"
+
+#lets me know which files are being processed
+echo "These are the reads to be aligned to the Pocillopora reference genome: $SRRnums"
+
+#loop to automate generation of scripts to direct sequence file trimming
+for SRRnum in $SRRnums
+do \
+echo "Aligning ${SRRnum}"
+
+#   input BSUB commands
+echo '#!/bin/bash' > "${prodir}"/bash/jobs/"${SRRnum}"_staralign_pdam.job
+echo '#BSUB -q bigmem' >> "${prodir}"/bash/jobs/"${SRRnum}"_staralign_pdam.job
+echo '#BSUB -J '"${SRRnum}"_staralign_pdam'' >> "${prodir}"/bash/jobs/"${SRRnum}"_staralign_pdam.job
+echo '#BSUB -o '"${prodir}"/outputs/logfiles/"$SRRnum"staralign_pdam%J.out'' >> "${prodir}"/bash/jobs/"${SRRnum}"_staralign_pdam.job
+echo '#BSUB -e '"${prodir}"/outputs/errorfiles/"$SRRnum"staralign_pdam%J.err'' >> "${prodir}"/bash/jobs/"${SRRnum}"_staralign_pdam.job
+echo '#BSUB -n 8' >> "${prodir}"/bash/jobs/"${SRRnum}"_staralign_pdam.job
+echo '#BSUB -W 4:00' >> "${prodir}"/bash/jobs/"${SRRnum}"_staralign_pdam.job
+
+#   input command to run STAR aligner
+echo ${mcs}/programs/STAR-2.5.3a/bin/Linux_x86_64/STAR \
+--runMode alignReads \
+--quantMode TranscriptomeSAM \
+--runThreadN 16 \
+--readFilesIn ${prodir}/outputs/trimmomaticreads/${SRRnum}_trimmed.fastq.gz \
+--readFilesCommand gunzip -c \
+--genomeDir ${mcs}/sequences/genomes/coral/pocillopora/STARindex \
+--sjdbGTFfeatureExon exon \
+--sjdbGTFtagExonParentTranscript Parent \
+--sjdbGTFfile  ${mcs}/sequences/genomes/coral/pocillopora/pdam_genome.gff \
+--twopassMode Basic \
+
+(... more ...)
+------------------------------------------------------------
+
+Successfully completed.
+
+Resource usage summary:
+
+    CPU time :                                   0.43 sec.
+    Max Memory :                                 2 MB
+    Average Memory :                             2.00 MB
+    Total Requested Memory :                     12000.00 MB
+    Delta Memory :                               11998.00 MB
+    Max Swap :                                   53 MB
+    Max Processes :                              1
+    Max Threads :                                1
+
+The output (if any) follows:
+
+These are the reads to be aligned to the Pocillopora reference genome: SRR3727281 SRR3727374 SRR3727379 SRR3727380 SRR3727383 SRR3727387 SRR3727388 SRR3727390 SRR3727400 SRR3727418 SRR3727424 SRR3727425 SRR8568563 SRR8568564 SRR8568567 SRR8568568 SRR8568569 SRR8568565 SRR8568566 SRR8568570
+Aligning SRR3727281
+STAR alignment script of SRR3727281 submitted
+Job <23135914> is submitted to queue <bigmem>.
+Aligning SRR3727374
+STAR alignment script of SRR3727374 submitted
+Job <23135915> is submitted to queue <bigmem>.
+Aligning SRR3727379
+STAR alignment script of SRR3727379 submitted
+Job <23135916> is submitted to queue <bigmem>.
+Aligning SRR3727380
+STAR alignment script of SRR3727380 submitted
+Job <23135917> is submitted to queue <bigmem>.
+Aligning SRR3727383
+STAR alignment script of SRR3727383 submitted
+Job <23135918> is submitted to queue <bigmem>.
+Aligning SRR3727387
+STAR alignment script of SRR3727387 submitted
+Job <23135919> is submitted to queue <bigmem>.
+Aligning SRR3727388
+STAR alignment script of SRR3727388 submitted
+Job <23135920> is submitted to queue <bigmem>.
+Aligning SRR3727390
+STAR alignment script of SRR3727390 submitted
+Job <23135921> is submitted to queue <bigmem>.
+Aligning SRR3727400
+STAR alignment script of SRR3727400 submitted
+Job <23135922> is submitted to queue <bigmem>.
+Aligning SRR3727418
+STAR alignment script of SRR3727418 submitted
+Job <23135923> is submitted to queue <bigmem>.
+Aligning SRR3727424
+STAR alignment script of SRR3727424 submitted
+Job <23135924> is submitted to queue <bigmem>.
+Aligning SRR3727425
+STAR alignment script of SRR3727425 submitted
+Job <23135925> is submitted to queue <bigmem>.
+Aligning SRR8568563
+STAR alignment script of SRR8568563 submitted
+Job <23135926> is submitted to queue <bigmem>.
+Aligning SRR8568564
+STAR alignment script of SRR8568564 submitted
+Job <23135927> is submitted to queue <bigmem>.
+Aligning SRR8568567
+STAR alignment script of SRR8568567 submitted
+Job <23135928> is submitted to queue <bigmem>.
+Aligning SRR8568568
+STAR alignment script of SRR8568568 submitted
+Job <23135929> is submitted to queue <bigmem>.
+Aligning SRR8568569
+STAR alignment script of SRR8568569 submitted
+Job <23135930> is submitted to queue <bigmem>.
+Aligning SRR8568565
+STAR alignment script of SRR8568565 submitted
+Job <23135931> is submitted to queue <bigmem>.
+Aligning SRR8568566
+STAR alignment script of SRR8568566 submitted
+Job <23135932> is submitted to queue <bigmem>.
+Aligning SRR8568570
+STAR alignment script of SRR8568570 submitted
+Job <23135933> is submitted to queue <bigmem>.
+
+
+PS:
+
+Read file <STARwrap_pdam23135913.err> for stderr output of this job.
+

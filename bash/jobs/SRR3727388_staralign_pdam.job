@@ -1,0 +1,9 @@
+#!/bin/bash
+#BSUB -q bigmem
+#BSUB -J SRR3727388_staralign_pdam
+#BSUB -o /scratch/projects/transcriptomics/mikeconnelly/projects/MetaPocillopora/outputs/logfiles/SRR3727388staralign_pdam%J.out
+#BSUB -e /scratch/projects/transcriptomics/mikeconnelly/projects/MetaPocillopora/outputs/errorfiles/SRR3727388staralign_pdam%J.err
+#BSUB -n 8
+#BSUB -W 4:00
+/scratch/projects/transcriptomics/mikeconnelly/programs/STAR-2.5.3a/bin/Linux_x86_64/STAR --runMode alignReads --quantMode TranscriptomeSAM --runThreadN 16 --readFilesIn /scratch/projects/transcriptomics/mikeconnelly/projects/MetaPocillopora/outputs/trimmomaticreads/SRR3727388_trimmed.fastq.gz --readFilesCommand gunzip -c --genomeDir /scratch/projects/transcriptomics/mikeconnelly/sequences/genomes/coral/pocillopora/STARindex --sjdbGTFfeatureExon exon --sjdbGTFtagExonParentTranscript Parent --sjdbGTFfile /scratch/projects/transcriptomics/mikeconnelly/sequences/genomes/coral/pocillopora/pdam_genome.gff --twopassMode Basic --twopass1readsN -1 --outStd Log BAM_Unsorted BAM_Quant --outSAMtype BAM Unsorted --outReadsUnmapped Fastx --outFileNamePrefix /scratch/projects/transcriptomics/mikeconnelly/projects/MetaPocillopora/outputs/STARalign_Pdam/SRR3727388_Pdam
+echo STAR alignment of SRR3727388 complete
