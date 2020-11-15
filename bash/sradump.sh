@@ -16,7 +16,9 @@
 mcs="/scratch/projects/transcriptomics/mikeconnelly"
 prodir="/scratch/projects/transcriptomics/mikeconnelly/projects/MetaPocillopora"
 #Yuan et al. 2017 (12), Boston University (8),
-SRRnums="SRR3727281 SRR3727374 SRR3727379 SRR3727380 SRR3727383 SRR3727387 SRR3727388 SRR3727390 SRR3727400 SRR3727418 SRR3727424 SRR3727425 SRR8568563 SRR8568564 SRR8568567 SRR8568568 SRR8568569 SRR8568565 SRR8568566 SRR8568570"
+#SRRnums="SRR3727281 SRR3727374 SRR3727379 SRR3727380 SRR3727383 SRR3727387 SRR3727388 SRR3727390 SRR3727400 SRR3727418 SRR3727424 SRR3727425 SRR8568563 SRR8568564 SRR8568567 SRR8568568 SRR8568569 SRR8568565 SRR8568566 SRR8568570"
+#Wecker et al. 2018
+SRRnums=$(cat ${prodir}/data/SraAccList_Wecker_2018.txt)
 
 #Run SRA acquisition command by specifying variable containing sequence file prefixes
 #Download from NCBI and convert SRA files into .fastq format in output directories
