@@ -1,0 +1,30 @@
+# /bin/sh 
+# ----------------Parameters---------------------- #
+#$  -S /bin/sh
+#$ -q sThC.q
+#$ -l mres=4G,h_data=4G,h_vmem=4G
+#$ -cwd
+#$ -j y
+#$ -N fastqdump_project_test
+#$ -o fastqdump_project_test.log
+#$ -m bea
+#$ -M connellym@si.edu
+#
+# ----------------Modules------------------------- #
+module load bioinformatics/edirect
+module load bioinformatics/gnuparallel/1.0.1
+module load bioinformatics/sratoolkit
+#
+# ----------------Your Commands------------------- #
+#
+echo + `date` job $JOB_NAME started in $QUEUE with jobID=$JOB_ID on $HOSTNAME
+#
+prodir="/scratch/nmnh_corals/connellym/projects/MetaPocillopora"
+#
+esearch -db sra -query PRJNA301162 | efetch --format runinfo |cut -d "," -f 1 > SRR.numbers
+#
+parallel --jobs 3 "fastq-dump --split-files --origfmt --gzip {}" ::: SRR.numbers
+#
+#https://bioinformaticsworkbook.org/dataAcquisition/fileTransfer/sra.html#gsc.tab=0
+#
+echo = `date` job $JOB_NAME done
