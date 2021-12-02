@@ -6,7 +6,7 @@
 #$ -cwd
 #$ -j y
 #$ -N fastqdump_test
-#$ -o fastqdump_test.log
+#$ -o fastqdump_test_loop.log
 #$ -m bea
 #$ -M connellym@si.edu
 #
