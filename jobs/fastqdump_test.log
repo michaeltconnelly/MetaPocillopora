@@ -5,3 +5,7 @@ Rejected 15308742 READS because READLEN < 1
 Read 15308742 spots for SRR3727281
 Written 15308742 spots for SRR3727281
 = Wed Dec 1 11:50:30 EST 2021 job fastqdump_test done
+Loading bioinformatics/sratoolkit/2.9.6
+  Loading requirement: gcc/7.3.0
++ Thu Dec 2 07:41:44 EST 2021 job fastqdump_test started in sThC.q with jobID=1570836 on compute-43-06
+/cm/local/apps/uge/var/spool/compute-43-06/job_scripts/1570836: line 33: syntax error: unexpected end of file
