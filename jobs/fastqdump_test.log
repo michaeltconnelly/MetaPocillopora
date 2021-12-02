@@ -1,0 +1,7 @@
+Loading bioinformatics/sratoolkit/2.9.6
+  Loading requirement: gcc/7.3.0
++ Wed Dec 1 11:39:04 EST 2021 job fastqdump_test started in sThC.q with jobID=1550195 on compute-81-12
+Rejected 15308742 READS because READLEN < 1
+Read 15308742 spots for SRR3727281
+Written 15308742 spots for SRR3727281
+= Wed Dec 1 11:50:30 EST 2021 job fastqdump_test done
