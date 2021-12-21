@@ -1,0 +1,10 @@
+Loading bioinformatics/sratoolkit/2.9.6
+  Loading requirement: gcc/7.3.0
++ Tue Dec 21 12:45:24 EST 2021 job fastqdump_Poquita-Du2019 started in sThC.q with jobID=1730197 on compute-43-05
+Read 19809725 spots for SRR7040514
+Written 19809725 spots for SRR7040514
+Loading bioinformatics/sratoolkit/2.9.6
+  Loading requirement: gcc/7.3.0
++ Tue Dec 21 15:06:55 EST 2021 job fastqdump_Poquita-Du2019 started in sThC.q with jobID=1730756 on compute-64-13
+Read 17406018 spots for SRR7041301
+Written 17406018 spots for SRR7041301

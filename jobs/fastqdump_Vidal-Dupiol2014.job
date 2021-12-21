@@ -1,0 +1,28 @@
+# /bin/sh 
+# ----------------Parameters---------------------- #
+#$  -S /bin/sh
+#$ -q sThC.q
+#$ -l mres=4G,h_data=4G,h_vmem=4G
+#$ -cwd
+#$ -j y
+#$ -N fastqdump_Vidal-Dupiol2014
+#$ -o fastqdump_Vidal-Dupiol2014.log
+#$ -m bea
+#$ -M connellym@si.edu
+#
+# ----------------Modules------------------------- #
+module load bioinformatics/sratoolkit
+#
+# ----------------Your Commands------------------- #
+#
+echo + `date` job $JOB_NAME started in $QUEUE with jobID=$JOB_ID on $HOSTNAME
+#
+prodir="/scratch/nmnh_corals/connellym/projects/MetaPocillopora"
+#
+SRAaccessions="SRR98851 SRR988670 SRR988671 SRR988672"
+for SRA in $SRAaccessions
+do \
+fastq-dump --split-files --outdir ${prodir}/data/srareads/ --gzip $SRA
+done
+#
+echo = `date` job $JOB_NAME done
