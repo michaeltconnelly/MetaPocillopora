@@ -23,8 +23,8 @@ echo 'module load bioinformatics/trimmomatic' >> $prodir/bash/jobs/trimmomatic_$
 #
 echo "# ----------------Your Commands------------------- #" >> $prodir/bash/jobs/trimmomatic_${sample}.job
 #
-echo "echo + `date` job $JOB_NAME started in $QUEUE with jobID=$JOB_ID on $HOSTNAME" >> $prodir/bash/jobs/trimmomatic_${sample}.job
-echo "echo + NSLOTS = $NSLOTS" >> $prodir/bash/jobs/trimmomatic_${sample}.job
+echo 'echo + `date` job $JOB_NAME started in $QUEUE with jobID=$JOB_ID on $HOSTNAME' >> $prodir/bash/jobs/trimmomatic_${sample}.job
+echo 'echo + NSLOTS = $NSLOTS' >> $prodir/bash/jobs/trimmomatic_${sample}.job
 #
 # Trim adapter sequences and poor-quality bases using Trimmomatic
 echo "java -jar /share/apps/bioinformatics/trimmomatic/0.39/trimmomatic-0.39.jar \
