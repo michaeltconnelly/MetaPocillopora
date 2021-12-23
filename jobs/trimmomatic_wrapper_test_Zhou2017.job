@@ -40,5 +40,5 @@ SLIDINGWINDOW:4:15 \
 MINLEN:36" >> $prodir/bash/jobs/trimmomatic_${sample}.job
 #
 echo 'echo = `date` job $JOB_NAME done' >> $prodir/bash/jobs/trimmomatic_${sample}.job
-#qsub $prodir/bash/jobs/trimmomatic_${sample}.job
+qsub $prodir/bash/jobs/trimmomatic_${sample}.job
 done
