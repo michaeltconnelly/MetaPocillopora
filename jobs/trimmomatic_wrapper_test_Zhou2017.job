@@ -14,12 +14,12 @@ echo "#$  -S /bin/sh
 #$ -l mres=64G,h_data=4G,h_vmem=4G" >> $prodir/bash/jobs/trimmomatic_${sample}.job
 echo "#$ -j y
 #$ -N trimmomatic_${sample}
-#$ -o trimmomatic_${sample}.log
+#$ -o ${prodir}/bash/jobs/trimmomatic_${sample}.log
 #$ -m bea
 #$ -M connellym@si.edu" >> $prodir/bash/jobs/trimmomatic_${sample}.job
 #
 echo "# ----------------Modules------------------------- #" >> $prodir/bash/jobs/trimmomatic_${sample}.job
-echo 'module load bioinformatics/trimmomatic' >> $prodir/bash/jobs/trimmomatic_${sample}.job
+echo "module load bioinformatics/trimmomatic" >> $prodir/bash/jobs/trimmomatic_${sample}.job
 #
 echo "# ----------------Your Commands------------------- #" >> $prodir/bash/jobs/trimmomatic_${sample}.job
 #
