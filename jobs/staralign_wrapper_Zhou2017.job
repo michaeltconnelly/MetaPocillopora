@@ -13,8 +13,8 @@ echo "#$  -S /bin/sh
 #$ -q sThC.q
 #$ -l mres=64G,h_data=4G,h_vmem=4G" >> $prodir/bash/jobs/staralign_${sample}.job
 echo "#$ -j y
-#$ -N trimmomatic_${sample}
-#$ -o ${prodir}/bash/jobs/trimmomatic_${sample}.log
+#$ -N staralign_${sample}
+#$ -o ${prodir}/bash/jobs/staralign_${sample}.log
 #$ -m bea
 #$ -M connellym@si.edu" >> $prodir/bash/jobs/staralign_${sample}.job
 #
@@ -25,7 +25,7 @@ echo "# ----------------Your Commands------------------- #" >> $prodir/bash/jobs
 echo 'echo + `date` job $JOB_NAME started in $QUEUE with jobID=$JOB_ID on $HOSTNAME' >> $prodir/bash/jobs/staralign_${sample}.job
 echo 'echo + NSLOTS = $NSLOTS' >> $prodir/bash/jobs/staralign_${sample}.job
 #
-# Trim adapter sequences and poor-quality bases using Trimmomatic
+# Align trimmed reads against reference genome using STAR
 echo "/home/connellym/programs/STAR-2.7.9a/bin/Linux_x86_64/STAR \
 --runMode alignReads \
 --quantMode TranscriptomeSAM \
