@@ -1,8 +1,8 @@
 #!/bin/bash
 
 prodir="/scratch/nmnh_corals/connellym/projects/MetaPocillopora"
-files=$(ls $prodir/data/srareads/Zhou2017)
-samples=$(echo "$files" | cut -d . -f 1)
+files=$(ls $prodir/data/srareads/Vidal-Dupiol2014)
+samples=$(echo "$files" | cut -d _ -f 1,2)
 #
 for sample in $samples
 do
@@ -30,7 +30,8 @@ echo "/home/connellym/programs/STAR-2.7.9a/bin/Linux_x86_64/STAR \
 --runMode alignReads \
 --quantMode TranscriptomeSAM \
 --runThreadN 16 \
---readFilesIn /scratch/nmnh_corals/connellym/projects/MetaPocillopora/outputs/trimmedreads/Zhou2017/${sample}_trimmed.fastq.gz \
+--readFilesIn /scratch/nmnh_corals/connellym/projects/MetaPocillopora/outputs/trimmedreads/Vidal-Dupiol2014/${sample}_1P_trimmed.fastq.gz \
+/scratch/nmnh_corals/connellym/projects/MetaPocillopora/outputs/trimmedreads/Vidal-Dupiol2014/${sample}_2P_trimmed.fastq.gz \
 --readFilesCommand gunzip -c \
 --genomeDir /home/connellym/sequences/STARidx_pdam \
 --sjdbGTFfeatureExon exon \
@@ -41,7 +42,7 @@ echo "/home/connellym/programs/STAR-2.7.9a/bin/Linux_x86_64/STAR \
 --outStd Log BAM_Unsorted BAM_Quant \
 --outSAMtype BAM Unsorted \
 --outReadsUnmapped Fastx \
---outFileNamePrefix ${prodir}/outputs/STARalign_pdam/Zhou2017/${sample}_pdam_" >> $prodir/bash/jobs/staralign_${sample}.job
+--outFileNamePrefix ${prodir}/outputs/STARalign_pdam/Vidal-Dupiol2014/${sample}_pdam_" >> $prodir/bash/jobs/staralign_${sample}.job
 #
 echo 'echo = `date` job $JOB_NAME done' >> $prodir/bash/jobs/staralign_${sample}.job
 qsub $prodir/bash/jobs/staralign_${sample}.job
