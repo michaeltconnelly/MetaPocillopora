@@ -1,3 +1,22 @@
 Loading bioinformatics/sratoolkit/2.9.6
   Loading requirement: gcc/7.3.0
 + Tue Dec 21 15:47:40 EST 2021 job fastqdump_Tang2018 started in sThC.q with jobID=1730886 on compute-43-23
+Read 30908901 spots for SRR6761151
+Written 30908901 spots for SRR6761151
+Read 31556713 spots for SRR6761152
+Written 31556713 spots for SRR6761152
+Read 35166421 spots for SRR6761153
+Written 35166421 spots for SRR6761153
+Read 37460177 spots for SRR6761154
+Written 37460177 spots for SRR6761154
+2021-12-22T04:44:21 fastq-dump.2.9.6 sys: timeout exhausted while reading file within network system module - mbedtls_ssl_read returned -76 ( NET - Reading information from the socket failed )
+2021-12-22T04:47:38 fastq-dump.2.9.6 sys: timeout exhausted while reading file within network system module - mbedtls_ssl_read returned -76 ( NET - Reading information from the socket failed )
+2021-12-22T05:10:28 fastq-dump.2.9.6 sys: timeout exhausted while reading file within network system module - mbedtls_ssl_read returned -76 ( NET - Reading information from the socket failed )
+Read 29516974 spots for SRR6761155
+Written 29516974 spots for SRR6761155
+2021-12-22T06:38:43 fastq-dump.2.9.6 sys: timeout exhausted while reading file within network system module - mbedtls_ssl_read returned -76 ( NET - Reading information from the socket failed )
+Read 34615644 spots for SRR6761156
+Written 34615644 spots for SRR6761156
+Read 199224830 spots total
+Written 199224830 spots total
+= Wed Dec 22 02:44:06 EST 2021 job fastqdump_Tang2018 done

@@ -1,3 +1,18 @@
 Loading bioinformatics/sratoolkit/2.9.6
   Loading requirement: gcc/7.3.0
 + Tue Dec 21 15:47:40 EST 2021 job fastqdump_Zhou2018 started in sThC.q with jobID=1730885 on compute-43-17
+Read 30846679 spots for SRR6001268
+Written 30846679 spots for SRR6001268
+Read 31226383 spots for SRR6001269
+Written 31226383 spots for SRR6001269
+Read 29244058 spots for SRR6001270
+Written 29244058 spots for SRR6001270
+Read 30777208 spots for SRR6001271
+Written 30777208 spots for SRR6001271
+Read 31344353 spots for SRR6001272
+Written 31344353 spots for SRR6001272
+Read 29245146 spots for SRR6001273
+Written 29245146 spots for SRR6001273
+Read 182683827 spots total
+Written 182683827 spots total
+= Tue Dec 21 17:51:27 EST 2021 job fastqdump_Zhou2018 done

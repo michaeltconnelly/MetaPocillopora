@@ -1,0 +1,14 @@
+Loading bioinformatics/trimmomatic/0.39
+  Loading requirement: java/1.8
++ Wed Dec 22 10:29:08 EST 2021 job trimmomatic_single_test_Zhou2017 started in sThC.q with jobID=1732606 on compute-81-12
++ NSLOTS = 16
+Picked up _JAVA_OPTIONS: -XX:+UseSerialGC
+TrimmomaticSE: Started with arguments:
+ -phred33 -trimlog /scratch/nmnh_corals/connellym/projects/MetaPocillopora/outputs/trimlogs/Zhou2017_SRR3727281_trim.log /scratch/nmnh_corals/connellym/projects/MetaPocillopora/data/srareads/Zhou2017/Zhou2017_SRR3727281.fastq.gz /scratch/nmnh_corals/connellym/projects/MetaPocillopora/outputs/trimmedreads/Zhou2017/Zhou2017_SRR3727281_trimmed.fastq.gz ILLUMINACLIP:/share/apps/bioinformatics/trimmomatic/0.39/adapters/TruSeq3-SE.fa:2:30:10 LEADING:3 TRAILING:3 SLIDINGWINDOW:4:15 MINLEN:36
+Automatically using 1 threads
+Using Long Clipping Sequence: 'AGATCGGAAGAGCGTCGTGTAGGGAAAGAGTGTA'
+Using Long Clipping Sequence: 'AGATCGGAAGAGCACACGTCTGAACTCCAGTCAC'
+ILLUMINACLIP: Using 0 prefix pairs, 2 forward/reverse sequences, 0 forward only sequences, 0 reverse only sequences
+Input Reads: 15308742 Surviving: 15248110 (99.60%) Dropped: 60632 (0.40%)
+TrimmomaticSE: Completed successfully
+= Wed Dec 22 11:24:12 EST 2021 job trimmomatic_single_test_Zhou2017 done

@@ -22,6 +22,6 @@ echo + NSLOTS = $NSLOTS
 fastqc \
 /scratch/nmnh_corals/connellym/projects/MetaPocillopora/data/srareads/Poquita-Du2019/* \
 --threads $NSLOTS \
--o /scratch/nmnh_corals/connellym/projects/MetaPocilloporaoutputs/QCs/fastqcs/
+-o /scratch/nmnh_corals/connellym/projects/MetaPocillopora/outputs/QCs/fastqcs/
 #
 echo = `date` job $JOB_NAME done
