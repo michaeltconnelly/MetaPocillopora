@@ -21,6 +21,8 @@ echo + NSLOTS = $NSLOTS
 prodir="/scratch/nmnh_corals/connellym/projects/MetaPocillopora"
 #
 /home/connellym/programs/subread-2.0.3-source/bin/featureCounts \
+-p \
+-T $NSLOTS \
 -t gene \
 -g ID \
 -a /home/connellym/sequences/pdam_annotation.gff3 \
