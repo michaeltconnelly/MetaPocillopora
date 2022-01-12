@@ -21,7 +21,7 @@ module load bioinformatics/gatk
 echo + `date` job $JOB_NAME started in $QUEUE with jobID=$JOB_ID on $HOSTNAME
 echo + NSLOTS = $NSLOTS
 #
-prodir="/scratch/projects/transcriptomics/mikeconnelly/projects/MetaPocillopora"
+prodir="/scratch/nmnh_corals/connellym/projects/MetaPocillopora"
 files=$(ls $prodir/data/srareads/Zhou2017)
 samples=$(echo "$files" | cut -d . -f 1)
 #
@@ -35,21 +35,21 @@ ${prodir}/outputs/phylotrans_Pdam/Zhou2017/SRR3727281_pdam_Aligned.sorted.out.ba
 #
 java -jar /share/apps/bioinformatics/picard-tools/2.20.6/picard.jar \
 AddOrReplaceReadGroups \
-INPUT=${prodir}/outputs/phylotrans_Pdam/Zhou2017/SRR3727281_pdam_Aligned.sorted.out.bam \
-OUTPUT=${prodir}/outputs/phylotrans_Pdam/Zhou2017/SRR3727281_pdam_Aligned.sorted.out.rg.bam \
-RGID=id \
-RGLB=library \
-RGPL=illumina \
-RGPU=unit1 \
-RGSM=SRR3727281
+-INPUT ${prodir}/outputs/phylotrans_Pdam/Zhou2017/SRR3727281_pdam_Aligned.sorted.out.bam \
+-OUTPUT ${prodir}/outputs/phylotrans_Pdam/Zhou2017/SRR3727281_pdam_Aligned.sorted.out.rg.bam \
+-RGID id \
+-RGLB library \
+-RGPL illumina \
+-RGPU unit1 \
+-RGSM SRR3727281
 #
 java -jar /share/apps/bioinformatics/picard-tools/2.20.6/picard.jar \
 MarkDuplicates \
-INPUT= ${prodir}/outputs/phylotrans_Pdam/Zhou2017/SRR3727281_pdam_Aligned.sorted.out.rg.bam \
-OUTPUT=${prodir}/outputs/phylotrans_Pdam/Zhou2017/SRR3727281_pdam_Aligned.sorted.out.md.rg.bam \
-CREATE_INDEX=true \
-VALIDATION_STRINGENCY=SILENT \
-METRICS_FILE=${prodir}/outputs/phylotrans_Pdam/Zhou2017/SRR3727281_marked_dup_metrics.txt
+-INPUT ${prodir}/outputs/phylotrans_Pdam/Zhou2017/SRR3727281_pdam_Aligned.sorted.out.rg.bam \
+-OUTPUT ${prodir}/outputs/phylotrans_Pdam/Zhou2017/SRR3727281_pdam_Aligned.sorted.out.md.rg.bam \
+-CREATE_INDEX true \
+-VALIDATION_STRINGENCY SILENT \
+-METRICS_FILE ${prodir}/outputs/phylotrans_Pdam/Zhou2017/SRR3727281_marked_dup_metrics.txt
 #
 java -jar /share/apps/bioinformatics/gatk/3.8.1.0/GenomeAnalysisTK.jar \
 -T SplitNCigarReads \
