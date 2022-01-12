@@ -1,0 +1,118 @@
+---
+title: "Pocillopora_meta-transcriptome_analysis"
+author: "Mike Connelly"
+date: "1/11/2022"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, warning = FALSE, message = FALSE, cache = TRUE)
+knitr::opts_knit$set(root.dir = rprojroot::find_rstudio_root_file())
+options(stringsAsFactors = FALSE)
+```
+
+## Setup packages and working directories
+```{r packages, message=FALSE, include=FALSE}
+# Include all packages needed for the entire transcriptome analysis and downstream visualizations
+library("tidyverse")
+# Essential RNAseq analysis packages
+library("DESeq2")
+library("apeglm")
+# library("WGCNA")
+# library("dynamicTreeCut")
+# library("flashClust")
+# library("genefilter")
+# library("variancePartition")
+# library("doParallel")
+# library("limma")
+# library("adegenet")
+# GO/KOG enrichment packages and other functions
+# library("KOGMWU")
+# source("./R/GO_MWU/gomwu.functions.R")
+# Data visualization packages
+# library("pheatmap")
+# library("ComplexHeatmap")
+# library("VennDiagram")
+# library("eulerr")
+# library("UpSetR")
+# Graphics packages
+# library("cowplot")
+# library("patchwork")
+# library("gridExtra")
+# library("ggthemes")
+# library("ggpubr")
+# library("ggrepel")
+# library("ggnewscale")
+# library("RColorBrewer")
+# library("circlize")
+# library("stringr")
+# library("extrafont")
+# library("extrafontdb")
+# extended visualization functions
+# source("./R/AXH_functions.R")
+```
+
+## Import sample metadata
+```{r factors}
+# factor levels
+```
+```{r  sample_data, echo=TRUE}
+# Import sample metadata 
+samples <- read_csv("data/SampleData_MetaPocillopora.csv")
+# may want to combine study name and SRR sample ID into one column
+```
+```{r coldata}
+# Get sample data into tibble
+coldata <- samples %>%
+  dplyr::filter(Study == "Mayfield2014") %>% #| Study == "Vidal-Dupiol2014"
+  as_tibble(.) %>%
+  # dplyr::arrange("Study") %>% #Order rows by study                    
+  column_to_rownames(var = "Sample")  
+```
+
+## Import *Pocillopora* coral counts data and gene annotation
+```{r coral_countdata}
+# Import and tidy counts data from each study
+countdata <- read.delim("./outputs/featureCounts_pdam/Mayfield2014_Pdam.counts", comment.char="#")
+# Set Gene ID's as row names
+row.names(countdata) <- countdata$Geneid
+# Remove first six columns (Geneid, chr, start, end, strand, length)
+countdata <- countdata[ ,7:ncol(countdata)]
+#countdata <- countdata[ ,6:ncol(countdata)]
+# Remove file prefixes and suffixes
+  colnames(countdata) <- gsub("X.scratch.nmnh_corals.connellym.projects.MetaPocillopora.outputs.STARalign_pdam.", "", colnames(countdata))
+  colnames(countdata) <- gsub("_pdam_Aligned.out.bam$", "", colnames(countdata))
+  colnames(countdata) <- gsub("Mayfield2014.Mayfield2014_", "", colnames(countdata))
+  # colnames(countdata) <- gsub("\\.", "-", colnames(countdata))
+# Sort countdata by P. damicornis gene ID
+countdata_sorted_coral <- as.data.frame(countdata[order(rownames(countdata)),])
+```
+
+## Create DESeq datasets
+### *Pocillopora* coral host
+```{r create_dds_coral}
+# Create full DESeqDataSet
+dds_coral <- DESeqDataSetFromMatrix(countData = countdata_sorted_coral,
+                              colData = coldata,
+                              design = ~1)
+# Check annotation and dds_coral object rowname order coherence
+all(rownames(dds_coral) == rownames(gene_annotation_coral))
+# Add gene feature annotation to DESeqDataSets
+mcols(dds_coral) <- cbind(mcols(dds_coral), gene_annotation_coral)
+# Subset DESeqDataSet
+# Remove genes with counts less than 10 in 90% of samples
+keep <- rowSums(counts(dds_coral) >= 10) > (ncol(countdata_sorted_coral)*0.9)
+dds_coral <- dds_coral[keep, ]
+# Normalize expression data for visualization purposes using VST tranformation
+vsd_coral <- vst(dds_coral, blind = TRUE) # use blind = TRUE to not account for experimental design
+```
+
+## Visualize global gene expression
+```{r choose_vsd, include=FALSE}
+# Choose vsd for host/symbiont analysis with PCoA and WGCNA
+vsd <- vsd_coral
+# vsd <- vsd_symbiont
+```
+```{r}
+DESeq2::plotPCA(vsd_coral, intgroup = c("Study")) 
+```
