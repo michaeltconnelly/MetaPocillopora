@@ -28,18 +28,22 @@ echo "module load bioinformatics/gatk" >> $prodir/bash/jobs/phylotrans_process_$
 echo "# ----------------Your Commands------------------- #" >> $prodir/bash/jobs/phylotrans_process_${sample}.job
 echo 'echo + `date` job $JOB_NAME started in $QUEUE with jobID=$JOB_ID on $HOSTNAME' >> $prodir/bash/jobs/phylotrans_process_${sample}.job
 echo 'echo + NSLOTS = $NSLOTS' >> $prodir/bash/jobs/phylotrans_process_${sample}.job
+echo "#" >> $prodir/bash/jobs/phylotrans_process_${sample}.job
 #
-echo "echo This is the sample being processed: $sample" >> $prodir/bash/jobs/phylotrans_process_${sample}.job
-echo "Starting samtools sort and index steps" >> $prodir/bash/jobs/phylotrans_process_${sample}.job
+echo 'echo "This is the sample being processed:"' >> $prodir/bash/jobs/phylotrans_process_${sample}.job
+echo "echo $sample" >> $prodir/bash/jobs/phylotrans_process_${sample}.job
+echo 'echo "Starting samtools sort and index steps"' >> $prodir/bash/jobs/phylotrans_process_${sample}.job
 #
 echo "samtools sort \
 ${prodir}/outputs/STARalign_pdam/Zhou2017/${sample}_pdam_Aligned.out.bam \
 > ${prodir}/outputs/phylotrans_pdam/Zhou2017/${sample}_pdam_Aligned.sorted.out.bam" >> $prodir/bash/jobs/phylotrans_process_${sample}.job
+echo "#" >> $prodir/bash/jobs/phylotrans_process_${sample}.job
 #
 echo "samtools index -b \
 ${prodir}/outputs/phylotrans_pdam/Zhou2017/${sample}_pdam_Aligned.sorted.out.bam" >> $prodir/bash/jobs/phylotrans_process_${sample}.job
+echo "#" >> $prodir/bash/jobs/phylotrans_process_${sample}.job
 #
-echo "Starting picardtools and GATK processing steps" >> $prodir/bash/jobs/phylotrans_process_${sample}.job
+echo 'echo "Starting PicardTools and GATK processing steps"' >> $prodir/bash/jobs/phylotrans_process_${sample}.job
 echo "java -jar /share/apps/bioinformatics/picard-tools/2.20.6/picard.jar \
 AddOrReplaceReadGroups \
 INPUT=${prodir}/outputs/phylotrans_pdam/Zhou2017/${sample}_pdam_Aligned.sorted.out.bam \
@@ -49,6 +53,7 @@ RGLB=library \
 RGPL=illumina \
 RGPU=unit1 \
 RGSM=${sample}" >> $prodir/bash/jobs/phylotrans_process_${sample}.job
+echo "#" >> $prodir/bash/jobs/phylotrans_process_${sample}.job
 #
 echo "java -jar /share/apps/bioinformatics/picard-tools/2.20.6/picard.jar \
 MarkDuplicates \
@@ -57,6 +62,7 @@ OUTPUT=${prodir}/outputs/phylotrans_pdam/Zhou2017/${sample}_pdam_Aligned.sorted.
 CREATE_INDEX=true \
 VALIDATION_STRINGENCY=SILENT \
 METRICS_FILE=${prodir}/outputs/phylotrans_pdam/Zhou2017/${sample}_marked_dup_metrics.txt" >> $prodir/bash/jobs/phylotrans_process_${sample}.job
+echo "#" >> $prodir/bash/jobs/phylotrans_process_${sample}.job
 #
 echo "java -jar /share/apps/bioinformatics/gatk/3.8.1.0/GenomeAnalysisTK.jar \
 -T SplitNCigarReads \
@@ -66,6 +72,7 @@ echo "java -jar /share/apps/bioinformatics/gatk/3.8.1.0/GenomeAnalysisTK.jar \
 -rf ReassignOneMappingQuality \
 -RMQF 255 -RMQT 60 \
 -U ALLOW_N_CIGAR_READS" >> $prodir/bash/jobs/phylotrans_process_${sample}.job
+echo "#" >> $prodir/bash/jobs/phylotrans_process_${sample}.job
 #
 echo 'echo = `date` job $JOB_NAME done' >> $prodir/bash/jobs/phylotrans_process_${sample}.job
 #qsub $prodir/bash/jobs/phylotrans_process_${sample}.job
