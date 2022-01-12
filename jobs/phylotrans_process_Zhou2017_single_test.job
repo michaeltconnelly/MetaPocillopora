@@ -14,6 +14,7 @@
 # ----------------Modules------------------------- #
 module load bioinformatics/picard-tools
 module load bioinformatics/samtools
+module load bioinformatics/gatk
 #
 # ----------------Your Commands------------------- #
 #
