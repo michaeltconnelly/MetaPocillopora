@@ -75,5 +75,5 @@ echo "java -jar /share/apps/bioinformatics/gatk/3.8.1.0/GenomeAnalysisTK.jar \
 echo "#" >> $prodir/bash/jobs/phylotrans_process_${sample}.job
 #
 echo 'echo = `date` job $JOB_NAME done' >> $prodir/bash/jobs/phylotrans_process_${sample}.job
-#qsub $prodir/bash/jobs/phylotrans_process_${sample}.job
+qsub $prodir/bash/jobs/phylotrans_process_${sample}.job
 done
