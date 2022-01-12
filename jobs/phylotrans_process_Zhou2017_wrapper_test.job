@@ -16,7 +16,7 @@ echo "#$  -S /bin/sh
 #$ -cwd
 #$ -j y
 #$ -N phylotrans_process_${sample}
-#$ -o phylotrans_process_${sample}.log
+#$ -o ${prodir}/bash/jobs/phylotrans_process_${sample}.log
 #$ -m bea
 #$ -M connellym@si.edu" >> $prodir/bash/jobs/phylotrans_process_${sample}.job
 #
