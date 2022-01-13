@@ -39,7 +39,7 @@ echo "/share/apps/bioinformatics/gatk/4.1.3.0/gatk HaplotypeCallerSpark \
 -O ${prodir}/outputs/phylotrans_pdam/${study}/${sample}_pdam.g.vcf.gz \
 -R /home/connellym/sequences/pdam_scaffolds.fasta \
 -stand_call_conf 20.0 \
---dont-use-soft-clipped-bases true\
+--dont-use-soft-clipped-bases true \
 --spark-master local[16]" >> $prodir/bash/jobs/gatk_haplotypecaller_${sample}.job
 echo "#" >> $prodir/bash/jobs/gatk_haplotypecaller_${sample}.job
 #
