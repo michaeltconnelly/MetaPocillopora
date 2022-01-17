@@ -1,0 +1,40 @@
+# /bin/sh
+# ----------------Parameters---------------------- #
+#$  -S /bin/sh
+#$ -pe mthread 8
+#$ -q mThC.q
+#$ -l mres=64G,h_data=8G,h_vmem=8G
+#$ -cwd
+#$ -j y
+#$ -N gatk_combine_gvcfs_test
+#$ -o gatk_combine_gvcfs_test.log
+#$ -m bea
+#$ -M connellym@si.edu
+#
+# ----------------Modules------------------------- #
+module load bioinformatics/gatk
+#
+# ----------------Your Commands------------------- #
+#
+echo + `date` job $JOB_NAME started in $QUEUE with jobID=$JOB_ID on $HOSTNAME
+echo + NSLOTS = $NSLOTS
+#
+prodir="/scratch/nmnh_corals/connellym/projects/MetaPocillopora"
+java -jar /share/apps/bioinformatics/gatk/3.8.1.0/GenomeAnalysisTK.jar \
+-T CombineGVCFs \
+-R /home/connellym/sequences/pdam_scaffolds.fasta \
+--variant ${prodir}/outputs/phylotrans_pdam/Mayfield2014/Mayfield2014_SRR1030692_pdam.g.vcf.gz \
+--variant ${prodir}/outputs/phylotrans_pdam/Mayfield2014/Mayfield2014_SRR1030693_pdam.g.vcf.gz \
+--variant ${prodir}/outputs/phylotrans_pdam/Mayfield2014/Mayfield2014_SRR1030694_pdam.g.vcf.gz \
+--variant ${prodir}/outputs/phylotrans_pdam/Vidal-Dupiol2014/Vidal-Dupiol2014_SRR988670_pdam.g.vcf.gz \
+--variant ${prodir}/outputs/phylotrans_pdam/Vidal-Dupiol2014/Vidal-Dupiol2014_SRR988671_pdam.g.vcf.gz \
+--variant ${prodir}/outputs/phylotrans_pdam/Vidal-Dupiol2014/Vidal-Dupiol2014_SRR988672_pdam.g.vcf.gz \
+--variant ${prodir}/outputs/phylotrans_pdam/Zhou2019/Zhou2019_SRR6784730_pdam.g.vcf.gz \
+--variant ${prodir}/outputs/phylotrans_pdam/Zhou2019/Zhou2019_SRR6784731_pdam.g.vcf.gz \
+--variant ${prodir}/outputs/phylotrans_pdam/Zhou2019/Zhou2019_SRR6784732_pdam.g.vcf.gz \
+--variant ${prodir}/outputs/phylotrans_pdam/Zhou2019/Zhou2019_SRR6784733_pdam.g.vcf.gz \
+--variant ${prodir}/outputs/phylotrans_pdam/Zhou2019/Zhou2019_SRR6784734_pdam.g.vcf.gz \
+--variant ${prodir}/outputs/phylotrans_pdam/Zhou2019/Zhou2019_SRR6784735_pdam.g.vcf.gz \
+--out ${prodir}/outputs/phylotrans_pdam/metapocillopora_001.g.vcf.gz
+#
+echo = `date` job $JOB_NAME done
