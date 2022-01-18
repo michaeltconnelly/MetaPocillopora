@@ -6,8 +6,8 @@
 #$ -l mres=32G,h_data=2G,h_vmem=2G
 #$ -cwd
 #$ -j y
-#$ -N featureCounts_Zhou2017
-#$ -o featureCounts_Zhou2017.log
+#$ -N featureCounts_Wecker2018
+#$ -o featureCounts_Wecker2018.log
 #$ -m bea
 #$ -M connellym@si.edu
 #
@@ -24,7 +24,7 @@ prodir="/scratch/nmnh_corals/connellym/projects/MetaPocillopora"
 -t gene \
 -g ID \
 -a /home/connellym/sequences/pdam_annotation.gff3 \
--o ${prodir}/outputs/featureCounts_pdam/Zhou2017_Pdam.counts \
-${prodir}/outputs/STARalign_pdam/Zhou2017/*Aligned.out.bam
+-o ${prodir}/outputs/featureCounts_pdam/Wecker2018_Pdam.counts \
+${prodir}/outputs/STARalign_pdam/Wecker2018/*Aligned.out.bam
 #
 echo = `date` job $JOB_NAME done
