@@ -48,7 +48,8 @@ FASTQCg + geom_point() +
   # scale_shape_manual(values = colshapes) +
   geom_hline(yintercept = 10000000, color  = "green") +
   geom_hline(yintercept = 8000000) + 
-  geom_hline(yintercept = 1000000, color = "red")
+  geom_hline(yintercept = 1000000, color = "red") +
+  theme(axis.text.x = element_text(angle = 90))
   #geom_text_repel(data = FASTQC_summary[1:15, ], aes(label = GNomExID), color = "black", size = 3, box.padding = unit(0.5, "lines")
 ```
 
