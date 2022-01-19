@@ -22,7 +22,6 @@ prodir="/scratch/nmnh_corals/connellym/projects/MetaPocillopora"
 study="$1"
 #
 /home/connellym/programs/subread-2.0.3-source/bin/featureCounts \
--p \
 -T $NSLOTS \
 -t gene \
 -g ID \
