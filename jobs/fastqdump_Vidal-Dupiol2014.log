@@ -19,3 +19,9 @@ Written 8510156 spots for SRR988671
 Read 13858112 spots for SRR988672
 Written 13858112 spots for SRR988672
 = Tue Dec 21 13:33:14 EST 2021 job fastqdump_Vidal-Dupiol2014 done
+Loading bioinformatics/sratoolkit/2.9.6
+  Loading requirement: gcc/7.3.0
++ Tue Jan 18 10:04:10 EST 2022 job fastqdump_Vidal-Dupiol2014 started in sThC.q with jobID=2143403 on compute-81-08
+Read 10180520 spots for SRR988551
+Written 10180520 spots for SRR988551
+= Tue Jan 18 10:19:05 EST 2022 job fastqdump_Vidal-Dupiol2014 done
