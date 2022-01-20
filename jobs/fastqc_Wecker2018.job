@@ -1,0 +1,27 @@
+# /bin/sh
+# ----------------Parameters---------------------- #
+#$  -S /bin/sh
+#$ -pe mthread 10
+#$ -q sThC.q
+#$ -l mres=16G,h_data=1G,h_vmem=1G
+#$ -cwd
+#$ -j y
+#$ -N fastqc_Wecker2018
+#$ -o fastqc_Wecker2018.log
+#$ -m bea
+#$ -M connellym@si.edu
+#
+# ----------------Modules------------------------- #
+module load bioinformatics/fastqc
+#
+# ----------------Your Commands------------------- #
+#
+echo + `date` job $JOB_NAME started in $QUEUE with jobID=$JOB_ID on $HOSTNAME
+echo + NSLOTS = $NSLOTS
+#
+fastqc \
+/scratch/nmnh_corals/connellym/projects/MetaPocillopora/data/srareads/Wecker2018/* \
+--threads $NSLOTS \
+-o /scratch/nmnh_corals/connellym/projects/MetaPocillopora/outputs/QCs/fastqcs/
+#
+echo = `date` job $JOB_NAME done
