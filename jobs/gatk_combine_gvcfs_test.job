@@ -23,18 +23,13 @@ prodir="/scratch/nmnh_corals/connellym/projects/MetaPocillopora"
 java -jar /share/apps/bioinformatics/gatk/3.8.1.0/GenomeAnalysisTK.jar \
 -T CombineGVCFs \
 -R /home/connellym/sequences/pdam_scaffolds.fasta \
---variant ${prodir}/outputs/phylotrans_pdam/Mayfield2014/Mayfield2014_SRR1030692_pdam.g.vcf.gz \
---variant ${prodir}/outputs/phylotrans_pdam/Mayfield2014/Mayfield2014_SRR1030693_pdam.g.vcf.gz \
---variant ${prodir}/outputs/phylotrans_pdam/Mayfield2014/Mayfield2014_SRR1030694_pdam.g.vcf.gz \
---variant ${prodir}/outputs/phylotrans_pdam/Vidal-Dupiol2014/Vidal-Dupiol2014_SRR988670_pdam.g.vcf.gz \
---variant ${prodir}/outputs/phylotrans_pdam/Vidal-Dupiol2014/Vidal-Dupiol2014_SRR988671_pdam.g.vcf.gz \
---variant ${prodir}/outputs/phylotrans_pdam/Vidal-Dupiol2014/Vidal-Dupiol2014_SRR988672_pdam.g.vcf.gz \
---variant ${prodir}/outputs/phylotrans_pdam/Zhou2019/Zhou2019_SRR6784730_pdam.g.vcf.gz \
---variant ${prodir}/outputs/phylotrans_pdam/Zhou2019/Zhou2019_SRR6784731_pdam.g.vcf.gz \
---variant ${prodir}/outputs/phylotrans_pdam/Zhou2019/Zhou2019_SRR6784732_pdam.g.vcf.gz \
---variant ${prodir}/outputs/phylotrans_pdam/Zhou2019/Zhou2019_SRR6784733_pdam.g.vcf.gz \
---variant ${prodir}/outputs/phylotrans_pdam/Zhou2019/Zhou2019_SRR6784734_pdam.g.vcf.gz \
---variant ${prodir}/outputs/phylotrans_pdam/Zhou2019/Zhou2019_SRR6784735_pdam.g.vcf.gz \
+-nct 8 \
+--variant ${prodir}/outputs/phylotrans_pdam/Zhou2018/Zhou2018_SRR6001268_pdam.g.vcf.gz \
+--variant ${prodir}/outputs/phylotrans_pdam/Zhou2018/Zhou2018_SRR6001269_pdam.g.vcf.gz \
+--variant ${prodir}/outputs/phylotrans_pdam/Zhou2018/Zhou2018_SRR6001270_pdam.g.vcf.gz \
+--variant ${prodir}/outputs/phylotrans_pdam/Zhou2018/Zhou2018_SRR6001271_pdam.g.vcf.gz \
+--variant ${prodir}/outputs/phylotrans_pdam/Zhou2018/Zhou2018_SRR6001273_pdam.g.vcf.gz \
 --out ${prodir}/outputs/phylotrans_pdam/metapocillopora_001.g.vcf.gz
 #
 echo = `date` job $JOB_NAME done
+#--variant ${prodir}/outputs/phylotrans_pdam/Zhou2018/Zhou2018_SRR6001272_pdam.g.vcf.gz \
