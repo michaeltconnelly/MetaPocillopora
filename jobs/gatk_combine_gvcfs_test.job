@@ -23,12 +23,27 @@ prodir="/scratch/nmnh_corals/connellym/projects/MetaPocillopora"
 java -jar /share/apps/bioinformatics/gatk/3.8.1.0/GenomeAnalysisTK.jar \
 -T CombineGVCFs \
 -R /home/connellym/sequences/pdam_scaffolds.fasta \
+--variant ${prodir}/outputs/phylotrans_pdam/Vidal-Dupiol2014/Vidal-Dupiol2014_SRR988670_pdam.g.vcf.gz \
+--variant ${prodir}/outputs/phylotrans_pdam/Vidal-Dupiol2014/Vidal-Dupiol2014_SRR988671_pdam.g.vcf.gz \
+--variant ${prodir}/outputs/phylotrans_pdam/Vidal-Dupiol2014/Vidal-Dupiol2014_SRR988672_pdam.g.vcf.gz \
+--variant ${prodir}/outputs/phylotrans_pdam/Zhou2017/Zhou2017_SRR3727281_pdam.g.vcf.gz \
+--variant ${prodir}/outputs/phylotrans_pdam/Zhou2017/Zhou2017_SRR3727374_pdam.g.vcf.gz \
+--variant ${prodir}/outputs/phylotrans_pdam/Zhou2017/Zhou2017_SRR3727379_pdam.g.vcf.gz \
+--variant ${prodir}/outputs/phylotrans_pdam/Zhou2017/Zhou2017_SRR3727380_pdam.g.vcf.gz \
+--variant ${prodir}/outputs/phylotrans_pdam/Zhou2017/Zhou2017_SRR3727383_pdam.g.vcf.gz \
+--variant ${prodir}/outputs/phylotrans_pdam/Zhou2017/Zhou2017_SRR3727387_pdam.g.vcf.gz \
+--variant ${prodir}/outputs/phylotrans_pdam/Zhou2017/Zhou2017_SRR3727388_pdam.g.vcf.gz \
+--variant ${prodir}/outputs/phylotrans_pdam/Zhou2017/Zhou2017_SRR3727390_pdam.g.vcf.gz \
+--variant ${prodir}/outputs/phylotrans_pdam/Zhou2017/Zhou2017_SRR3727400_pdam.g.vcf.gz \
+--variant ${prodir}/outputs/phylotrans_pdam/Zhou2017/Zhou2017_SRR3727418_pdam.g.vcf.gz \
+--variant ${prodir}/outputs/phylotrans_pdam/Zhou2017/Zhou2017_SRR3727424_pdam.g.vcf.gz \
+--variant ${prodir}/outputs/phylotrans_pdam/Zhou2017/Zhou2017_SRR3727425_pdam.g.vcf.gz \
 --variant ${prodir}/outputs/phylotrans_pdam/Zhou2018/Zhou2018_SRR6001268_1_pdam.g.vcf.gz \
 --variant ${prodir}/outputs/phylotrans_pdam/Zhou2018/Zhou2018_SRR6001269_1_pdam.g.vcf.gz \
 --variant ${prodir}/outputs/phylotrans_pdam/Zhou2018/Zhou2018_SRR6001270_1_pdam.g.vcf.gz \
 --variant ${prodir}/outputs/phylotrans_pdam/Zhou2018/Zhou2018_SRR6001271_1_pdam.g.vcf.gz \
 --variant ${prodir}/outputs/phylotrans_pdam/Zhou2018/Zhou2018_SRR6001273_1_pdam.g.vcf.gz \
+--variant ${prodir}/outputs/phylotrans_pdam/Zhou2018/Zhou2018_SRR6001272_1_pdam.g.vcf.gz \
 --out ${prodir}/outputs/phylotrans_pdam/metapocillopora_001.g.vcf.gz
 #
 echo = `date` job $JOB_NAME done
-#--variant ${prodir}/outputs/phylotrans_pdam/Zhou2018/Zhou2018_SRR6001272_pdam.g.vcf.gz \
