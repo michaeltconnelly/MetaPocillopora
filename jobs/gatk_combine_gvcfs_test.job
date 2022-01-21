@@ -24,11 +24,11 @@ java -jar /share/apps/bioinformatics/gatk/3.8.1.0/GenomeAnalysisTK.jar \
 -T CombineGVCFs \
 -R /home/connellym/sequences/pdam_scaffolds.fasta \
 -nct 8 \
---variant ${prodir}/outputs/phylotrans_pdam/Zhou2018/Zhou2018_SRR6001268_pdam.g.vcf.gz \
---variant ${prodir}/outputs/phylotrans_pdam/Zhou2018/Zhou2018_SRR6001269_pdam.g.vcf.gz \
---variant ${prodir}/outputs/phylotrans_pdam/Zhou2018/Zhou2018_SRR6001270_pdam.g.vcf.gz \
---variant ${prodir}/outputs/phylotrans_pdam/Zhou2018/Zhou2018_SRR6001271_pdam.g.vcf.gz \
---variant ${prodir}/outputs/phylotrans_pdam/Zhou2018/Zhou2018_SRR6001273_pdam.g.vcf.gz \
+--variant ${prodir}/outputs/phylotrans_pdam/Zhou2018/Zhou2018_SRR6001268_1_pdam.g.vcf.gz \
+--variant ${prodir}/outputs/phylotrans_pdam/Zhou2018/Zhou2018_SRR6001269_1_pdam.g.vcf.gz \
+--variant ${prodir}/outputs/phylotrans_pdam/Zhou2018/Zhou2018_SRR6001270_1_pdam.g.vcf.gz \
+--variant ${prodir}/outputs/phylotrans_pdam/Zhou2018/Zhou2018_SRR6001271_1_pdam.g.vcf.gz \
+--variant ${prodir}/outputs/phylotrans_pdam/Zhou2018/Zhou2018_SRR6001273_1_pdam.g.vcf.gz \
 --out ${prodir}/outputs/phylotrans_pdam/metapocillopora_001.g.vcf.gz
 #
 echo = `date` job $JOB_NAME done
