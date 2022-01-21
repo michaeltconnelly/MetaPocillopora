@@ -23,7 +23,6 @@ prodir="/scratch/nmnh_corals/connellym/projects/MetaPocillopora"
 java -jar /share/apps/bioinformatics/gatk/3.8.1.0/GenomeAnalysisTK.jar \
 -T CombineGVCFs \
 -R /home/connellym/sequences/pdam_scaffolds.fasta \
--nct 8 \
 --variant ${prodir}/outputs/phylotrans_pdam/Zhou2018/Zhou2018_SRR6001268_1_pdam.g.vcf.gz \
 --variant ${prodir}/outputs/phylotrans_pdam/Zhou2018/Zhou2018_SRR6001269_1_pdam.g.vcf.gz \
 --variant ${prodir}/outputs/phylotrans_pdam/Zhou2018/Zhou2018_SRR6001270_1_pdam.g.vcf.gz \
