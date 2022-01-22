@@ -1,0 +1,309 @@
+---
+title: "Pocillopora meta-analysis VCF SNP filtering"
+author: "Mike Connelly"
+date: "01/21/2022"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+# O'Leary et al. 
+# modified from https://github.com/sjoleary/SNPFILT/blob/master/filteringsnapper.Rmd
+knitr::opts_chunk$set(echo = TRUE)
+knitr::opts_knit$set(root.dir = rprojroot::find_rstudio_root_file())
+
+```
+```{r}
+library("tidyverse")
+source("./R/VCFfilterstats_edit.R")
+source("./R/VCFfilterviz.R")
+# need to build custom functions in the repository (ex. multiplot())
+```
+
+## Raw dataset stats
+```{bash vcftools_query_raw}
+# vcf file, out directory, outfile prefix
+bash ./bash/vcftools_query.sh \
+./outputs/phylotrans_pdam/metapocillopora_001.vcf \
+./outputs/phylotrans_pdam/metapocillopora_001 \
+metapocillopora_001
+```
+### Query stats
+```{r raw_stats}
+ind_stats_raw <- read.ind.stats(dir = "./outputs/phylotrans_pdam/metapocillopora_001", vcf = "metapocillopora_001")
+loc_stats_raw <- read.loc.stats(dir = "./outputs/phylotrans_pdam/metapocillopora_001", vcf = "metapocillopora_001")
+# site_qual_raw <- read.table("./outputs/phylotrans_pdam/metapocillopora_001.lqual",
+#                             header = TRUE, stringsAsFactors = FALSE) %>%
+#   mutate(PROB = 10^(-QUAL/10))
+```
+The initial VCF contains 466,548 sites in 170 individuals.
+
+### Visualize raw dataset stats
+```{r raw_dataset_visualization}
+vcfqvis("metapocillopora_001", ind_stats_raw, loc_stats_raw)
+```
+```{r raw_dataset_missing-data}
+# Visualize missing data among individuals and loci
+pdf("./outputs/phylotrans_pdam/filtered_vcf_viz/merge_raw_vcf.pdf", height = 8.5, width = 11)
+vcf_raw_viz <- vcfqvis_miss("metapocillopora_001", ind_stats_raw, loc_stats_raw, title = "Raw, unfiltered VCF")
+dev.off()
+```
+
+## Filtering strategy #1
+* Step 1: Remove loci with genotype call rate < 95% (missing data > 5%)
+* Step 2: Remove individuals with missing data > 95%
+* Step 3: Remove loci with depth < 20 
+* Step 4: Remove loci with minor allele frequency < 5%
+
+### Step 1: Remove loci with genotype call rate < 95%
+```{bash vcftools_filter_1}
+# Step 1: Remove loci with genotype call rate < 95%
+bash ./bash/vcftools_filter_maxmissing.sh \
+./outputs/phylotrans_pdam/metapocillopora_001.vcf \
+./outputs/phylotrans_pdam/filtered_vcfs/max-missing-0.95 \
+0.95
+```
+The filtered VCF contains 184,904 sites in 21 individuals (12% of total sites)
+
+```{bash vcftools_query_1}
+# vcf file, out directory, outfile prefix
+bash ./bash/vcftools_query.sh \
+./outputs/phylotrans_pdam/filtered_vcfs/max-missing-0.95.recode.vcf \
+./outputs/phylotrans_pdam/max-missing-0.95 \
+max-missing-0.95
+```
+```{r read vcf query stats and viz}
+#
+ind_stats_1 <- read.ind.stats(dir = "./outputs/phylotrans_pdam/max-missing-0.95", vcf = "max-missing-0.95")
+loc_stats_1 <- read.loc.stats(dir = "./outputs/phylotrans_pdam/max-missing-0.95", vcf = "max-missing-0.95")
+#
+pdf("./outputs/phylotrans_pdam/filtered_vcf_viz/max-missing-0.95_vcf.pdf", height = 8.5, width = 11)
+vcfqvis_miss(vcf = "max-missing-0.95", ind_stats_1, loc_stats_1, title = " 95% max-missing VCF")
+dev.off()
+```
+```{r raw_dataset_missing-data}
+# Visualize missing data among individuals and loci
+pdf("./outputs/phylotrans_pdam/filtered_vcf_viz/merge_step1_vcf.pdf", height = 8.5, width = 11)
+vcf_raw_viz <- vcfqvis_miss("max-missing-0.05", ind_stats_1, loc_stats_1, title = "Step 1: Max-missing-0.05")
+dev.off()
+```
+
+### Step 2: Remove individuals with missing data > 95%
+```{r}
+imissing <- read.table("./outputs/phylotrans_pdam/max-missing-0.95/max-missing-0.95.imiss",
+                       header = TRUE, stringsAsFactors = FALSE)
+# plot
+ggplot(imissing, aes(x = F_MISS)) +
+  geom_histogram(binwidth = .01, color = "black", fill = "grey95") +
+  geom_vline(aes(xintercept = 0.85),
+                 color = "red", linetype = "dashed", size = 1) +
+  geom_vline(aes(xintercept = mean(F_MISS, na.rm = TRUE)),
+                 color = "black", linetype = "dashed", size = 1) +
+  geom_vline(aes(xintercept = 0.25),
+                 color = "blue", linetype = "dashed", size = 1) +
+  scale_x_continuous(limits = c(0, 1)) +
+  labs(x = "missing data per indv") 
+```
+```{r}
+#
+indv_missing_0.95 <- imissing %>%
+  dplyr::filter(F_MISS > 0.95) %>%
+  select(INDV)
+#
+write.table(indv_missing_0.95, "./outputs/phylotrans_pdam/max-missing-0.95/indv_missing_0.95.txt",
+            col.names = FALSE, row.names = FALSE, quote = FALSE)
+```
+```{bash vcftools_filter_2}
+# Step 2: Remove individuals with missing data > 95%
+bash ./bash/vcftools_filter_remove.sh \
+./outputs/phylotrans_pdam/filtered_vcfs/max-missing-0.95.recode.vcf \
+./outputs/phylotrans_pdam/filtered_vcfs/max-missing-0.95_indv-missing-0.95 \
+./outputs/phylotrans_pdam/max-missing-0.95/indv_missing_0.95.txt
+```
+The filtered VCF contains 184,904 sites in 21 individuals (0 individuals were removed)
+
+```{bash vcftools_query_2}
+# vcf file, out directory, outfile prefix
+bash ./bash/vcftools_query.sh \
+./outputs/phylotrans_pdam/filtered_vcfs/max-missing-0.05_indv-missing-0.85.recode.vcf \
+./outputs/phylotrans_pdam/max-missing-0.05_indv-missing-0.85/ \
+max-missing-0.05_indv-missing-0.85
+```
+```{r read vcf query stats and viz 2}
+#
+ind_stats_2 <- read.ind.stats(dir = "./outputs/phylotrans_pdam/max-missing-0.05_indv-missing-0.85", vcf = "max-missing-0.05_indv-missing-0.85")
+loc_stats_2 <- read.loc.stats(dir = "./outputs/phylotrans_pdam/max-missing-0.05_indv-missing-0.85", vcf = "max-missing-0.05_indv-missing-0.85")
+#
+vcfqvis(vcf = "max-missing-0.05_indv-missing-0.85.recode", ind_stats_2, loc_stats_2)
+```
+```{r}
+# Visualize missing data among individuals and loci
+pdf("./outputs/phylotrans_pdam/filtered_vcf_viz/merge_step2_vcf.pdf", height = 8.5, width = 11)
+vcf_raw_viz <- vcfqvis_miss("max-missing-0.05_indv-missing-0.85", ind_stats_2, loc_stats_2, title = "Step 2: Max-missing-0.05, Indv-missing-0.85")
+dev.off()
+```
+
+### Step 3: Remove loci with depth < 20 
+```{bash vcftools_filter_1}
+# Step 3: Remove loci with depth < 20 
+bash ./bash/vcftools_filter_depth.sh \
+./outputs/phylotrans_pdam/filtered_vcfs/max-missing-0.05_indv-missing-0.85.recode.vcf \
+./outputs/phylotrans_pdam/filtered_vcfs/max-missing-0.05_indv-missing-0.85_depth-20 \
+20
+```
+The filtered VCF contains 2,714 sites in 61 individuals.
+```{bash vcftools_query_1}
+# vcf file, out directory, outfile prefix
+bash ./bash/vcftools_query.sh \
+./outputs/phylotrans_pdam/filtered_vcfs/max-missing-0.05_indv-missing-0.85_depth-20.recode.vcf \
+./outputs/phylotrans_pdam/max-missing-0.05_indv-missing-0.85_depth-20/ \
+max-missing-0.05_indv-missing-0.85_depth-20
+```
+```{r read vcf query stats and viz}
+#
+ind_stats_3 <- read.ind.stats(dir = "./outputs/phylotrans_pdam/max-missing-0.05_indv-missing-0.85_depth-20", vcf = "max-missing-0.05_indv-missing-0.85_depth-20")
+loc_stats_3 <- read.loc.stats(dir = "./outputs/phylotrans_pdam/max-missing-0.05_indv-missing-0.85_depth-20", vcf = "max-missing-0.05_indv-missing-0.85_depth-20")
+#
+vcfqvis(vcf = "max-missing-0.05_indv-missing-0.85_depth-20", ind_stats_3, loc_stats_3)
+```
+```{r}
+# Visualize missing data among individuals and loci
+pdf("./outputs/phylotrans_pdam/filtered_vcf_viz/merge_step3_vcf.pdf", height = 8.5, width = 11)
+vcf_raw_viz <- vcfqvis_miss("max-missing-0.05_indv-missing-0.85_depth-20", ind_stats_3, loc_stats_3, title = "Step 3: Max-missing-0.05, Indv-missing-0.85, Depth-20")
+dev.off()
+```
+
+### Step 4: Remove loci with minor allele frequency < 5%
+```{bash vcftools_filter_1}
+# Step 4: Remove loci with minor allele frequency < 5%
+bash ./bash/vcftools_filter_maf.sh \
+./outputs/phylotrans_pdam/filtered_vcfs/max-missing-0.05_indv-missing-0.85_depth-20.recode.vcf \
+./outputs/phylotrans_pdam/filtered_vcfs/max-missing-0.05_indv-missing-0.85_depth-20_maf-0.05 \
+ 0.05
+```
+The filtered VCF contains 1,417 sites in 61 individuals.
+```{bash vcftools_query_1}
+# vcf file, out directory, outfile prefix
+bash ./bash/vcftools_query.sh \
+./outputs/phylotrans_pdam/filtered_vcfs/max-missing-0.05_indv-missing-0.85_depth-20_maf-0.05.recode.vcf \
+./outputs/phylotrans_pdam/max-missing-0.05_indv-missing-0.85_depth-20_maf-0.05 \
+max-missing-0.05_indv-missing-0.85_depth-20_maf-0.05
+```
+```{r read vcf query stats and viz}
+#
+ind_stats_4 <- read.ind.stats(dir = "./outputs/phylotrans_pdam/max-missing-0.05_indv-missing-0.85_depth-20_maf-0.05", vcf = "max-missing-0.05_indv-missing-0.85_depth-20_maf-0.05")
+loc_stats_4 <- read.loc.stats(dir = "./outputs/phylotrans_pdam/max-missing-0.05_indv-missing-0.85_depth-20_maf-0.05", vcf = "max-missing-0.05_indv-missing-0.85_depth-20_maf-0.05")
+#
+vcfqvis(vcf = "max-missing-0.05_indv-missing-0.85_depth-20_maf-0.05", ind_stats_4, loc_stats_4)
+```
+```{r}
+# Visualize missing data among individuals and loci
+pdf("./outputs/phylotrans_pdam/filtered_vcf_viz/merge_step4_vcf.pdf", height = 8.5, width = 11)
+vcf_raw_viz <- vcfqvis_miss("max-missing-0.05_indv-missing-0.85_depth-20_maf-0.05", ind_stats_4, loc_stats_4, title = "Step 4: Max-missing-0.05, Indv-missing-0.85, Depth-20, MAF-0.05")
+dev.off()
+```
+
+## Filtering strategy #2
+* Step 1: Remove loci with genotype call rate < 5% (missing data > 95%)
+* Step 2: Remove individuals with missing data > 95%
+* Step 3: Remove loci with depth < (10 - 25)
+* Step 4: Remove loci with minor allele frequency < 5%
+* Step 5: Remove loci that are not in Hardy-Weinberg equilibrium
+
+## Custom filtering strategy
+### Step 1: Identify individuals with > 90% missing data:
+```{r, fig.height=4, fig.width=5}
+imissing <- read.table("./outputs/phylotrans_pdam/metapocillopora_001.imiss",
+                       header = TRUE, stringsAsFactors = FALSE)
+# plot
+ggplot(imissing, aes(x = F_MISS)) +
+  geom_histogram(binwidth = .01, color = "black", fill = "grey95") +
+    geom_vline(aes(xintercept = 0.95),
+                 color = "red", linetype = "dashed", size = 1) +
+  geom_vline(aes(xintercept = mean(F_MISS, na.rm = TRUE)),
+                 color = "black", linetype = "dashed", size = 1) +
+  geom_vline(aes(xintercept = 0.25),
+                 color = "blue", linetype = "dashed", size = 1) +
+  scale_x_continuous(limits = c(0, 1)) +
+  labs(x = "missing data per indv") 
+
+indv_missing_0.95 <- imissing %>%
+  dplyr::filter(F_MISS > 0.95) %>%
+  select(INDV)
+
+# write.table(indv_missing_0.95, "./outputs/phylotrans_pdam/indv_missing_95",
+            # col.names = FALSE, row.names = FALSE, quote = FALSE)
+```
+```{r}
+imissing <- read.table("./outputs/phylotrans_pdam/max-missing-0.05/etp_gbs_max-missing-0.05.imiss",
+                       header = TRUE, stringsAsFactors = FALSE)
+# plot
+ggplot(imissing, aes(x = F_MISS)) +
+  geom_histogram(binwidth = .01, color = "black", fill = "grey95") +
+  geom_vline(aes(xintercept = 0.95),
+                 color = "red", linetype = "dashed", size = 1) +
+  geom_vline(aes(xintercept = mean(F_MISS, na.rm = TRUE)),
+                 color = "black", linetype = "dashed", size = 1) +
+  geom_vline(aes(xintercept = 0.25),
+                 color = "blue", linetype = "dashed", size = 1) +
+  scale_x_continuous(limits = c(0, 1)) +
+  labs(x = "missing data per indv") 
+
+indv_missing_0.95 <- imissing %>%
+  dplyr::filter(F_MISS > 0.95) %>%
+  select(INDV)
+
+write.table(indv_missing_0.95, "./outputs/phylotrans_pdam/max-missing-0.05/indv_missing_0.95",
+            col.names = FALSE, row.names = FALSE, quote = FALSE)
+```
+
+```{r}
+imissing <- read.table("./outputs/phylotrans_pdam/max-missing-0.25/etp_gbs_max-missing-0.25.imiss",
+                       header = TRUE, stringsAsFactors = FALSE)
+
+ggplot(imissing, aes(x = F_MISS)) +
+  geom_histogram(binwidth = .01, color = "black", fill = "grey95") +
+  geom_vline(aes(xintercept = 0.95),
+                 color = "red", linetype = "dashed", size = 1) +
+  geom_vline(aes(xintercept = mean(F_MISS, na.rm = TRUE)),
+                 color = "black", linetype = "dashed", size = 1) +
+  geom_vline(aes(xintercept = 0.25),
+                 color = "blue", linetype = "dashed", size = 1) +
+  scale_x_continuous(limits = c(0, 1)) +
+  labs(x = "missing data per indv") 
+
+indv_missing_0.95 <- imissing %>%
+  dplyr::filter(F_MISS > 0.95) %>%
+  select(INDV)
+
+write.table(indv_missing_0.95, "./outputs/phylotrans_pdam/max-missing-0.25/indv_missing_0.95",
+            col.names = FALSE, row.names = FALSE, quote = FALSE)
+```
+
+```{r}
+ind_stats_A <- read.ind.stats(dir = "~/Desktop/vcfquery/max-missing-0.05_indv-missing-0.95", vcf = "etp_gbs_max-missing-0.05_indv-missing-0.95")
+loc_stats_A <- read.loc.stats(dir = "~/Desktop/vcfquery/max-missing-0.05_indv-missing-0.95", vcf = "etp_gbs_max-missing-0.05_indv-missing-0.95")
+```
+```{r}
+pdf("~/Desktop/vcfqvis_test.pdf", height = 11, width = 8.5)
+vcfqvis(vcf = "etp_gbs_max-missing-0.05_indv-missing-0.95", ind_stats_A, loc_stats_A)
+dev.off()
+```
+```{r}
+ind_stats_B <- read.ind.stats(dir = "~/Desktop/vcfquery/max-missing-0.25_indv-missing-0.95", vcf = "etp_gbs_max-missing-0.25_indv-missing-0.95")
+loc_stats_B <- read.loc.stats(dir = "~/Desktop/vcfquery/max-missing-0.25_indv-missing-0.95", vcf = "etp_gbs_max-missing-0.25_indv-missing-0.95")
+```
+```{r}
+pdf("~/Desktop/vcfqvis_test.pdf", height = 11, width = 8.5)
+vcfqvis(vcf = "etp_gbs_max-missing-0.25_indv-missing-0.95", ind_stats_B, loc_stats_B)
+dev.off()
+```
+```{r}
+ind_stats_C <- read.ind.stats(dir = "~/Desktop/vcfquery/max-missing-0.25_indv-missing-0.95_maf_0.01_hwe-0.05", vcf = "max-missing-0.25_indv-missing-0.95_maf_0.01_hwe-0.05")
+loc_stats_C <- read.loc.stats(dir = "~/Desktop/vcfquery/max-missing-0.25_indv-missing-0.95_maf_0.01_hwe-0.05", vcf = "max-missing-0.25_indv-missing-0.95_maf_0.01_hwe-0.05")
+```
+```{r}
+pdf("~/Desktop/vcfqvis_test_2.pdf", height = 11, width = 8.5)
+vcfqvis(vcf = "max-missing-0.25_indv-missing-0.95_maf_0.01_hwe-0.05", ind_stats_C, loc_stats_C)
+dev.off()
+```
+

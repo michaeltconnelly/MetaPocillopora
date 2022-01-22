@@ -19,9 +19,9 @@ library("tidyverse")
 library("DESeq2")
 library("PCAtools")
 library("apeglm")
-# library("WGCNA")
-# library("dynamicTreeCut")
-# library("flashClust")
+library("WGCNA")
+library("dynamicTreeCut")
+library("flashClust")
 # library("genefilter")
 # library("variancePartition")
 # library("doParallel")
@@ -59,13 +59,13 @@ library("apeglm")
 ```
 ```{r  sample_data, echo=TRUE}
 # Import sample metadata 
-samples <- read_csv("data/SampleData_MetaPocillopora.csv")
+samples <- read_csv("data/SampleData_MetaPocillopora_011822.csv")
 # may want to combine study name and SRR sample ID into one column
 ```
 ```{r coldata}
 # Get sample data into tibble
 coldata <- samples %>%
-  # dplyr::filter(Study == "Mayfield2014") %>% #| Study == "Vidal-Dupiol2014"
+  dplyr::filter(Include == TRUE) %>% 
   as_tibble(.) %>%
   # dplyr::arrange("Study") %>% #Order rows by study                    
   column_to_rownames(var = "Sample")  
@@ -125,6 +125,9 @@ gene2kog_coral <- gene_annotation_coral %>%
   dplyr::select(ID, KOG_Class) %>% 
   filter(KOG_Class != "")
 ```
+```{r}
+gene_annotation <- gene_annotation_coral
+```
 
 ## Create DESeq datasets
 ### *Pocillopora* coral host
@@ -138,8 +141,8 @@ all(rownames(dds_coral) == rownames(gene_annotation_coral))
 # Add gene feature annotation to DESeqDataSets
 mcols(dds_coral) <- cbind(mcols(dds_coral), gene_annotation_coral)
 # Subset DESeqDataSet
-# Remove genes with counts less than 10 in 75% of samples
-keep <- rowSums(counts(dds_coral) >= 10) > (ncol(countdata_sorted_coral)*0.75)
+# Remove genes with counts less than 10 in 90% of samples
+keep <- rowSums(counts(dds_coral) >= 10) > (ncol(countdata_sorted_coral)*0.90)
 dds_coral <- dds_coral[keep, ]
 # Normalize expression data for visualization purposes using VST tranformation
 vsd_coral <- vst(dds_coral, blind = TRUE) # use blind = TRUE to not account for experimental design
@@ -160,8 +163,174 @@ p <- pca(assay(vsd), metadata = coldata, removeVar = 0.2)
 screeplot(p, axisLabSize = 18, titleLabSize = 22)
 ```
 ```{r}
+# pdf("./outputs/figures/pca_biplot_temp.pdf", height = 9, width = 9)
   biplot(p, showLoadings = TRUE,
-         colby = 'Study',
-    labSize = 1, pointSize = 2, sizeLoadingsNames = 1)
+         colby = 'Species',
+    labSize = 1, pointSize = 2, sizeLoadingsNames = 1,
+    legendPosition = "right")
+  # dev.off()
+```
+```{r}
+pdf("./outputs/figures/pca_pairsplot_all.pdf", height = 9, width = 9)
+pairsplot(p, colby = 'Study')
+dev.off
 ```
 
+```{r}
+eigencorplot(p,
+    metavars = c('Study', 'Species', 'Treatment', 'Temperature'))
+```
+
+## Weighted gene co-expression network analysis (WGCNA)
+```{r wgcna_setup_datExpr}
+allowWGCNAThreads(nThreads = 4)
+# obtain vst-transformed counts
+countdata_vst <- assay(vsd)
+# Convert to matrix and transpose, check dimensions
+datExpr <- t(countdata_vst)
+dim(datExpr)
+```
+```{r soft_threshold}
+# Find correlation power R^N that satisfies scale free critereon (SFT.R.sq>0.9)
+sft <- pickSoftThreshold(datExpr, verbose=5)
+sft$powerEstimate
+```
+### Step-by-step network construction
+```{r adjacency_TOM}
+# This follows the tutorial: 
+# https://horvath.genetics.ucla.edu/html/CoexpressionNetwork/Rpackages/WGCNA/Tutorials/FemaleLiver-02-networkConstr-man.pdf
+# 
+# I have chosen the following network construction parameters for the following reasons:
+# First, following the recommendations of the WGCNA developers (https://horvath.genetics.ucla.edu/html/CoexpressionNetwork/Rpackages/WGCNA/faq.html), a signed network was chosen to be able to detect positive and negative gene correlations, and the biweight midcorrelation was used since it is more robust to outliers. 
+
+adjacency <- adjacency(datExpr,
+      # Network construction arguments:  correlation, adjacency function,  and topological overlap map options
+                       corFnc = "bicor", # bimidweight correlation
+                       power = sft$powerEstimate, # 20 for coral
+                       type = "signed") # signed
+# 
+TOM <- TOMsimilarity(adjacency,
+                     TOMType = "signed",
+                     verbose = 5)
+dissTOM <- 1-TOM
+# 
+rm(adjacency) # may need to delete adjacency, TOM to clear up vector memory
+```
+```{r gene_dendrogram}
+geneTree <- flashClust(as.dist(dissTOM), method = "average")
+plot(geneTree, labels = FALSE, xlab="", sub="", main = "Gene clustering on TOM-based dissimilarity")
+```
+```{r dynamic_treecut}
+# minModuleSize = 100 because I prefer large modules that lend themselves to enrichment tests with GO_MWU for easier interpretation.
+minModuleSize <- 50
+# Module identification using dynamic tree cut, with cutHeight = 0.99 and deepSplit = 2 based on the recommendations of the WGCNA developers
+dynamicMods <- cutreeDynamic(dendro = geneTree,
+                             distM = dissTOM,
+                             cutHeight = 0.99,
+                             deepSplit = 2,
+                             pamRespectsDendro = FALSE,
+                             minClusterSize = minModuleSize)
+table(dynamicMods)
+# Convert numeric lables into colors
+dynamicColors <- labels2colors(dynamicMods, colorSeq = standardColors())
+```
+```{r module_dendrogram}
+# Calculate eigengenes
+MEList <- moduleEigengenes(datExpr, colors = dynamicColors)
+MEs <- MEList$eigengenes
+# Calculate dissimilarity of module eigengenes
+MEDiss <- 1-cor(MEs);
+# Cluster module eigengenes
+METree <- flashClust(as.dist(MEDiss), method = "average");
+# Plot the result
+plot(METree, main = "Clustering of module eigengenes",
+xlab = "", sub = "")
+MEDissThres = 0.3
+# Plot the cut line into the dendrogram
+abline(h=MEDissThres, col = "red")
+```
+```{r merge_modules}
+# Call an automatic merging function
+# merge cutHeight = 0.3 because I want to group together modules with >70% similar module eigengene expression
+mergedMods <- mergeCloseModules(datExpr, dynamicColors, cutHeight = 0.3, verbose = 5)
+# The merged module colors
+mergedColors <- mergedMods$colors
+table(mergedColors) 
+```
+```{r dendrogram_modules}
+pdf(file = "./outputs/figures/WGCNA_dendrogram_coral.pdf", width = 8, height = 6)
+# pdf(file = "./manuscript_figures/FigS##_WGCNA_dendrogram.pdf", width = 8, height = 6)
+# Plot the dendrogram and the module colors underneath
+plotDendroAndColors(dendro = geneTree, 
+                    colors = cbind(dynamicColors, mergedColors),
+                    groupLabels = c("Dynamic modules", "Merged dynamic"),
+                    dendroLabels = FALSE, hang = 0.03,
+                    addGuide = TRUE, guideHang = 0.05,
+                    abHeight = c(0.99))
+```
+```{r merged_eigengenes}
+MEList <- moduleEigengenes(datExpr, colors = mergedColors)
+mergedMEs <- MEList$eigengenes
+```
+```{r choose_modules}
+moduleColors <- mergedColors#netColors#
+MEs1 <- mergedMEs#netMEs#
+# MEs1 <- MEs1 %>% select(-MEgrey)
+MEmodule_colors <- colnames(MEs1)
+module_colors <- gsub("ME", "", colnames(MEs1))
+colnames(MEs1) <- module_colors
+```
+```{r ME_clustering}
+datME <- MEs1
+dissimME <- (1-t(cor(datME, method="p")))/2
+hclustME <- flashClust(as.dist(dissimME), method="average" )
+# Plot the eigengene dendrogram
+par(mfrow=c(1,1))
+plot(hclustME, main="Clustering tree based on the module eigengenes")
+```
+```{r uniq_modules}
+# Extract all unique modules
+uniqModules <- unique(colnames(MEs1))
+# set in order according to ME clustering dendogram
+hclustME$order
+uniqModules <- uniqModules[hclustME$order]
+#
+uniqModules
+# create ordered factor for downstream analysis
+modules_factor <- factor(levels = uniqModules[hclustME$order], ordered = TRUE)
+```
+### Module genes and hub genes
+```{r modules_genes}
+# Generate GeneIDs
+Genes <- colnames(datExpr)
+# Output genes and annotations for each module
+for (module in uniqModules)
+{
+# Select module genes
+inModule <- (moduleColors == module)
+# Get gene IDs
+modGeneIDs <- Genes[inModule] #this is the correct set of gene IDs!
+# Write gene annotations into a file
+fileName = paste("./outputs/WGCNA_results/notes/", module, ".csv", sep="");
+module_annotation <- gene_annotation[modGeneIDs, ]
+write_csv(module_annotation, path = fileName)
+}
+```
+```{r hub_genes}
+hubs <- chooseTopHubInEachModule(datExpr,
+                         mergedColors,
+                         corFnc = "bicor", # bimidweight correlation
+                         power=sft$powerEstimate, # 10
+                         # power = 10,
+                         type = "signed")
+hub_genes <- gene_annotation[hubs, ]
+hub_genes$module <- names(hubs)
+row.names(hub_genes) <- NULL
+hub_genes <- hub_genes %>% dplyr::select(module, everything())
+```
+```{r sig_hubs}
+hub_genes <- hub_genes %>%
+  # filter(module %in% sigModules) %>%
+  dplyr::select(module, ID, Gene_Info) %>% 
+  dplyr::rename("hub gene" = ID, "UniProt best match" = Gene_Info) 
+```

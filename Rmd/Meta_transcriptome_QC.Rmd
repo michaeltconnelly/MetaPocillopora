@@ -21,9 +21,9 @@ library("patchwork")
 ```{r data}
 # samples <- 
 # samples$SampleID <- gsub('-','.', samples$SampleID)
-QC_summary <- read_csv("./data/MultiQCs_MetaPocillopora_011122.csv")
+QC_summary <- read_csv("./data/MultiQCs_MetaPocillopora_012022.csv") %>% filter(`Study` != "ConnellyEAPSI")
 sum(QC_summary$`Raw Reads`)
-# 1.43 billion reads as of 01/11/2022
+# 1.72 billion reads as of 01/20/2022
 ```
 ```{r tidydata}
 QC_summary <- QC_summary %>%
@@ -59,7 +59,7 @@ pipeQC_counts <- QC_summary %>%
   ggplot(aes(pipeline_step, read_count, color = Study)) +
   geom_path(aes(group = Sample), show.legend = FALSE) +
   geom_point(aes(fill = Study), size = 2, shape = 21, color = "black", alpha = 0.5, stroke = 0.5, show.legend = TRUE) + 
-  facet_grid(.~Study, scales = "free") +
+  # facet_grid(.~Study, scales = "free") +
   # scale_y_continuous(limits = c(0, 2.5e7), breaks = c(0, 5e6, 1e7, 1.5e7, 2e7, 2.5e7)) +
   # scale_color_manual(values = condcolors_AxH) +
   # scale_shape_manual(values = colshapes) + 
@@ -82,7 +82,7 @@ pipeQC_props <- QC_summary %>%
   ggplot(aes(pipeline_step, proportion, color = Study, fill = Study)) +
   geom_path(aes(group = Sample), show.legend = TRUE) +
   geom_point(size = 2, shape = 21, color = "black", alpha = 0.5, stroke = 0.5, show.legend = TRUE) + 
-  facet_grid(.~Study, scales = "free") +
+  # facet_grid(.~Study, scales = "free") +
   # scale_y_continuous(limits = c(0, 1)) +
   # scale_color_manual(values = condcolors_AxH) +
   # scale_shape_manual(values = colshapes) + 
@@ -98,6 +98,6 @@ pipeQC_props
 ```
 ```{r}
 qcfig <- (pipeQC_counts | pipeQC_props) + plot_annotation(tag_levels = "A")
-ggsave(qcfig, filename = "./manuscript_figures/FigS5_readcounts.pdf", width = 220, height = 90, units = "mm", device = "pdf")
+ggsave(qcfig, filename = "./outputs/figures/Fig1_pipelineQC.pdf", width = 8, height = 4, units = "in", device = "pdf")
 ```
 
