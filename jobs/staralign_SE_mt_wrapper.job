@@ -15,7 +15,7 @@ echo "#$  -S /bin/sh
 #$ -l mres=64G,h_data=4G,h_vmem=4G" >> $prodir/bash/jobs/staralign_mt_${sample}.job
 echo "#$ -j y
 #$ -N staralign_${sample}
-#$ -o ${prodir}/bash/jobs/staralign_${sample}.log
+#$ -o ${prodir}/bash/jobs/staralign_mt_${sample}.log
 #$ -m bea
 #$ -M connellym@si.edu" >> $prodir/bash/jobs/staralign_mt_${sample}.job
 #
