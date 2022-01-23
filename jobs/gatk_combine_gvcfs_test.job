@@ -38,12 +38,48 @@ java -jar /share/apps/bioinformatics/gatk/3.8.1.0/GenomeAnalysisTK.jar \
 --variant ${prodir}/outputs/phylotrans_pdam/Zhou2017/Zhou2017_SRR3727418_pdam.g.vcf.gz \
 --variant ${prodir}/outputs/phylotrans_pdam/Zhou2017/Zhou2017_SRR3727424_pdam.g.vcf.gz \
 --variant ${prodir}/outputs/phylotrans_pdam/Zhou2017/Zhou2017_SRR3727425_pdam.g.vcf.gz \
+--variant ${prodir}/outputs/phylotrans_pdam/Wecker2018/Wecker2018_SRR5215310_1_pdam.g.vcf.gz \
+--variant ${prodir}/outputs/phylotrans_pdam/Wecker2018/Wecker2018_SRR5215311_1_pdam.g.vcf.gz \
+--variant ${prodir}/outputs/phylotrans_pdam/Wecker2018/Wecker2018_SRR5215312_1_pdam.g.vcf.gz \
+--variant ${prodir}/outputs/phylotrans_pdam/Wecker2018/Wecker2018_SRR5215313_1_pdam.g.vcf.gz \
+--variant ${prodir}/outputs/phylotrans_pdam/Wecker2018/Wecker2018_SRR5215314_1_pdam.g.vcf.gz \
+--variant ${prodir}/outputs/phylotrans_pdam/Wecker2018/Wecker2018_SRR5215315_1_pdam.g.vcf.gz \
+--variant ${prodir}/outputs/phylotrans_pdam/Wecker2018/Wecker2018_SRR5215316_1_pdam.g.vcf.gz \
+--variant ${prodir}/outputs/phylotrans_pdam/Wecker2018/Wecker2018_SRR5215317_1_pdam.g.vcf.gz \
+--variant ${prodir}/outputs/phylotrans_pdam/Wecker2018/Wecker2018_SRR5215318_1_pdam.g.vcf.gz \
+--variant ${prodir}/outputs/phylotrans_pdam/Wecker2018/Wecker2018_SRR5215319_1_pdam.g.vcf.gz \
 --variant ${prodir}/outputs/phylotrans_pdam/Zhou2018/Zhou2018_SRR6001268_1_pdam.g.vcf.gz \
 --variant ${prodir}/outputs/phylotrans_pdam/Zhou2018/Zhou2018_SRR6001269_1_pdam.g.vcf.gz \
 --variant ${prodir}/outputs/phylotrans_pdam/Zhou2018/Zhou2018_SRR6001270_1_pdam.g.vcf.gz \
 --variant ${prodir}/outputs/phylotrans_pdam/Zhou2018/Zhou2018_SRR6001271_1_pdam.g.vcf.gz \
 --variant ${prodir}/outputs/phylotrans_pdam/Zhou2018/Zhou2018_SRR6001273_1_pdam.g.vcf.gz \
 --variant ${prodir}/outputs/phylotrans_pdam/Zhou2018/Zhou2018_SRR6001272_1_pdam.g.vcf.gz \
---out ${prodir}/outputs/phylotrans_pdam/metapocillopora_001.g.vcf.gz
+--variant ${prodir}/outputs/phylotrans_pdam/Poquita-Du2019/Poquita-Du2019_SRR6914151_pdam.g.vcf.gz \
+--variant ${prodir}/outputs/phylotrans_pdam/Poquita-Du2019/Poquita-Du2019_SRR6914609_pdam.g.vcf.gz \
+--variant ${prodir}/outputs/phylotrans_pdam/Poquita-Du2019/Poquita-Du2019_SRR6914908_pdam.g.vcf.gz \
+--variant ${prodir}/outputs/phylotrans_pdam/Poquita-Du2019/Poquita-Du2019_SRR6934388_pdam.g.vcf.gz \
+--variant ${prodir}/outputs/phylotrans_pdam/Poquita-Du2019/Poquita-Du2019_SRR6934542_pdam.g.vcf.gz \
+--variant ${prodir}/outputs/phylotrans_pdam/Poquita-Du2019/Poquita-Du2019_SRR6935629_pdam.g.vcf.gz \
+--variant ${prodir}/outputs/phylotrans_pdam/Poquita-Du2019/Poquita-Du2019_SRR6942678_pdam.g.vcf.gz \
+--variant ${prodir}/outputs/phylotrans_pdam/Poquita-Du2019/Poquita-Du2019_SRR6942729_pdam.g.vcf.gz \
+--variant ${prodir}/outputs/phylotrans_pdam/Poquita-Du2019/Poquita-Du2019_SRR6951423_pdam.g.vcf.gz \
+--variant ${prodir}/outputs/phylotrans_pdam/Poquita-Du2019/Poquita-Du2019_SRR6951744_pdam.g.vcf.gz \
+--variant ${prodir}/outputs/phylotrans_pdam/Poquita-Du2019/Poquita-Du2019_SRR6952431_pdam.g.vcf.gz \
+--variant ${prodir}/outputs/phylotrans_pdam/Poquita-Du2019/Poquita-Du2019_SRR6963586_pdam.g.vcf.gz \
+--variant ${prodir}/outputs/phylotrans_pdam/Poquita-Du2019/Poquita-Du2019_SRR6963878_pdam.g.vcf.gz \
+--variant ${prodir}/outputs/phylotrans_pdam/Poquita-Du2019/Poquita-Du2019_SRR6963891_pdam.g.vcf.gz \
+--variant ${prodir}/outputs/phylotrans_pdam/Poquita-Du2019/Poquita-Du2019_SRR6964364_pdam.g.vcf.gz \
+--variant ${prodir}/outputs/phylotrans_pdam/Poquita-Du2019/Poquita-Du2019_SRR6986864_pdam.g.vcf.gz \
+--variant ${prodir}/outputs/phylotrans_pdam/Poquita-Du2019/Poquita-Du2019_SRR6987146_pdam.g.vcf.gz \
+--variant ${prodir}/outputs/phylotrans_pdam/Poquita-Du2019/Poquita-Du2019_SRR7039808_pdam.g.vcf.gz \
+--variant ${prodir}/outputs/phylotrans_pdam/Poquita-Du2019/Poquita-Du2019_SRR7040514_pdam.g.vcf.gz \
+--variant ${prodir}/outputs/phylotrans_pdam/Poquita-Du2019/Poquita-Du2019_SRR7041301_pdam.g.vcf.gz \
+--variant ${prodir}/outputs/phylotrans_pdam/Zhou2019/Zhou2019_SRR6784730_pdam.g.vcf.gz \
+--variant ${prodir}/outputs/phylotrans_pdam/Zhou2019/Zhou2019_SRR6784731_pdam.g.vcf.gz \
+--variant ${prodir}/outputs/phylotrans_pdam/Zhou2019/Zhou2019_SRR6784732_pdam.g.vcf.gz \
+--variant ${prodir}/outputs/phylotrans_pdam/Zhou2019/Zhou2019_SRR6784733_pdam.g.vcf.gz \
+--variant ${prodir}/outputs/phylotrans_pdam/Zhou2019/Zhou2019_SRR6784734_pdam.g.vcf.gz \
+--variant ${prodir}/outputs/phylotrans_pdam/Zhou2019/Zhou2019_SRR6784735_pdam.g.vcf.gz \
+--out ${prodir}/outputs/phylotrans_pdam/metapocillopora_002.g.vcf.gz
 #
 echo = `date` job $JOB_NAME done
