@@ -31,7 +31,8 @@ echo "/home/connellym/programs/STAR-2.7.9a/bin/Linux_x86_64/STAR \
 --runMode alignReads \
 --quantMode TranscriptomeSAM \
 --runThreadN 16 \
---readFilesIn /scratch/nmnh_corals/connellym/projects/MetaPocillopora/outputs/trimmedreads/${study}/${sample}_trimmed.fastq.gz \
+--readFilesIn /scratch/nmnh_corals/connellym/projects/MetaPocillopora/outputs/trimmedreads/${study}/${sample}_1P_trimmed.fastq.gz \
+/scratch/nmnh_corals/connellym/projects/MetaPocillopora/outputs/trimmedreads/${study}/${sample}_2P_trimmed.fastq.gz \
 --readFilesCommand gunzip -c \
 --genomeDir /home/connellym/sequences/STARidx_pdam_mt \
 --sjdbGTFfeatureExon exon \
