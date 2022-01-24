@@ -23,7 +23,7 @@ prodir="/scratch/nmnh_corals/connellym/projects/MetaPocillopora"
 java -jar /share/apps/bioinformatics/gatk/3.8.1.0/GenomeAnalysisTK.jar \
 -T GenotypeGVCFs \
 -R /home/connellym/sequences/pdam_scaffolds.fasta \
--V ${prodir}/outputs/phylotrans_pdam/metapocillopora_002.g.vcf.gz \
--o ${prodir}/outputs/phylotrans_pdam/metapocillopora_002.vcf.gz
+-V ${prodir}/outputs/phylotrans_pdam/metapocillopora_003.g.vcf.gz \
+-o ${prodir}/outputs/phylotrans_pdam/metapocillopora_003.vcf.gz
 #
 echo = `date` job $JOB_NAME done

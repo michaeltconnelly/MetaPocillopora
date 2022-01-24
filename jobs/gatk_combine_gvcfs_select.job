@@ -67,3 +67,4 @@ java -jar /share/apps/bioinformatics/gatk/3.8.1.0/GenomeAnalysisTK.jar \
 --out ${prodir}/outputs/phylotrans_pdam/metapocillopora_003.g.vcf.gz
 #
 echo = `date` job $JOB_NAME done
+qsub ${prodir}/jobs/gatk_genotype_gvcfs_test.job
