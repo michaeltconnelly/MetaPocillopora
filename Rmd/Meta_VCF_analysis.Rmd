@@ -17,7 +17,9 @@ library("ggrepel")
 ```
 ```{r}
 # Import sample metadata 
-samples <- read_csv("data/SampleData_MetaPocillopora_011822.csv")
+samples <- read_csv("data/SampleData_MetaPocillopora_011822.csv") %>% 
+  filter(Include_SNPs == TRUE) %>% 
+  mutate("Sample_ID" = str_c(`Study`, `Sample`, sep = "_"))
 # 
 ```
 
@@ -30,7 +32,7 @@ samples <- read_csv("data/SampleData_MetaPocillopora_011822.csv")
 
 ## Import VCF file
 ```{r imporf vcf}
-vcf_meta <- vcfR::read.vcfR(file = "./outputs/phylotrans_pdam/filtered_vcfs/max-missing-0.75.recode.vcf")
+vcf_meta <- vcfR::read.vcfR(file = "./outputs/phylotrans_pdam/metapocillopora_002_filtered.recode.vcf")
 ```
 
 ## Convert to GENIND object
@@ -47,11 +49,11 @@ vcfR::write.fasta()
 
 ## PCA
 ```{r}
-grp_meta <- find.clusters(genind_meta, max.n.clust = 40)
+grp_meta <- find.clusters(genind_meta, max.n.clust = 8)
 ```
 ```{r}
 pdf("./outputs/adegenet/pca_find-clusters.pdf", height = 5, width = 6)
-grp_meta <- find.clusters(genind_meta, max.n.clust = 40, n.pca = 81)
+grp_meta <- find.clusters(genind_meta, max.n.clust = 20, n.pca = 24)
 dev.off()
 ```
 ```{r}
@@ -81,17 +83,19 @@ pca_meta$eig[2]/sum(pca_meta$eig)
 ```{r}
 s.label(pca_meta$li, xax=1, yax=2)
 
-pca_df <- pca_meta$li #%>%
+pca_df <- pca_meta$li %>%
   rownames_to_column("Sample_ID") %>%
-  left_join(samples, by = "Sample_ID")
+  mutate(Sample_ID = str_replace(`Sample_ID`, "_1$", "")) %>% 
+  full_join(samples, by = "Sample_ID")
 ```
 ```{r}
-pdf("./outputs/adegenet/pca_max-missing-0.25_indv-missing_0.95_maf-0.01_hwe-0.05.pdf")
+pdf("./outputs/figures/VCF_SNPs_pca.pdf")
 pca_df %>%
   ggplot(., aes(Axis1, Axis2)) +
-  geom_point(size = 3, alpha = 0.5) + #aes(color = Site, shape = Species),
+  geom_point(size = 3, alpha = 0.5, aes(color = Study, shape = Species)) + #a
   # geom_text_repel(aes(label = Sample_ID), size = 2, max.overlaps = 100)
-  theme_bw()
+  theme_bw() +
+  ggtitle("Phylotranscriptomic SNPs PCA")
 dev.off()
 ```
 ```{r}
@@ -120,7 +124,7 @@ scatter(dapc_meta,
          scree.da=TRUE,  posi.da="bottomright",
          scree.pca=TRUE, posi.pca="bottomleft",
          bg="white", pch=20,  cell=0, cstar=0,
-        cex=3,clab=0, leg=TRUE, txt.leg=paste("Cluster",1:6))
+        cex=3,clab=0, leg=TRUE, txt.leg=paste("Cluster",1:8))
 dev.off()
 ```
 ```{r}
@@ -136,10 +140,10 @@ scatter(dapc_meta, 2, 2, bg="white",
 # Add DAPC cluster group information to samples data frame
 samples_grp <- data.frame("Sample_ID" = names(grp_meta$grp), "Group" = unname(grp_meta$grp))
 # 
-samples_keep <- samples_all %>% 
+samples_keep <- samples %>% 
   filter(Sample_ID %in% samples_grp$Sample_ID) %>% 
   left_join(samples_grp) %>% 
-  arrange(Sample_ID) %>% select(-Number, -Dataset, -SampleID)
+  arrange(Sample_ID)
 # 
 write_csv(samples_keep, "~/Desktop/samples_keep.csv")
 write_csv(samples_grp, "~/Desktop/samples_grp.csv")
@@ -165,7 +169,7 @@ dev.off()
 ```
 ```{r}
 compoplot(dapc_meta, posi="bottomright",
-          txt.leg=paste("Cluster", 1:6), lab="",
+          txt.leg=paste("Cluster", 1:8), lab="",
           ncol=1, xlab="individuals", col=funky(6))
 ```
 
