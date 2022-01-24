@@ -23,6 +23,8 @@ prodir="/scratch/nmnh_corals/connellym/projects/MetaPocillopora"
 java -jar /share/apps/bioinformatics/gatk/3.8.1.0/GenomeAnalysisTK.jar \
 -T CombineGVCFs \
 -R /home/connellym/sequences/pdam_scaffolds.fasta \
+--variant ${prodir}/outputs/phylotrans_pdam/Vidal-Dupiol2014/Vidal-Dupiol2014_SRR988670_pdam.g.vcf.gz \
+--variant ${prodir}/outputs/phylotrans_pdam/Vidal-Dupiol2014/Vidal-Dupiol2014_SRR988671_pdam.g.vcf.gz \
 --variant ${prodir}/outputs/phylotrans_pdam/Vidal-Dupiol2014/Vidal-Dupiol2014_SRR988672_pdam.g.vcf.gz \
 --variant ${prodir}/outputs/phylotrans_pdam/Zhou2017/Zhou2017_SRR3727281_pdam.g.vcf.gz \
 --variant ${prodir}/outputs/phylotrans_pdam/Zhou2017/Zhou2017_SRR3727374_pdam.g.vcf.gz \
@@ -44,9 +46,24 @@ java -jar /share/apps/bioinformatics/gatk/3.8.1.0/GenomeAnalysisTK.jar \
 --variant ${prodir}/outputs/phylotrans_pdam/Poquita-Du2019/Poquita-Du2019_SRR7042978_pdam.g.vcf.gz \
 --variant ${prodir}/outputs/phylotrans_pdam/Poquita-Du2019/Poquita-Du2019_SRR7043013_pdam.g.vcf.gz \
 --variant ${prodir}/outputs/phylotrans_pdam/Poquita-Du2019/Poquita-Du2019_SRR7043704_pdam.g.vcf.gz \
+--variant ${prodir}/outputs/phylotrans_pdam/Zhou2019/Zhou2019_SRR6784730_pdam.g.vcf.gz \
+--variant ${prodir}/outputs/phylotrans_pdam/Zhou2019/Zhou2019_SRR6784731_pdam.g.vcf.gz \
+--variant ${prodir}/outputs/phylotrans_pdam/Zhou2019/Zhou2019_SRR6784732_pdam.g.vcf.gz \
 --variant ${prodir}/outputs/phylotrans_pdam/Zhou2019/Zhou2019_SRR6784733_pdam.g.vcf.gz \
 --variant ${prodir}/outputs/phylotrans_pdam/Zhou2019/Zhou2019_SRR6784734_pdam.g.vcf.gz \
 --variant ${prodir}/outputs/phylotrans_pdam/Zhou2019/Zhou2019_SRR6784735_pdam.g.vcf.gz \
---out ${prodir}/outputs/phylotrans_pdam/metapocillopora_002.g.vcf.gz
+--variant ${prodir}/outputs/phylotrans_pdam/ConnellyEAPSI/ConnellyEAPSI_SRR10395133_1_pdam.g.vcf.gz \
+--variant ${prodir}/outputs/phylotrans_pdam/ConnellyEAPSI/ConnellyEAPSI_SRR10395134_1_pdam.g.vcf.gz \
+--variant ${prodir}/outputs/phylotrans_pdam/ConnellyEAPSI/ConnellyEAPSI_SRR10395135_1_pdam.g.vcf.gz \
+--variant ${prodir}/outputs/phylotrans_pdam/ConnellyEAPSI/ConnellyEAPSI_SRR10395151_1_pdam.g.vcf.gz \
+--variant ${prodir}/outputs/phylotrans_pdam/ConnellyEAPSI/ConnellyEAPSI_SRR10395152_1_pdam.g.vcf.gz \
+--variant ${prodir}/outputs/phylotrans_pdam/ConnellyEAPSI/ConnellyEAPSI_SRR10395154_1_pdam.g.vcf.gz \
+--variant ${prodir}/outputs/phylotrans_pdam/ConnellyEAPSI/ConnellyEAPSI_SRR10395170_1_pdam.g.vcf.gz \
+--variant ${prodir}/outputs/phylotrans_pdam/ConnellyEAPSI/ConnellyEAPSI_SRR10395171_1_pdam.g.vcf.gz \
+--variant ${prodir}/outputs/phylotrans_pdam/ConnellyEAPSI/ConnellyEAPSI_SRR10395172_1_pdam.g.vcf.gz \
+--variant ${prodir}/outputs/phylotrans_pdam/ConnellyEAPSI/ConnellyEAPSI_SRR10395189_1_pdam.g.vcf.gz \
+--variant ${prodir}/outputs/phylotrans_pdam/ConnellyEAPSI/ConnellyEAPSI_SRR10395190_1_pdam.g.vcf.gz \
+--variant ${prodir}/outputs/phylotrans_pdam/ConnellyEAPSI/ConnellyEAPSI_SRR10395191_1_pdam.g.vcf.gz \
+--out ${prodir}/outputs/phylotrans_pdam/metapocillopora_003.g.vcf.gz
 #
 echo = `date` job $JOB_NAME done
