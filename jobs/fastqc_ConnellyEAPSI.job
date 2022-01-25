@@ -1,0 +1,42 @@
+# /bin/sh
+# ----------------Parameters---------------------- #
+#$  -S /bin/sh
+#$ -pe mthread 15
+#$ -q sThC.q
+#$ -l mres=16G,h_data=1G,h_vmem=1G
+#$ -cwd
+#$ -j y
+#$ -N fastqc_ConnellyEAPSI
+#$ -o fastqc_ConnellyEAPSI.log
+#$ -m bea
+#$ -M connellym@si.edu
+#
+# ----------------Modules------------------------- #
+module load bioinformatics/fastqc
+#
+# ----------------Your Commands------------------- #
+#
+echo + `date` job $JOB_NAME started in $QUEUE with jobID=$JOB_ID on $HOSTNAME
+echo + NSLOTS = $NSLOTS
+#
+fastqc \
+/scratch/nmnh_corals/connellym/projects/MetaPocillopora/data/srareads/ConnellyEAPSI/WT1/* \
+--threads $NSLOTS \
+-o /scratch/nmnh_corals/connellym/projects/MetaPocillopora/outputs/QCs/fastqcs/
+#
+fastqc \
+/scratch/nmnh_corals/connellym/projects/MetaPocillopora/data/srareads/ConnellyEAPSI/WT2/* \
+--threads $NSLOTS \
+-o /scratch/nmnh_corals/connellym/projects/MetaPocillopora/outputs/QCs/fastqcs/
+#
+fastqc \
+/scratch/nmnh_corals/connellym/projects/MetaPocillopora/data/srareads/ConnellyEAPSI/HW1/* \
+--threads $NSLOTS \
+-o /scratch/nmnh_corals/connellym/projects/MetaPocillopora/outputs/QCs/fastqcs/
+#
+fastqc \
+/scratch/nmnh_corals/connellym/projects/MetaPocillopora/data/srareads/ConnellyEAPSI/HW2/* \
+--threads $NSLOTS \
+-o /scratch/nmnh_corals/connellym/projects/MetaPocillopora/outputs/QCs/fastqcs/
+#
+echo = `date` job $JOB_NAME done
