@@ -9,11 +9,21 @@ output: html_document
 knitr::opts_chunk$set(echo = TRUE)
 knitr::opts_knit$set(root.dir = rprojroot::find_rstudio_root_file())
 ```
+
+## Setup packages and working directories
 ```{r}
 library("vcfR")
 library("tidyverse")
 library("adegenet")
 library("ggrepel")
+#
+library("extrafont")
+library("extrafontdb")
+```
+
+## Import sample metadata
+```{r factor levels}
+study_factor <- c("Vidal-Dupiol2014", "Yuan2017", "Zhou2017", "Brener-Raffali2018", "Tang2018", "Wecker2018", "Zhou2018", "Poquita-Du2019", "Zhou2019", "ConnellyEAPSI", "Chuang-Mitarai2020", "Li2020")
 ```
 ```{r}
 # Import sample metadata 
@@ -32,7 +42,7 @@ samples <- read_csv("data/SampleData_MetaPocillopora_011822.csv") %>%
 
 ## Import VCF file
 ```{r imporf vcf}
-vcf_meta <- vcfR::read.vcfR(file = "./outputs/phylotrans_pdam/metapocillopora_002_filtered.recode.vcf")
+vcf_meta <- vcfR::read.vcfR(file = "./outputs/phylotrans_pdam/metapocillopora_003_filtered.vcf")
 ```
 
 ## Convert to GENIND object
@@ -49,11 +59,65 @@ vcfR::write.fasta()
 
 ## PCA
 ```{r}
-grp_meta <- find.clusters(genind_meta, max.n.clust = 8)
+# 
+x_meta <- tab(genind_meta, freq = TRUE, NA.method = "mean")
+# 
+pca_meta <- dudi.pca(x_meta, center = TRUE, scale = FALSE, scannf = FALSE, nf = 41)
+# ?dudi.pca()
+```
+```{r}
+pdf("./outputs/adegenet/pca_screeplot.pdf")
+dudi.pca(x_meta, center=TRUE, scale=FALSE, scannf = FALSE, nf = 4)
+dev.off()
+```
+```{r}
+s.label(pca_meta$li, xax=1, yax=2)
+```
+```{r}
+pca_df <- pca_meta$li %>%
+  rownames_to_column("Sample_ID") %>%
+  mutate(Sample_ID = str_replace(`Sample_ID`, "_1$", "")) %>% 
+  right_join(samples, by = "Sample_ID")
+pca_df$Study <- factor(pca_df$Study, levels = study_levels, ordered = TRUE)
+```
+```{r PC_vars}
+pc1lab <- paste("PC1: ", round(pca_meta$eig[1]/sum(pca_meta$eig)*100, 2), "%", sep = "")
+pc2lab <- paste("PC2: ", round(pca_meta$eig[2]/sum(pca_meta$eig)*100, 2), "%", sep = "")
+```
+```{r}
+# Figure
+pdf("./outputs/figures/VCF_SNPs_pca.pdf", height = 7, width = 10)
+pca_df %>%
+  ggplot(., aes(Axis1, Axis2)) +
+  geom_point( aes(fill = Study, shape = Species), size = 6, alpha = 0.5, stroke = 0.5, color = "black") + 
+  # geom_text_repel(aes(label = Sample_ID), size = 2, max.overlaps = 100)
+  scale_fill_manual(values = gg_color_hue(7), 
+                    guide = guide_legend(override.aes = list(size = 6, shape = 21, fill = gg_color_hue(7)))) +
+  scale_shape_manual(values = c(21, 24, 22),
+                     guide = guide_legend(override.aes = list(size = 6, alpha = 0.5, stroke = 0.5, fill = "black"))) +
+  theme_bw() +
+  theme(plot.title = element_text(size = 24),
+        axis.title = element_text(size = 20),
+        axis.text = element_blank(),
+        legend.title = element_text(size = 20),
+        legend.text = element_text(size = 18),
+        legend.spacing.y = unit(0.15, "in")) +
+  xlab(pc1lab) + ylab(pc2lab) +
+  ggtitle("PCA of phylotranscriptomic SNPs (12,049)")
+dev.off()
+```
+```{r}
+# Label and color PCA points according to library, site, etc. 
+```
+
+## DAPC
+```{r}
+# Find clusters
+grp_meta <- find.clusters(genind_meta, max.n.clust = 20)
 ```
 ```{r}
 pdf("./outputs/adegenet/pca_find-clusters.pdf", height = 5, width = 6)
-grp_meta <- find.clusters(genind_meta, max.n.clust = 20, n.pca = 24)
+grp_meta <- find.clusters(genind_meta, max.n.clust = 40, n.pca = 41)
 dev.off()
 ```
 ```{r}
@@ -63,46 +127,6 @@ grp_meta$stat
 grp_meta$grp
 grp_meta$size
 ```
-
-```{r}
-# 
-x_meta <- tab(genind_meta, freq=TRUE, NA.method="mean")
-# 
-pca_meta <- dudi.pca(x_meta, center=TRUE, scale=FALSE, scannf = TRUE)
-?dudi.pca()
-```
-```{r}
-pdf("./outputs/adegenet/pca_screeplot.pdf")
-dudi.pca(x_meta, center=TRUE, scale=FALSE, scannf = FALSE, nf = 4)
-dev.off()
-```
-```{r}
-pca_meta$eig[2]/sum(pca_meta$eig)
-```
-
-```{r}
-s.label(pca_meta$li, xax=1, yax=2)
-
-pca_df <- pca_meta$li %>%
-  rownames_to_column("Sample_ID") %>%
-  mutate(Sample_ID = str_replace(`Sample_ID`, "_1$", "")) %>% 
-  full_join(samples, by = "Sample_ID")
-```
-```{r}
-pdf("./outputs/figures/VCF_SNPs_pca.pdf")
-pca_df %>%
-  ggplot(., aes(Axis1, Axis2)) +
-  geom_point(size = 3, alpha = 0.5, aes(color = Study, shape = Species)) + #a
-  # geom_text_repel(aes(label = Sample_ID), size = 2, max.overlaps = 100)
-  theme_bw() +
-  ggtitle("Phylotranscriptomic SNPs PCA")
-dev.off()
-```
-```{r}
-# Label and color PCA points according to library, site, etc. 
-```
-
-## DAPC
 ```{r}
 # Run the analysis on the dataset using the previously inferred groups
 dapc_meta <- dapc(genind_meta, grp_meta$grp)
@@ -124,7 +148,7 @@ scatter(dapc_meta,
          scree.da=TRUE,  posi.da="bottomright",
          scree.pca=TRUE, posi.pca="bottomleft",
          bg="white", pch=20,  cell=0, cstar=0,
-        cex=3,clab=0, leg=TRUE, txt.leg=paste("Cluster",1:8))
+        cex=3,clab=0, leg=TRUE, txt.leg=paste("Cluster",1:12))
 dev.off()
 ```
 ```{r}
@@ -161,7 +185,7 @@ dapc_loadings <- data.frame(dapc_meta$var.contr) %>%
 
 ### Interpreting group memberships
 ```{r}
-pdf("./outputs/adegenet/assignplot-dapc_max-missing-0.25_indv-missing-0.95_depth-20_maf-0.05.pdf", width = 8, height = 6)
+pdf("./outputs/figures_VCF_SNP_assignplot.pdf", width = 8.5, height = 11)
 par(mar=c(4,10,4,4))
 # summary(dapc_meta)
 assignplot(dapc_meta)

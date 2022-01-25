@@ -1,0 +1,104 @@
+---
+title: "Pocillopora RNAseq sample origin maps"
+author: "Mike Connelly"
+date: "01/26/2022"
+output: html_document
+---
+## Setup packages
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+knitr::opts_knit$set(root.dir = rprojroot::find_rstudio_root_file())
+```
+```{r setup packages}
+library("tidyverse")
+library("sf")
+library("maps")
+# library("igraph")
+# library("tidygraph")
+# library("ggspatial")
+# library("ggmap")
+# library("usmap")
+# library("gdistance")
+# library("SpatialGraph")
+library("rnaturalearth")
+library("rnaturalearthdata")
+# library("osmdata")
+# library("tools")
+library("patchwork")
+library("cowplot")
+library("ggrepel")
+library("extrafont")
+library("extrafontdb")
+```
+
+```{r}
+theme_set(theme_bw())
+```
+
+## Create mapping sf data objects
+```{r}
+world <- ne_countries(scale = "medium", returnclass = "sf")
+```
+```{r}
+# Center world map shapefile on Pacific
+pacmap <- map('world', wrap = c(0, 360), plot = F, fill = T)
+world_pacific_center <- sf::st_as_sf(pacmap)
+```
+```{r Quick check of base world map}
+ggplot() +
+  geom_sf(data = world_pacific_center, fill = "antiquewhite") + 
+  coord_sf(ylim = c(-42, 42), xlim = c(20, 295), expand = F) +
+  theme(panel.grid.major = element_blank(), 
+        panel.background = element_rect(fill = "aliceblue"), 
+        panel.border = element_rect(fill = NA))
+```
+
+### Map of Pocillopora RNAseq study locations
+```{r factor levels}
+study_levels <- c("Mayfield2014", "Vidal-Dupiol2014", "Yuan2017", "Zhou2017", "Brener-Raffali2018", "Tang2018", "Wecker2018", "Zhou2018", "Poquita-Du2019", "Zhou2019", "ConnellyEAPSI", "Chuang-Mitarai2020", "Li2020")
+```
+```{r study_locations}
+study_locations <- read_csv("./data/StudyGeography.csv") %>%
+  dplyr::rename( "# of samples" = n)
+study_locations$Longitude <- ifelse(study_locations$Longitude < 0, (study_locations$Longitude + 360), (study_locations$Longitude)) 
+study_locations$Study <- factor(study_locations$Study, levels = study_levels, ordered = TRUE)
+title <- expression(italic("Pocillopora")~"RNAseq study locations")
+```
+```{r}
+pdf("./outputs/figures/study_locations_map.pdf", height = 6, width = 14)
+map <- study_locations %>% 
+  filter(Include == T) %>%
+  ggplot(data = .) +
+  geom_sf(data = world_pacific_center, fill = "antiquewhite") + 
+  # 
+  geom_point(aes(x = `Longitude`, y = `Latitude`, size = `# of samples`, fill = `Study`), shape = 21, alpha = 0.5, color = "black", stroke = 0.5,
+             position = position_jitter(width = 2, height = 2, seed = 2),
+             show.legend = T) +
+  # scale_shape_manual(values = c(21, 24), guide = guide_legend(override.aes = list(size = 5))) +
+  # scale_color_manual(values = gcolors) +
+  scale_fill_manual(values = gcolors, guide = guide_legend(override.aes = list(size = 6, shape = 21, fill = gcolors))) +
+  scale_size(range = c(1, 12), breaks = c(6, 12, 24, 48, 60), limits = c(0, 60), guide = guide_legend(override.aes = list(fill = "black"))) +
+  # 
+  coord_sf(ylim = c(-42, 42), xlim = c(20, 295), expand = F) +
+  # 
+  theme(plot.title = element_text(size = 24),
+        axis.title = element_text(size = 20),
+        axis.text = element_text(size = 14),
+        legend.title = element_text(size = 20),
+        legend.text = element_text(size = 18),
+        legend.spacing.y = unit(0.15, "in"),
+        panel.grid.major = element_blank(), 
+        panel.background = element_rect(fill = "aliceblue"), 
+        panel.border = element_rect(fill = NA)) +
+  ggtitle(title)
+map
+dev.off()
+```
+```{r}
+gg_color_hue <- function(n) {
+  hues = seq(15, 375, length = n + 1)
+  hcl(h = hues, l = 65, c = 100)[1:n]
+}
+gcolors <- gg_color_hue(n_distinct(study_locations$Study))
+gcolors <- gg_color_hue(12)
+```

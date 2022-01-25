@@ -54,8 +54,8 @@ library("flashClust")
 ```
 
 ## Import sample metadata
-```{r factors}
-# factor levels
+```{r factor levels}
+study_factor <- c("Vidal-Dupiol2014", "Yuan2017", "Zhou2017", "Brener-Raffali2018", "Tang2018", "Wecker2018", "Zhou2018", "Poquita-Du2019", "Zhou2019", "ConnellyEAPSI", "Chuang-Mitarai2020")
 ```
 ```{r  sample_data, echo=TRUE}
 # Import sample metadata 
@@ -65,9 +65,9 @@ samples <- read_csv("data/SampleData_MetaPocillopora_011822.csv")
 ```{r coldata}
 # Get sample data into tibble
 coldata <- samples %>%
-  dplyr::filter(Include == TRUE) %>% 
+  dplyr::filter(Include_Counts == TRUE) %>% 
   as_tibble(.) %>%
-  # dplyr::arrange("Study") %>% #Order rows by study                    
+  dplyr::arrange(desc("Sample")) %>% #Order rows                    
   column_to_rownames(var = "Sample")  
 ```
 
@@ -109,10 +109,11 @@ countdata <- countdata[ ,6:ncol(countdata)]
 # Remove file prefixes and suffixes
   colnames(countdata) <- gsub("X.scratch.nmnh_corals.connellym.projects.MetaPocillopora.outputs.STARalign_pdam.", "", colnames(countdata))
   colnames(countdata) <- gsub("_pdam_Aligned.out.bam$", "", colnames(countdata))
-  colnames(countdata) <- gsub("^.*_", "", colnames(countdata))
+  colnames(countdata) <- gsub("_1$", "", colnames(countdata))
+  colnames(countdata) <- gsub("^.*\\..*_", "", colnames(countdata))
   # colnames(countdata) <- gsub("\\.", "-", colnames(countdata))
 # Sort countdata by P. damicornis gene ID
-countdata_sorted_coral <- as.data.frame(countdata[order(rownames(countdata)),])
+countdata_sorted_coral <- as.data.frame(countdata[sort(rownames(countdata)), order(match(colnames(countdata),row.names(coldata)))]) 
 ```
 ```{r coral_gene_annotation}
 gene_annotation_coral <- read.delim(file = "./data/pdam_genome_annotations.tsv", header = T) %>% arrange(ID)
@@ -155,7 +156,9 @@ vsd <- vsd_coral
 # vsd <- vsd_symbiont
 ```
 ```{r}
+pdf("./outputs/figures/gene_expression_pca.pdf")
 DESeq2::plotPCA(vsd_coral, intgroup = c("Study")) 
+dev.off()
 ```
 ### Visualize global gene expression using PCAtools
 ```{r}
