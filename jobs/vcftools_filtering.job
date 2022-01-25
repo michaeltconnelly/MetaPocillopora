@@ -21,11 +21,11 @@ echo + `date` job $JOB_NAME started in $QUEUE with jobID=$JOB_ID on $HOSTNAME
 prodir="/scratch/nmnh_corals/connellym/projects/MetaPocillopora"
 VCF_IN="${prodir}/outputs/phylotrans_pdam/metapocillopora_003.vcf.gz"
 VCF_OUT="${prodir}/outputs/phylotrans_pdam/metapocillopora_003_filtered.vcf.gz"
-MAF="0.05"
+MAF="0.01"
 MISS="0.95"
-QUAL="20"
-MIN_DEPTH="20"
-MAX_DEPTH="200"
+QUAL="10"
+MIN_DEPTH="10"
+MAX_DEPTH="300"
 vcftools --gzvcf $VCF_IN \
 --remove-indels --maf $MAF --max-missing $MISS --minQ $QUAL \
 --min-meanDP $MIN_DEPTH --max-meanDP $MAX_DEPTH \
