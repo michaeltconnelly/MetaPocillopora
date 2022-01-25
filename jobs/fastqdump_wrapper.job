@@ -35,4 +35,5 @@ echo "fastq-dump --split-files --outdir ${prodir}/data/srareads/${study} --gzip 
 #
 echo "#" >> $prodir/bash/jobs/fastqdump_${study}_${sample}.job
 echo 'echo = `date` job $JOB_NAME done' >> $prodir/bash/jobs/fastqdump_${study}_${sample}.job
+qsub $prodir/bash/jobs/fastqdump_${study}_${sample}.job
 done
