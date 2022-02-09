@@ -1,0 +1,29 @@
+# /bin/sh
+# ----------------Parameters---------------------- #
+#$  -S /bin/sh
+#$ -pe mthread 20
+#$ -q sThC.q
+#$ -l mres=160G,h_data=8G,h_vmem=8G
+#$ -cwd
+#$ -j y
+#$ -N raxml_meta_001
+#$ -o raxml_meta_001.log
+#$ -m bea
+#$ -M connellym@si.edu
+#
+# ----------------Modules------------------------- #
+module load bioinformatics/raxml
+#
+# ----------------Your Commands------------------- #
+#
+echo + `date` job $JOB_NAME started in $QUEUE with jobID=$JOB_ID on $HOSTNAME
+echo + NSLOTS = $NSLOTS
+#
+raxmlHPC \
+--all \
+--msa metapocillopora_004_filtered_strict.min4.phy \
+ --model GTR+ASC_LEWIS \
+ --tree pars{10} \
+ --bs-trees 100
+#
+echo = `date` job $JOB_NAME done
