@@ -22,10 +22,10 @@ echo + NSLOTS = $NSLOTS
 prodir="/scratch/nmnh_corals/connellym/projects/MetaPocillopora"
 #
 raxmlHPC \
---all \
---msa ${prodir}/outputs/phylotrans_pdam/metapocillopora_004_filtered_strict.min4.phy \
- --model GTR+ASC_LEWIS \
- --tree pars{10} \
- --bs-trees 100
+-s ${prodir}/outputs/phylotrans_pdam/metapocillopora_004_filtered_strict.min4.phy \
+-n ${prodir}/outputs/phylotrans_pdam/metapocillopora_004_filtered_strict \
+-m GTR+ASC_LEWIS \
+--tree pars{10} \
+--bs-trees 100
 #
 echo = `date` job $JOB_NAME done
