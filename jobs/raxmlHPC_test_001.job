@@ -1,0 +1,33 @@
+# /bin/sh 
+# ----------------Parameters---------------------- #
+#$  -S /bin/sh
+#$ -pe mthread 8
+#$ -q sThC.q
+#$ -l mres=8G,h_data=1G,h_vmem=1G
+#$ -cwd
+#$ -j y
+#$ -N raxmlHPC_test_001
+#$ -o raxmlHPC_test_001.log
+#$ -m bea
+#$ -M connellym@si.edu
+#
+# ----------------Modules------------------------- #
+module load bioinformatics/raxml
+#
+# ----------------Your Commands------------------- #
+#
+echo + `date` job $JOB_NAME started in $QUEUE with jobID=$JOB_ID on $HOSTNAME
+echo + NSLOTS = $NSLOTS
+#
+prodir="/scratch/nmnh_corals/connellym/projects/MetaPocillopora"
+#
+raxmlHPC \
+-s ${prodir}/outputs/phylotrans_pdam/metapocillopora_004_filtered_strict_ascbi.phy \
+-n ${prodir}/outputs/raxml/raxml_run_002/metapocillopora_004_filtered_strict_ascbi \
+-m GTRGAMMA \
+-p 12345 \
+-# 20 \
+-T $NSLOTS 
+# 
+#
+echo = `date` job $JOB_NAME done
