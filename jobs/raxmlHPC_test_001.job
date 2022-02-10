@@ -1,4 +1,4 @@
-# /bin/sh 
+# /bin/sh
 # ----------------Parameters---------------------- #
 #$  -S /bin/sh
 #$ -pe mthread 8
@@ -23,11 +23,11 @@ prodir="/scratch/nmnh_corals/connellym/projects/MetaPocillopora"
 #
 raxmlHPC \
 -s ${prodir}/outputs/phylotrans_pdam/metapocillopora_004_filtered_strict_ascbi.phy \
--n ${prodir}/outputs/raxml/raxml_run_002/metapocillopora_004_filtered_strict_ascbi \
+-n metapocillopora_004_filtered_strict_ascbi_001 \
+-w ${prodir}/outputs/raxml/raxml_run_002/ \
 -m GTRGAMMA \
 -p 12345 \
 -# 20 \
 -T $NSLOTS 
-# 
 #
 echo = `date` job $JOB_NAME done
