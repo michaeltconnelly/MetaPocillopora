@@ -1,0 +1,31 @@
+# /bin/sh 
+# ----------------Parameters---------------------- #
+#$  -S /bin/sh
+#$ -pe mthread 12
+#$ -q sThC.q
+#$ -l mres=48G,h_data=4G,h_vmem=4G
+#$ -cwd
+#$ -j y
+#$ -N iqtree_test_005
+#$ -o iqtree_test_005.log
+#$ -m bea
+#$ -M connellym@si.edu
+#
+# ----------------Modules------------------------- #
+module load bioinformatics/iqtree
+#
+# ----------------Your Commands------------------- #
+#
+echo + `date` job $JOB_NAME started in $QUEUE with jobID=$JOB_ID on $HOSTNAME
+echo + NSLOTS = $NSLOTS
+#
+prodir="/scratch/nmnh_corals/connellym/projects/MetaPocillopora"
+iqtree2 \
+-s ${prodir}/outputs/phylotrans_pdam/metapocillopora_004_filtered_strict.min4.phy \
+-pre ${prodir}/outputs/iqtree/iqtree_run_005/metapocillopora_004_filtered_strict \
+-st DNA \
+-m TVMe+G4 \
+-b 100 \
+-T $NSLOTS
+#
+echo = `date` job $JOB_NAME done
