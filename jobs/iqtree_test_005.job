@@ -1,4 +1,4 @@
-# /bin/sh 
+# /bin/sh
 # ----------------Parameters---------------------- #
 #$  -S /bin/sh
 #$ -pe mthread 12
@@ -21,7 +21,7 @@ echo + NSLOTS = $NSLOTS
 #
 prodir="/scratch/nmnh_corals/connellym/projects/MetaPocillopora"
 iqtree2 \
--s ${prodir}/outputs/phylotrans_pdam/metapocillopora_004_filtered_strict.min4.phy \
+-s ${prodir}/outputs/phylotrans_pdam/max-missing-0.75_indv-missing-0.75_max-missing_0.1.recode.min4.phy \
 -pre ${prodir}/outputs/iqtree/iqtree_run_005/metapocillopora_004_filtered_strict \
 -st DNA \
 -m TVMe+G4 \
