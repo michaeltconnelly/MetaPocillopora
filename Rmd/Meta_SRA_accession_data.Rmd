@@ -1,0 +1,73 @@
+---
+title: "Pocillopora meta-analysis SRA accessions"
+author: "Mike Connelly"
+date: "1/27/2022"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, warning = FALSE, message = FALSE, cache = TRUE)
+knitr::opts_knit$set(root.dir = rprojroot::find_rstudio_root_file())
+options(stringsAsFactors = FALSE)
+```
+
+## Setup packages and working directories
+```{r packages}
+library("tidyverse")
+library("purrr")
+```
+
+## Import SRA accession data
+```{r message = T}
+bioproject_spec <- spec(read_csv(sra_run_tables[1]))
+bioproject_spec
+# 
+sra_cols <- cols(
+  Run = col_character(),
+  `Assay Type` = col_character(),
+  AvgSpotLen = col_double(),
+  Bases = col_double(),
+  BioProject = col_character(),
+  BioSample = col_character(),
+  BioSampleModel = col_character(),
+  Bytes = col_double(),
+  `Center Name` = col_character(),
+  Collection_Date = col_character(),
+  `Collection_timepoint_(h)` = col_double(),
+  Consent = col_character(),
+  `DATASTORE filetype` = col_character(),
+  `DATASTORE provider` = col_character(),
+  `DATASTORE region` = col_character(),
+  Experiment = col_character(),
+  geo_loc_name_country = col_character(),
+  geo_loc_name_country_continent = col_character(),
+  geo_loc_name = col_character(),
+  Host = col_character(),
+  Instrument = col_character(),
+  Isolate = col_character(),
+  lat_lon = col_character(),
+  `Library Name` = col_character(),
+  LibraryLayout = col_character(),
+  LibrarySelection = col_character(),
+  LibrarySource = col_character(),
+  Organism = col_character(),
+  Platform = col_character(),
+  ReleaseDate = col_datetime(format = ""),
+  `Sample Name` = col_character(),
+  `SRA Study` = col_character(),
+  treatment = col_character(),
+  env_broad_scale = col_logical(),
+  env_local_scale = col_logical(),
+  env_medium = col_logical(),
+  isol_growth_condt = col_logical(),
+  strain = col_logical(),
+  BREED = col_character(),
+  Isolation_source = col_character(),
+  tissue = col_character()
+)
+```
+```{r}
+sra_run_tables <- list.files("./data/run_tables", pattern = "*.csv", full.names = TRUE)
+sra_table <- map_df(sra_run_tables, read_csv)
+```
+

@@ -21,19 +21,18 @@ library("pegas")
 ## RSMAS Pocillopora corals
 ### Import mtORF sequence alignment 
 ```{r import_alignment}
-data <- read.dna("./data/GenBank_mtORF/aligned.fasta", format = "fasta")
+data <- read.dna("./outputs/GenBank_mtORF/aligned.clipkit.manual.fasta", format = "fasta")
 checkAlignment(data)
-#14 sequences, 828 sites
+#361 sequences, 742 sites
 # attributes(data)
 # dimnames(data)[[1]]
 ```
 ```{r haplotypes}
 dataHaplo <- haplotype(data)
 dataHaplo
-# 6 unique haplotypes
-  # I  II III  IV   V  VI 
-  # 4   3   1   2   2   2 
-# summary(dataHaplo)
+# 54 unique haplotypes
+
+summary(dataHaplo)
 ```
 ```{r extract haplotypes and build network}
 dataHaplo <- sort(dataHaplo, what = "labels")
@@ -73,7 +72,7 @@ plot(dataNet)
 # pdf(file="~/Desktop/mtORF_haplotypes_sites.pdf", width = 8, height = 10, pointsize = 10)
 plot(dataNet,
      size = attr(dataNet, "freq"),
-     show.mutation = 1,
+     show.mutation = 0,
      labels = FALSE,
      legend = c(-20,20))
 # dev.off()

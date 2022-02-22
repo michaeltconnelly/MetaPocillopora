@@ -23,8 +23,8 @@ library("WGCNA")
 library("dynamicTreeCut")
 library("flashClust")
 # library("genefilter")
-# library("variancePartition")
-# library("doParallel")
+library("variancePartition")
+library("doParallel")
 # library("limma")
 # library("adegenet")
 # GO/KOG enrichment packages and other functions
@@ -50,22 +50,25 @@ library("flashClust")
 # library("extrafont")
 # library("extrafontdb")
 # extended visualization functions
-# source("./R/AXH_functions.R")
+source("./R/pocillopora_meta_functions.R")
+```
+```{r}
+theme_set(theme_bw())
 ```
 
 ## Import sample metadata
 ```{r factor levels}
-study_factor <- c("Vidal-Dupiol2014", "Yuan2017", "Zhou2017", "Brener-Raffali2018", "Tang2018", "Wecker2018", "Zhou2018", "Poquita-Du2019", "Zhou2019", "ConnellyEAPSI", "Chuang-Mitarai2020")
+study_levels <- c("Mayfield2014", "Vidal-Dupiol2014", "Yuan2017", "Zhou2017", "Brener-Raffali2018", "Delgadillo-Nuno2018", "Tang2018", "Wecker2018", "Zhou2018", "Poquita-Du2019", "Zhou2019", "Buitrago-Lopez2020", "Chuang-Mitarai2020", "Li2020", "ConnellyEAPSI", "Grupstra2022")
 ```
-```{r  sample_data, echo=TRUE}
+```{r sample_data, echo=TRUE}
 # Import sample metadata 
-samples <- read_csv("data/SampleData_MetaPocillopora_011822.csv")
-# may want to combine study name and SRR sample ID into one column
+samples <- read_csv("data/SampleData_MetaPocillopora_012722.csv")
 ```
 ```{r coldata}
 # Get sample data into tibble
 coldata <- samples %>%
-  dplyr::filter(Include_Counts == TRUE) %>% 
+  dplyr::filter(Include_Counts == TRUE) %>%
+  # dplyr::filter(Treatment == "control") %>% 
   as_tibble(.) %>%
   dplyr::arrange(desc("Sample")) %>% #Order rows                    
   column_to_rownames(var = "Sample")  
@@ -89,7 +92,7 @@ read_dat = function(x){
 #read in and join the datasets
 print('Reading in and joining...')
 dat <- fileList %>%
-  map(function(x) read_dat(x)) %>% 
+  purrr::map(function(x) read_dat(x)) %>% 
   purrr::reduce(full_join, by = c('Geneid', 'Chr', 'Start', 'End', 'Strand', 'Length'))
 print('Done.')
 #print summary
@@ -106,14 +109,22 @@ countdata <- countdata %>% column_to_rownames("Geneid")
 # row.names(countdata) <- countdata$Geneid
 # Remove first six columns (Geneid, chr, start, end, strand, length)
 countdata <- countdata[ ,6:ncol(countdata)]
-# Remove file prefixes and suffixes
+# Remove file prefixes and suffixes to leave SRR accession number
   colnames(countdata) <- gsub("X.scratch.nmnh_corals.connellym.projects.MetaPocillopora.outputs.STARalign_pdam.", "", colnames(countdata))
   colnames(countdata) <- gsub("_pdam_Aligned.out.bam$", "", colnames(countdata))
   colnames(countdata) <- gsub("_1$", "", colnames(countdata))
   colnames(countdata) <- gsub("^.*\\..*_", "", colnames(countdata))
   # colnames(countdata) <- gsub("\\.", "-", colnames(countdata))
+```
+```{r countdata_tidy}
+# Select counts for samples present in coldata
+countdata_select <- countdata[, colnames(countdata) %in% rownames(coldata)]
+
 # Sort countdata by P. damicornis gene ID
-countdata_sorted_coral <- as.data.frame(countdata[sort(rownames(countdata)), order(match(colnames(countdata),row.names(coldata)))]) 
+countdata_sorted_coral <- as.data.frame(countdata_select[sort(rownames(countdata_select)), order(match(colnames(countdata_select),row.names(coldata)))]) 
+
+# Sanity check
+all(colnames(countdata_sorted_coral) == rownames(coldata))
 ```
 ```{r coral_gene_annotation}
 gene_annotation_coral <- read.delim(file = "./data/pdam_genome_annotations.tsv", header = T) %>% arrange(ID)
@@ -150,16 +161,57 @@ vsd_coral <- vst(dds_coral, blind = TRUE) # use blind = TRUE to not account for 
 ```
 
 ## Visualize global gene expression
+```{r colors}
+gg_color_hue <- function(n) {
+  hues = seq(15, 375, length = n + 1)
+  hcl(h = hues, l = 65, c = 100)[1:n]
+}
+```
 ```{r choose_vsd, include=FALSE}
 # Choose vsd for host/symbiont analysis with PCoA and WGCNA
 vsd <- vsd_coral
 # vsd <- vsd_symbiont
 ```
-```{r}
-pdf("./outputs/figures/gene_expression_pca.pdf")
-DESeq2::plotPCA(vsd_coral, intgroup = c("Study")) 
+## Figure 3: PCA of overall gene expression
+```{r prepare_pca_dataframe}
+pca_df <- plotPCA.custom(vsd, intgroup = c("Study"), ntop = 500, returnData = TRUE,  pcs = c(1,2))
+# 
+pca_df<- pca_df %>% dplyr::rename("Sample" = "name") %>%
+  # mutate(Sample_ID = str_replace(`Sample_ID`, "_1$", "")) %>% 
+  inner_join(samples, by = "Sample") %>% 
+  dplyr::rename("Study" = Study.x)
+pca_df$Study <- factor(pca_df$Study, levels = study_levels, ordered = TRUE)
+```
+```{r gene expression pca figure}
+pdf("./outputs/figures/Fig3_gene_expression_pca.pdf", height = 7.5, width = 9)
+pca_title <- paste("PCA of overall gene expression (12,826 genes)", sep = "")
+#
+PCAtmtpercentVar <- round(100 * attr(pca_df, "percentVar"), 2)
+pc1lab <- paste0( "PC", 1, ": ", PCAtmtpercentVar[1], "%")
+pc2lab <- paste0( "PC", 2, ": ", PCAtmtpercentVar[2], "%")
+#
+pca_df %>%
+  ggplot(., aes(PC1, PC2)) +
+  geom_point( aes(fill = Study, shape = Species), size = 6, alpha = 0.8, stroke = 0.5, color = "black") + 
+  # geom_text_repel(aes(label = Sample_ID), size = 2, max.overlaps = 100)
+  scale_fill_manual(values = gg_color_hue(n_distinct(coldata$Study)), 
+                    guide = guide_legend(override.aes = list(size = 6, shape = 21, fill = gg_color_hue(n_distinct(coldata$Study))), nrow = 8, title.position = "top")) +
+  scale_shape_manual(values = c(21, 24, 22, 23),
+                     guide = guide_legend(override.aes = list(size = 6, alpha = 0.8, stroke = 0.5, fill = "black"), nrow = 4, title.position = "top")) +
+  theme_bw() +
+  coord_fixed(12.32/21.52) + 
+  theme(plot.title = element_text(size = 28),
+        axis.title = element_text(size = 24),
+        axis.text = element_blank(),
+        legend.title = element_text(size = 24),
+        legend.text = element_text(size = 20),
+        legend.position = "bottom",
+        legend.spacing.y = unit(0.15, "in")) +
+  xlab(pc1lab) + ylab(pc2lab) +
+  ggtitle(pca_title)
 dev.off()
 ```
+
 ### Visualize global gene expression using PCAtools
 ```{r}
 p <- pca(assay(vsd), metadata = coldata, removeVar = 0.2)
@@ -167,21 +219,95 @@ screeplot(p, axisLabSize = 18, titleLabSize = 22)
 ```
 ```{r}
 # pdf("./outputs/figures/pca_biplot_temp.pdf", height = 9, width = 9)
-  biplot(p, showLoadings = TRUE,
-         colby = 'Species',
+  biplot(p, showLoadings = FALSE, 
+         colby = 'Genotype',
+         shape = 'Species',
     labSize = 1, pointSize = 2, sizeLoadingsNames = 1,
     legendPosition = "right")
   # dev.off()
+?biplot(
+
+)
 ```
 ```{r}
 pdf("./outputs/figures/pca_pairsplot_all.pdf", height = 9, width = 9)
 pairsplot(p, colby = 'Study')
 dev.off
 ```
-
 ```{r}
 eigencorplot(p,
     metavars = c('Study', 'Species', 'Treatment', 'Temperature'))
+```
+
+## VariancePartition
+```{r variance_partition}
+# Partition total transcriptome variance among explanatory factors including sequencing round, coral genotype, treatment, and their interaction
+formula <- ~ (1|Study) + (1|Species) + (1|Genotype) + (1|Treatment)
+#
+cores<-detectCores()
+cl <- makeCluster(cores[1]-1); registerDoParallel(cl)
+varpart_total <- fitExtractVarPartModel(assay(vsd), formula, coldata)
+stopCluster(cl)
+# sort variables (i.e. columns) by median fraction of variance explained
+vpt <- sortCols(varpart_total, FUN = mean)
+```
+```{r }
+# Violin plot of contribution of each variable to total variance
+varcols <- rev(c('#ffffcc','#a1dab4','#41b6c4','#2c7fb8','#253494'))
+varplot <- plotVarPart(vpt, col = varcols)
+vartitle <- expression(paste(italic("Pocillopora"), " expression variance partition"))
+varplot <- varplot +
+  theme(plot.title = element_text(size = 24, hjust = -0.1),
+        axis.title = element_text(size = 20),
+        axis.text = element_text(size = 18),
+        axis.text.x = element_text(angle = 330, hjust= 0, size = 20),
+        legend.title = element_text(size = 20),
+        legend.text = element_text(size = 18),
+        legend.spacing.y = unit(0.15, "in")) +
+  ggtitle(vartitle)
+print(varplot)
+ggsave(varplot, filename = "./outputs/figures/variancePartition_total.pdf", width = 10, height = 5, units = "in", device = "pdf")
+```
+```{r varpart_sum}
+vptdf <- as.data.frame(vpt) %>% rownames_to_column("gene")
+varpct <- vptdf %>% pivot_longer(cols = -gene, names_to = "source", values_to = "value") %>% 
+  mutate(relvar = value / sum(value)) %>%
+  mutate(source = str_replace(source, "_", " ")) %>% 
+  group_by(source) %>% 
+  # filter(source != "Residuals") %>%
+  summarise(total_pctvar_explained = sum(relvar))
+```
+### Supplementary Figure
+```{r}
+varpct %>% 
+  mutate(source = fct_reorder(source, order(colnames(vpt)))) %>% 
+  ggplot(aes(source, total_pctvar_explained)) +
+  geom_col(aes(fill = source), color = "black") +
+  ylab("Total percent variance explained") +
+  scale_fill_viridis(discrete = T) +
+  theme_bw() +
+  theme(axis.text.x = element_text(angle = 330, hjust = 0))
+```
+```{r total_variance figure: powerpoint}
+pdf("./outputs/figures/Fig4_variance_partition_totals.pdf", height = 6.5, width = 3.5)
+var_title <- expression(paste("Variance factors"))
+# 
+varpct %>% 
+  dplyr::mutate(source = fct_reorder(source, order(colnames(vpt)))) %>%
+  # dplyr::filter(source != "Residuals") %>% 
+  ggplot(aes(source, total_pctvar_explained)) +
+  geom_col(aes(fill = source), color = "black", show.legend = FALSE) +
+  ylab("Total percent variance") +
+  scale_fill_manual(values = varcols, name = "Factor") +
+  scale_y_continuous(limits = c(0, 0.5), labels = scales::percent) +
+  theme_bw() +
+  theme(plot.title = element_text(size = 28, hjust = 1),
+        axis.title = element_text(size = 24),
+        axis.title.x = element_blank(),
+        axis.text = element_text(size = 24),
+        axis.text.x = element_text(angle = 270, hjust = 0)) + 
+  ggtitle(var_title)
+dev.off()
 ```
 
 ## Weighted gene co-expression network analysis (WGCNA)

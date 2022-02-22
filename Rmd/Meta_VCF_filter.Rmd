@@ -19,77 +19,79 @@ source("./R/VCFfilterviz.R")
 # need to build custom functions in the repository (ex. multiplot())
 ```
 
-## Raw dataset stats
+## Preliminary filtered dataset stats
+The raw VCF was filtered on Hydra for loci with <25% missing data, Q > 30, depth 20 - 300, and minor allele frequency > 0.01
+The preliminary VCF contains 720,086 sites in 217 individuals.
+Target several thousand (~1,000 - 10,000) SNPs for downstream analyses
 ```{bash vcftools_query_raw}
 # vcf file, out directory, outfile prefix
 bash ./bash/vcftools_query.sh \
-./outputs/phylotrans_pdam/metapocillopora_001.vcf \
-./outputs/phylotrans_pdam/metapocillopora_001 \
-metapocillopora_001
+./outputs/phylotrans_pdam/metapocillopora_004_filtered_primary.vcf \
+./outputs/phylotrans_pdam/metapocillopora_004_primary \
+metapocillopora_004_primary
 ```
 ### Query stats
 ```{r raw_stats}
-ind_stats_raw <- read.ind.stats(dir = "./outputs/phylotrans_pdam/metapocillopora_001", vcf = "metapocillopora_001")
-loc_stats_raw <- read.loc.stats(dir = "./outputs/phylotrans_pdam/metapocillopora_001", vcf = "metapocillopora_001")
-# site_qual_raw <- read.table("./outputs/phylotrans_pdam/metapocillopora_001.lqual",
-#                             header = TRUE, stringsAsFactors = FALSE) %>%
-#   mutate(PROB = 10^(-QUAL/10))
+ind_stats_primary <- read.ind.stats(dir = "./outputs/phylotrans_pdam/metapocillopora_004_primary", vcf = "metapocillopora_004_primary")
+loc_stats_primary <- read.loc.stats(dir = "./outputs/phylotrans_pdam/metapocillopora_004_primary", vcf = "metapocillopora_004_primary")
+site_qual_raw <- read.table("./outputs/phylotrans_pdam/metapocillopora_004_primary/metapocillopora_004_primary.lqual",
+                            header = TRUE, stringsAsFactors = FALSE) %>%
+  mutate(PROB = 10^(-QUAL/10))
 ```
-The initial VCF contains 466,548 sites in 170 individuals.
 
-### Visualize raw dataset stats
+### Visualize preliminary dataset stats
 ```{r raw_dataset_visualization}
-vcfqvis("metapocillopora_001", ind_stats_raw, loc_stats_raw)
+vcfqvis("metapocillopora_004_primary", ind_stats_primary, loc_stats_primary)
 ```
 ```{r raw_dataset_missing-data}
 # Visualize missing data among individuals and loci
-pdf("./outputs/phylotrans_pdam/filtered_vcf_viz/merge_raw_vcf.pdf", height = 8.5, width = 11)
-vcf_raw_viz <- vcfqvis_miss("metapocillopora_001", ind_stats_raw, loc_stats_raw, title = "Raw, unfiltered VCF")
+pdf("./outputs/phylotrans_pdam/filtered_vcf_viz/meta_004_primary.pdf", height = 8.5, width = 11)
+vcf_raw_viz <- vcfqvis_miss("metapocillopora_004_primary", ind_stats_primary, loc_stats_primary, title = "Primary VCF")
 dev.off()
 ```
 
-## Filtering strategy #1
-* Step 1: Remove loci with genotype call rate < 95% (missing data > 5%)
+## Filtering strategy 
+* Step 1: Remove loci with genotype call rate < 25% (missing data > 75%)
 * Step 2: Remove individuals with missing data > 95%
 * Step 3: Remove loci with depth < 20 
 * Step 4: Remove loci with minor allele frequency < 5%
 
-### Step 1: Remove loci with genotype call rate < 95%
+### Step 1: Remove loci with genotype call rate < 25%
 ```{bash vcftools_filter_1}
-# Step 1: Remove loci with genotype call rate < 95%
+# Step 1: Remove loci with genotype call rate < 25%
 bash ./bash/vcftools_filter_maxmissing.sh \
-./outputs/phylotrans_pdam/metapocillopora_001.vcf \
-./outputs/phylotrans_pdam/filtered_vcfs/max-missing-0.95 \
-0.95
+./outputs/phylotrans_pdam/metapocillopora_004_filtered_primary.vcf \
+./outputs/phylotrans_pdam/filtered_vcfs/max-missing-0.75 \
+0.75
 ```
-The filtered VCF contains 184,904 sites in 21 individuals (12% of total sites)
+The filtered VCF contains 335,796 sites in 217 individuals (46.6% of total sites)
 
 ```{bash vcftools_query_1}
 # vcf file, out directory, outfile prefix
 bash ./bash/vcftools_query.sh \
-./outputs/phylotrans_pdam/filtered_vcfs/max-missing-0.95.recode.vcf \
-./outputs/phylotrans_pdam/max-missing-0.95 \
-max-missing-0.95
+./outputs/phylotrans_pdam/filtered_vcfs/max-missing-0.75.recode.vcf \
+./outputs/phylotrans_pdam/max-missing-0.75 \
+max-missing-0.75
 ```
 ```{r read vcf query stats and viz}
 #
-ind_stats_1 <- read.ind.stats(dir = "./outputs/phylotrans_pdam/max-missing-0.95", vcf = "max-missing-0.95")
-loc_stats_1 <- read.loc.stats(dir = "./outputs/phylotrans_pdam/max-missing-0.95", vcf = "max-missing-0.95")
+ind_stats_1 <- read.ind.stats(dir = "./outputs/phylotrans_pdam/max-missing-0.75", vcf = "max-missing-0.75")
+loc_stats_1 <- read.loc.stats(dir = "./outputs/phylotrans_pdam/max-missing-0.75", vcf = "max-missing-0.75")
 #
-pdf("./outputs/phylotrans_pdam/filtered_vcf_viz/max-missing-0.95_vcf.pdf", height = 8.5, width = 11)
-vcfqvis_miss(vcf = "max-missing-0.95", ind_stats_1, loc_stats_1, title = " 95% max-missing VCF")
+pdf("./outputs/phylotrans_pdam/filtered_vcf_viz/max-missing-0.75_vcf.pdf", height = 8.5, width = 11)
+vcfqvis_miss(vcf = "max-missing-0.75", ind_stats_1, loc_stats_1, title = " 25% max-missing VCF")
 dev.off()
 ```
 ```{r raw_dataset_missing-data}
 # Visualize missing data among individuals and loci
-pdf("./outputs/phylotrans_pdam/filtered_vcf_viz/merge_step1_vcf.pdf", height = 8.5, width = 11)
-vcf_raw_viz <- vcfqvis_miss("max-missing-0.05", ind_stats_1, loc_stats_1, title = "Step 1: Max-missing-0.05")
+pdf("./outputs/phylotrans_pdam/filtered_vcf_viz/meta_step1_vcf.pdf", height = 8.5, width = 11)
+vcf_raw_viz <- vcfqvis_miss("max-missing-0.75", ind_stats_1, loc_stats_1, title = "Step 1: Max-missing-0.25")
 dev.off()
 ```
 
-### Step 2: Remove individuals with missing data > 95%
+### Step 2: Remove individuals with missing data > 75%
 ```{r}
-imissing <- read.table("./outputs/phylotrans_pdam/max-missing-0.95/max-missing-0.95.imiss",
+imissing <- read.table("./outputs/phylotrans_pdam/max-missing-0.75/max-missing-0.75.imiss",
                        header = TRUE, stringsAsFactors = FALSE)
 # plot
 ggplot(imissing, aes(x = F_MISS)) +
@@ -105,65 +107,70 @@ ggplot(imissing, aes(x = F_MISS)) +
 ```
 ```{r}
 #
-indv_missing_0.95 <- imissing %>%
-  dplyr::filter(F_MISS > 0.95) %>%
+indv_missing_0.75 <- imissing %>%
+  dplyr::filter(F_MISS > 0.25) %>%
   select(INDV)
 #
-write.table(indv_missing_0.95, "./outputs/phylotrans_pdam/max-missing-0.95/indv_missing_0.95.txt",
+write.table(indv_missing_0.75, "./outputs/phylotrans_pdam/max-missing-0.75/indv_missing_0.75.txt",
             col.names = FALSE, row.names = FALSE, quote = FALSE)
 ```
 ```{bash vcftools_filter_2}
 # Step 2: Remove individuals with missing data > 95%
 bash ./bash/vcftools_filter_remove.sh \
-./outputs/phylotrans_pdam/filtered_vcfs/max-missing-0.95.recode.vcf \
-./outputs/phylotrans_pdam/filtered_vcfs/max-missing-0.95_indv-missing-0.95 \
-./outputs/phylotrans_pdam/max-missing-0.95/indv_missing_0.95.txt
+./outputs/phylotrans_pdam/filtered_vcfs/max-missing-0.75.recode.vcf \
+./outputs/phylotrans_pdam/filtered_vcfs/max-missing-0.75_indv-missing-0.75 \
+./outputs/phylotrans_pdam/max-missing-0.75/indv_missing_0.75.txt
 ```
-The filtered VCF contains 184,904 sites in 21 individuals (0 individuals were removed)
+The filtered VCF contains 184,904 sites in 210 individuals (7 individuals were removed)
+"ConnellyEAPSI_SRR10395136_1" "ConnellyEAPSI_SRR10395145_1" 
+"Grupstra2022_SRR16897910"    "Grupstra2022_SRR16897911"   
+"Grupstra2022_SRR16897912"    "Grupstra2022_SRR16897913"    
+"Grupstra2022_SRR16897914"   
 
 ```{bash vcftools_query_2}
 # vcf file, out directory, outfile prefix
 bash ./bash/vcftools_query.sh \
-./outputs/phylotrans_pdam/filtered_vcfs/max-missing-0.05_indv-missing-0.85.recode.vcf \
-./outputs/phylotrans_pdam/max-missing-0.05_indv-missing-0.85/ \
-max-missing-0.05_indv-missing-0.85
+./outputs/phylotrans_pdam/filtered_vcfs/max-missing-0.75_indv-missing-0.75.recode.vcf \
+./outputs/phylotrans_pdam/max-missing-0.75_indv-missing-0.75/ \
+max-missing-0.75_indv-missing-0.75
 ```
 ```{r read vcf query stats and viz 2}
 #
-ind_stats_2 <- read.ind.stats(dir = "./outputs/phylotrans_pdam/max-missing-0.05_indv-missing-0.85", vcf = "max-missing-0.05_indv-missing-0.85")
-loc_stats_2 <- read.loc.stats(dir = "./outputs/phylotrans_pdam/max-missing-0.05_indv-missing-0.85", vcf = "max-missing-0.05_indv-missing-0.85")
+ind_stats_2 <- read.ind.stats(dir = "./outputs/phylotrans_pdam/max-missing-0.75_indv-missing-0.75", vcf = "max-missing-0.75_indv-missing-0.75")
+loc_stats_2 <- read.loc.stats(dir = "./outputs/phylotrans_pdam/max-missing-0.75_indv-missing-0.75", vcf = "max-missing-0.75_indv-missing-0.75")
 #
-vcfqvis(vcf = "max-missing-0.05_indv-missing-0.85.recode", ind_stats_2, loc_stats_2)
+vcfqvis(vcf = "max-missing-0.75_indv-missing-0.75.recode", ind_stats_2, loc_stats_2)
 ```
 ```{r}
 # Visualize missing data among individuals and loci
 pdf("./outputs/phylotrans_pdam/filtered_vcf_viz/merge_step2_vcf.pdf", height = 8.5, width = 11)
-vcf_raw_viz <- vcfqvis_miss("max-missing-0.05_indv-missing-0.85", ind_stats_2, loc_stats_2, title = "Step 2: Max-missing-0.05, Indv-missing-0.85")
+vcf_raw_viz <- vcfqvis_miss("max-missing-0.75_indv-missing-0.75", ind_stats_2, loc_stats_2, title = "Step 2: Max-missing-0.25, Indv-missing-0.75")
 dev.off()
 ```
 
-### Step 3: Remove loci with depth < 20 
+### Step 3: Remove loci with genotype call rate < 25%
 ```{bash vcftools_filter_1}
-# Step 3: Remove loci with depth < 20 
-bash ./bash/vcftools_filter_depth.sh \
-./outputs/phylotrans_pdam/filtered_vcfs/max-missing-0.05_indv-missing-0.85.recode.vcf \
-./outputs/phylotrans_pdam/filtered_vcfs/max-missing-0.05_indv-missing-0.85_depth-20 \
-20
+# Step 1: Remove loci with genotype call rate < 10%
+bash ./bash/vcftools_filter_maxmissing.sh \
+./outputs/phylotrans_pdam/filtered_vcfs/max-missing-0.75_indv-missing-0.75.recode.vcf \
+./outputs/phylotrans_pdam/filtered_vcfs/max-missing-0.75_indv-missing-0.75_max-missing_0.1 \
+0.90
 ```
+
 The filtered VCF contains 2,714 sites in 61 individuals.
 ```{bash vcftools_query_1}
 # vcf file, out directory, outfile prefix
 bash ./bash/vcftools_query.sh \
-./outputs/phylotrans_pdam/filtered_vcfs/max-missing-0.05_indv-missing-0.85_depth-20.recode.vcf \
-./outputs/phylotrans_pdam/max-missing-0.05_indv-missing-0.85_depth-20/ \
-max-missing-0.05_indv-missing-0.85_depth-20
+./outputs/phylotrans_pdam/filtered_vcfs/max-missing-0.75_indv-missing-0.75_max-missing_0.1.recode.vcf \
+./outputs/phylotrans_pdam/max-missing-0.75_indv-missing-0.75_max-missing_0.1/ \
+max-missing-0.75_indv-missing-0.75_max-missing_0.1
 ```
 ```{r read vcf query stats and viz}
 #
-ind_stats_3 <- read.ind.stats(dir = "./outputs/phylotrans_pdam/max-missing-0.05_indv-missing-0.85_depth-20", vcf = "max-missing-0.05_indv-missing-0.85_depth-20")
-loc_stats_3 <- read.loc.stats(dir = "./outputs/phylotrans_pdam/max-missing-0.05_indv-missing-0.85_depth-20", vcf = "max-missing-0.05_indv-missing-0.85_depth-20")
+ind_stats_3 <- read.ind.stats(dir = "./outputs/phylotrans_pdam/max-missing-0.75_indv-missing-0.75_max-missing_0.1", vcf = "max-missing-0.75_indv-missing-0.75_max-missing_0.1")
+loc_stats_3 <- read.loc.stats(dir = "./outputs/phylotrans_pdam/max-missing-0.75_indv-missing-0.75_max-missing_0.1", vcf = "max-missing-0.75_indv-missing-0.75_max-missing_0.1")
 #
-vcfqvis(vcf = "max-missing-0.05_indv-missing-0.85_depth-20", ind_stats_3, loc_stats_3)
+vcfqvis(vcf = "max-missing-0.75_indv-missing-0.75_max-missing_0.1", ind_stats_3, loc_stats_3)
 ```
 ```{r}
 # Visualize missing data among individuals and loci

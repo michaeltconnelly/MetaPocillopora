@@ -23,20 +23,24 @@ library("patchwork")
 
 ## Import sample metadata
 ```{r factor levels}
-study_levels <- c("Mayfield2014", "Vidal-Dupiol2014", "Yuan2017", "Zhou2017", "Brener-Raffali2018", "Tang2018", "Wecker2018", "Zhou2018", "Poquita-Du2019", "Zhou2019", "ConnellyEAPSI", "Chuang-Mitarai2020", "Li2020")
+study_levels <- c("Mayfield2014", "Vidal-Dupiol2014", "Yuan2017", "Zhou2017", "Brener-Raffali2018", "Delgadillo-Nuno2018", "Tang2018", "Wecker2018", "Zhou2018", "Poquita-Du2019", "Zhou2019", "Buitrago-Lopez2020", "Chuang-Mitarai2020", "Li2020", "ConnellyEAPSI", "Grupstra2022")
 ```
-```{r data}
-samples <- read_csv("data/SampleData_MetaPocillopora_011822.csv") 
-#
+```{r sample_data, echo=TRUE}
+# Import sample metadata 
+samples <- read_csv("data/SampleData_MetaPocillopora_012722.csv") 
+```
+
+## Import and tidy transcriptome pipeline QC data
+```{r QC_data}
 QC_summary_data <- read_csv("./data/MultiQCs_MetaPocillopora_012022.csv") #%>%
-sum(QC_summary_data$`Raw Reads`)
-# 2.51 billion reads as of 01/26/2022
+sum(QC_summary_data$`Raw`)
+# 5.21 billion reads as of 02/04/2022
 ```
-```{r tidydata}
+```{r tidy_QC_data}
 QC_summary_select <- QC_summary_data %>% 
   dplyr::select(-`Study`, -`BioProject`) %>% 
   full_join(samples, by = "Sample") %>%
-  filter(`Include_SNPs` == TRUE)
+  filter(`Include_Counts` == TRUE) # remove Mayfield samples
 
 QC_summary <- QC_summary_select %>%
   pivot_longer(., `Raw`:`Assigned Reads`, names_to = "pipeline_step", values_to = "read_count") 
@@ -49,6 +53,7 @@ QC_summary <- QC_summary %>%
   arrange(`Study`)
 ```
 
+## Exploratory plots of sample read depth
 ```{r colors}
 gg_color_hue <- function(n) {
   hues = seq(15, 375, length = n + 1)
@@ -56,44 +61,41 @@ gg_color_hue <- function(n) {
 }
 gcolors <- gg_color_hue(n_distinct(QC_summary$Study))
 ```
-
-
-### #1-#15 below 8 million reads
-### #16-#43 below 10 million reads
-
 ```{r}
 FASTQCg <- QC_summary %>% 
   filter(pipeline_step == "Raw") %>%
-  ggplot(aes(Sample, read_count, color = Study))
-FASTQCg + geom_point(aes(shape = Species)) + 
-  scale_color_manual(values = gcolors) +
-  # scale_shape_manual(values = colshapes) +
+  ggplot(aes(Sample, read_count)) +
   geom_hline(yintercept = 10000000, color  = "green") +
   geom_hline(yintercept = 8000000) + 
-  geom_hline(yintercept = 1000000, color = "red") +
+  geom_hline(yintercept = 1000000, color = "red")
+FASTQCg + 
+  geom_point(aes(fill = Study, shape = Species), color = "black") + 
+  scale_fill_manual(values = gcolors) +
+  scale_shape_manual(values = c(21, 24, 22, 23)) +
   theme(axis.text.x = element_text(angle = 90))
   #geom_text_repel(data = FASTQC_summary[1:15, ], aes(label = GNomExID), color = "black", size = 3, box.padding = unit(0.5, "lines")
 ```
 
+## Figure 2: Read depth and proportions across pipeline steps
 ```{r read_counts}
 pipeQC_counts <- QC_summary %>%
   dplyr::filter(pipeline_step != "Input Reads" & pipeline_step != "Assigned Reads") %>%
   ggplot(aes(pipeline_step, read_count, color = Study)) +
   geom_path(aes(group = Sample), show.legend = FALSE) +
-  geom_point(aes(fill = Study, shape = Species), size = 5, color = "black", alpha = 0.5, stroke = 0.5, show.legend = FALSE) + 
+  geom_point(aes(fill = Study, shape = Species), size = 5, color = "black", alpha = 0.8, stroke = 0.5, show.legend = FALSE) + 
   # facet_grid(.~Study, scales = "free") +
-  scale_y_continuous(limits = c(0, 4.5e7)) +
+  scale_y_continuous(limits = c(0, 1.25e8)) +
   scale_color_manual(values = gcolors) +
-  scale_shape_manual(values = c(21, 24, 22)) +
+  scale_shape_manual(values = c(21, 24, 22, 23)) +
   scale_fill_manual(values = gcolors) +
   theme_bw() +
-    theme(plot.title = element_text(size = 20),
-        axis.title = element_text(size = 20),
-        axis.text = element_text(size = 16),
+    theme(plot.title = element_text(size = 24),
+        axis.title = element_text(size = 24),
+        axis.text = element_text(size = 20),
         axis.text.x = element_text(angle = 315, hjust = 0),
         # panel.grid.major = element_line(color = "grey92"),
-        legend.title = element_text(size = 20),
-        legend.text = element_text(size = 18),
+        legend.title = element_text(size = 24),
+        legend.text = element_text(size = 20),
         legend.spacing.y = unit(0.15, "in")) +
   ylab("read count") +
   xlab("pipeline step") + 
@@ -111,22 +113,23 @@ pipeQC_props <- QC_summary %>%
   dplyr::filter(pipeline_step != "Input Reads" & pipeline_step != "Assigned Reads") %>%
   ggplot(aes(pipeline_step, proportion, color = Study, fill = Study)) +
   geom_path(aes(group = Sample), show.legend = TRUE) +
-  geom_point(aes(fill = Study, shape = Species), size = 5, alpha = 0.5, stroke = 0.5, color = "black", show.legend = TRUE) + 
+  geom_point(aes(fill = Study, shape = Species), size = 5, alpha = 0.8, stroke = 0.5, color = "black", show.legend = TRUE) + 
   # facet_grid(.~Study, scales = "free") +
-  scale_y_continuous(limits = c(0, 1)) +
+  scale_y_continuous(limits = c(0, 1), labels = scales::percent) +
   scale_color_manual(values = gcolors) +
-  scale_shape_manual(values = c(21, 24, 22)) +
+  scale_shape_manual(values = c(21, 24, 22, 23)) +
   scale_fill_manual(values = gcolors) +
-  guides(fill = guide_legend(override.aes = list(fill = gcolors, shape = 21, stroke = 0.5)),
-         shape = guide_legend(override.aes = list(shape = c(21, 24, 22), alpha = 0.5, stroke = 0.5, fill = "black"))) +
+  guides(fill = guide_legend(order = 1, override.aes = list(fill = gcolors, shape = 21, stroke = 0.5)),
+         shape = guide_legend(order = 2, override.aes = list(shape = c(21, 24, 22, 23), alpha = 0.8, stroke = 0.5, fill = "black")),
+         color = "none") +
   theme_bw() +
-  theme(plot.title = element_text(size = 20),
-        axis.title = element_text(size = 20),
-        axis.text = element_text(size = 16),
+  theme(plot.title = element_text(size = 24),
+        axis.title = element_text(size = 24),
+        axis.text = element_text(size = 20),
         axis.text.x = element_text(angle = 315, hjust = 0),
         # panel.grid.major = element_line(color = "grey92"),
-        legend.title = element_text(size = 20),
-        legend.text = element_text(size = 18),
+        legend.title = element_text(size = 24),
+        legend.text = element_text(size = 20),
         legend.spacing.y = unit(0.15, "in")) +
   ylab("proportion") +
   xlab("pipeline step") + 
@@ -137,10 +140,10 @@ pipeQC_props
 qcfig <- (pipeQC_counts | pipeQC_props) + 
   plot_annotation(tag_levels = "A",
                   title = "RNAseq read depth, trimming, and alignment rates") &
-  theme(plot.tag = element_text(size = 24),
-        plot.title = element_text(size = 24))
+  theme(plot.tag = element_text(size = 28),
+        plot.title = element_text(size = 28))
 # qcfig + ggtitle("RNAseq read depth, trimming, and alignment rates")
 #   theme(plot.title = element_text(size = 24))
-ggsave(qcfig, filename = "./outputs/figures/Fig1_pipelineQC.pdf", width = 12, height = 7, units = "in", device = "pdf")
+ggsave(qcfig, filename = "./outputs/figures/Fig2_pipelineQC_all.pdf", width = 13, height = 7, units = "in", device = "pdf")
 ```
 

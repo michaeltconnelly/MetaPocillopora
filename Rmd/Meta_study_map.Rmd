@@ -55,7 +55,7 @@ ggplot() +
 
 ### Map of Pocillopora RNAseq study locations
 ```{r factor levels}
-study_levels <- c("Mayfield2014", "Vidal-Dupiol2014", "Yuan2017", "Zhou2017", "Brener-Raffali2018", "Tang2018", "Wecker2018", "Zhou2018", "Poquita-Du2019", "Zhou2019", "ConnellyEAPSI", "Chuang-Mitarai2020", "Li2020")
+study_levels <- c("Mayfield2014", "Vidal-Dupiol2014", "Yuan2017", "Zhou2017", "Brener-Raffali2018", "Delgadillo-Nuno2018", "Tang2018", "Wecker2018", "Zhou2018", "Poquita-Du2019", "Zhou2019", "Buitrago-Lopez2020", "Chuang-Mitarai2020", "Li2020", "ConnellyEAPSI", "Grupstra2022")
 ```
 ```{r study_locations}
 study_locations <- read_csv("./data/StudyGeography.csv") %>%
@@ -65,28 +65,31 @@ study_locations$Study <- factor(study_locations$Study, levels = study_levels, or
 title <- expression(italic("Pocillopora")~"RNAseq study locations")
 ```
 ```{r}
-pdf("./outputs/figures/study_locations_map.pdf", height = 6, width = 14)
+pdf("./outputs/figures/Fig1_study_locations_map.pdf", height = 7.5, width = 13)
 map <- study_locations %>% 
   filter(Include == T) %>%
   ggplot(data = .) +
   geom_sf(data = world_pacific_center, fill = "antiquewhite") + 
   # 
-  geom_point(aes(x = `Longitude`, y = `Latitude`, size = `# of samples`, fill = `Study`), shape = 21, alpha = 0.5, color = "black", stroke = 0.5,
-             position = position_jitter(width = 2, height = 2, seed = 2),
+  geom_point(aes(x = `Longitude`, y = `Latitude`, size = `# of samples`, fill = `Study`), shape = 21, alpha = 0.8, color = "black", stroke = 0.5,
+             position = position_jitter(width = 2, height = 2, seed = 3),
              show.legend = T) +
   # scale_shape_manual(values = c(21, 24), guide = guide_legend(override.aes = list(size = 5))) +
   # scale_color_manual(values = gcolors) +
-  scale_fill_manual(values = gcolors, guide = guide_legend(override.aes = list(size = 6, shape = 21, fill = gcolors))) +
-  scale_size(range = c(1, 12), breaks = c(6, 12, 24, 48, 60), limits = c(0, 60), guide = guide_legend(override.aes = list(fill = "black"))) +
+  scale_fill_manual(values = gcolors,
+                    guide = guide_legend(order = 1, override.aes = list(size = 6, shape = 21, fill = gcolors), nrow = 5, title.position = "top")) +
+  scale_size(range = c(1, 12), breaks = c(1, 12, 24, 48, 60), limits = c(0, 60),
+             guide = guide_legend(order = 2, override.aes = list(fill = "black"), nrow = 5, title.position = "top")) +
   # 
   coord_sf(ylim = c(-42, 42), xlim = c(20, 295), expand = F) +
   # 
-  theme(plot.title = element_text(size = 24),
-        axis.title = element_text(size = 20),
-        axis.text = element_text(size = 14),
-        legend.title = element_text(size = 20),
-        legend.text = element_text(size = 18),
-        legend.spacing.y = unit(0.15, "in"),
+  theme(plot.title = element_text(size = 28),
+        axis.title = element_blank(),
+        axis.text = element_text(size = 20),
+        legend.title = element_text(size = 24),
+        legend.text = element_text(size = 20),
+        legend.position = "bottom",
+        legend.spacing.y = unit(0.25, "in"),
         panel.grid.major = element_blank(), 
         panel.background = element_rect(fill = "aliceblue"), 
         panel.border = element_rect(fill = NA)) +
@@ -99,6 +102,6 @@ gg_color_hue <- function(n) {
   hues = seq(15, 375, length = n + 1)
   hcl(h = hues, l = 65, c = 100)[1:n]
 }
-gcolors <- gg_color_hue(n_distinct(study_locations$Study))
-gcolors <- gg_color_hue(12)
+# gcolors <- gg_color_hue(n_distinct(study_locations$Study))
+gcolors <- gg_color_hue(16)
 ```
