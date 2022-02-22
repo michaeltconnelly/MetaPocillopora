@@ -1,4 +1,4 @@
-This GitHub repository contains links to data and scripts used for a meta-analysis of *Pocillopora* coral transcriptome data. This analysis was presented as a poster "Towards a modern integrative taxonomy of Pocillopora corals: a literature synthesis and meta-analysis of genetic data"  (#3964) at Ocean Sciences Meeting 2022.
+This GitHub repository contains links to data and scripts used for a meta-analysis of *Pocillopora* coral transcriptome data. This analysis was presented as a poster "Towards a modern integrative taxonomy of *Pocillopora* corals: a literature synthesis and meta-analysis of genetic data"  (#3964) at Ocean Sciences Meeting 2022.
 
 ## *Pocillopora* RNAseq studies used in meta-analysis
 | Study | NCBI SRA Link |
@@ -22,4 +22,4 @@ This GitHub repository contains links to data and scripts used for a meta-analys
 
 *studies using larvae, bailed-out polyps and 3’ tagged libraries were excluded this analysis.
 
-For a table of *Pocillopora* population genetics studies since 1984, please download ==pocillopora_popgen_studies.xlsx==
+For a table of *Pocillopora* population genetics studies since 1984, please download "pocillopora_popgen_studies.xlsx""
