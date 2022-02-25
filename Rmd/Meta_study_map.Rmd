@@ -103,5 +103,39 @@ gg_color_hue <- function(n) {
   hcl(h = hues, l = 65, c = 100)[1:n]
 }
 # gcolors <- gg_color_hue(n_distinct(study_locations$Study))
-gcolors <- gg_color_hue(16)
+gcolors <- gg_color_hue(15)
+```
+```{r}
+# make PNG file for GitHub repository
+png(filename = "./outputs/figures/Fig1_study_locations_map.png", height = 600, width = 1000, units = "px")
+map <- study_locations %>% 
+  filter(Include == T) %>%
+  ggplot(data = .) +
+  geom_sf(data = world_pacific_center, fill = "antiquewhite") + 
+  # 
+  geom_point(aes(x = `Longitude`, y = `Latitude`, size = `# of samples`, fill = `Study`), shape = 21, alpha = 0.8, color = "black", stroke = 0.5,
+             position = position_jitter(width = 2, height = 2, seed = 3),
+             show.legend = T) +
+  # scale_shape_manual(values = c(21, 24), guide = guide_legend(override.aes = list(size = 5))) +
+  # scale_color_manual(values = gcolors) +
+  scale_fill_manual(values = gcolors,
+                    guide = guide_legend(order = 1, override.aes = list(size = 6, shape = 21, fill = gcolors), nrow = 5, title.position = "top")) +
+  scale_size(range = c(1, 12), breaks = c(1, 12, 24, 48, 60), limits = c(0, 60),
+             guide = guide_legend(order = 2, override.aes = list(fill = "black"), nrow = 5, title.position = "top")) +
+  # 
+  coord_sf(ylim = c(-42, 42), xlim = c(20, 295), expand = F) +
+  # 
+  theme(plot.title = element_text(size = 28),
+        axis.title = element_blank(),
+        axis.text = element_text(size = 20),
+        legend.title = element_text(size = 24),
+        legend.text = element_text(size = 20),
+        legend.position = "bottom",
+        legend.spacing.y = unit(0.25, "in"),
+        panel.grid.major = element_blank(), 
+        panel.background = element_rect(fill = "aliceblue"), 
+        panel.border = element_rect(fill = NA)) +
+  ggtitle(title)
+map
+dev.off()
 ```
