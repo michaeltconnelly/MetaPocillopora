@@ -28,5 +28,5 @@ For a comprehensive table of *Pocillopora* population genetics studies since 198
 
 The meta-analysis approach involved read quality control and trimming, alignment to the *P. damicornis* reference genome, followed by the Genome Analysis Toolkit RNAseq variant calling best practices pipeline.
 
-![Meta-analysis workflow diagram](./poster_figures/Meta-analysis workflow.png)
+![Meta-analysis workflow diagram](./poster_figures/Meta_analysis_workflow.png)
 
