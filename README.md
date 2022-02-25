@@ -22,6 +22,11 @@ This GitHub repository contains links to data and scripts used for a meta-analys
 
 *studies using larvae, bailed-out polyps and 3’ tagged libraries were excluded this analysis.
 
+For a comprehensive table of *Pocillopora* population genetics studies since 1984 (not including RNAseq studies), please see "pocillopora_popgen_studies.csv""
+
 ![Fig. 1: Geographic locations of Pocillopora RNAseq studies that range from the Red Sea to the Mexican Pacific, with most studies in east Asia.](./poster_figures/Fig1_study_locations_map.png)
 
-For a comprehensive table of *Pocillopora* population genetics studies since 1984 (not including RNAseq studies), please see "pocillopora_popgen_studies.csv""
+The meta-analysis approach involved read quality control and trimming, alignment to the *P. damicornis* reference genome, followed by the Genome Analysis Toolkit RNAseq variant calling best practices pipeline.
+
+![Meta-analysis workflow diagram](./poster_figures/Meta-analysis workflow.png)
+
