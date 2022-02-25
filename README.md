@@ -22,6 +22,6 @@ This GitHub repository contains links to data and scripts used for a meta-analys
 
 *studies using larvae, bailed-out polyps and 3’ tagged libraries were excluded this analysis.
 
-![Fig. 1: Geographic locations of Pocillopora RNAseq studies that range from the Red Sea to the Mexican Pacific, with most studies in east Asia.](./outputs/figures/Fig1_study_locations_map.png)
+![Fig. 1: Geographic locations of Pocillopora RNAseq studies that range from the Red Sea to the Mexican Pacific, with most studies in east Asia.](./poster_figures/Fig1_study_locations_map.png)
 
 For a comprehensive table of *Pocillopora* population genetics studies since 1984 (not including RNAseq studies), please see "pocillopora_popgen_studies.csv""

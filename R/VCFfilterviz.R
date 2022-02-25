@@ -103,12 +103,12 @@ p9 <- ggplot(loc_stats, aes(x = MEAN_DEPTH, y = MISS)) +
 
 # plot no of SNPs per locus ----
 p10 <- loc_stats %>%
-  count(CHR) %>%
+  dplyr::count(CHR) %>%
   ggplot(aes(x = n)) +
   geom_histogram(binwidth = 1, color = "black", fill = "grey95") +
   labs(x = "number of SNPs per locus")
 temp <- loc_stats %>%
-  count(CHR)
+  dplyr::count(CHR)
 
 # plot number of SNPs per contig vs. mean depth ----
 p11 <- left_join(temp, loc_stats) %>%
