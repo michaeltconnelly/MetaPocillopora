@@ -1,0 +1,42 @@
+#!/bin/bash
+
+prodir="/scratch/nmnh_corals/connellym/projects/MetaPocillopora"
+study="$1"
+mkdir ${prodir}/outputs/symABCD/${study}
+files=$(ls $prodir/data/srareads/$study)
+samples=$(echo "$files" | cut -d . -f 1 | sort -u)
+#
+for sample in $samples
+do
+echo "# /bin/sh" > $prodir/bash/jobs/sym_bowtie_${sample}.job
+echo "# ----------------Parameters---------------------- #" >> $prodir/bash/jobs/sym_bowtie_${sample}.job
+echo "#$  -S /bin/sh
+#$ -pe mthread 8
+#$ -q sThC.q
+#$ -l mres=64G,h_data=4G,h_vmem=4G" >> $prodir/bash/jobs/sym_bowtie_${sample}.job
+echo "#$ -j y
+#$ -N staralign_${sample}
+#$ -o ${prodir}/bash/jobs/staralign_${sample}.log
+#$ -m bea
+#$ -M connellym@si.edu" >> $prodir/bash/jobs/sym_bowtie_${sample}.job
+#
+echo "# ----------------Modules------------------------- #" >> $prodir/bash/jobs/sym_bowtie_${sample}.job
+echo "module load bioinformatics/bowtie2/" >> $prodir/bash/jobs/sym_bowtie_${sample}.job
+#
+echo "# ----------------Your Commands------------------- #" >> $prodir/bash/jobs/sym_bowtie_${sample}.job
+#
+echo 'echo + `date` job $JOB_NAME started in $QUEUE with jobID=$JOB_ID on $HOSTNAME' >> $prodir/bash/jobs/sym_bowtie_${sample}.job
+echo 'echo + NSLOTS = $NSLOTS' >> $prodir/bash/jobs/sym_bowtie_${sample}.job
+#
+# Align trimmed non-coral reads against concatenated symbiont reference genome using Bowtie2
+#
+echo "bowtie2 \
+-x /scratch/nmnh_corals/connellym/sequences/symbio/symABCDgenome \
+-U /scratch/nmnh_corals/connellym/projects/MetaPocillopora/outputs/STARalign_pdam/${study}/${sample}_pdam_Unmapped.out.mate1 \
+--local \
+-p 8 \
+-S ${prodir}/outputs/symABCD/${study}/${sample}_pdam_symABCD.sam" >> $prodir/bash/jobs/sym_bowtie_${sample}.job
+#
+echo 'echo = `date` job $JOB_NAME done' >> $prodir/bash/jobs/sym_bowtie_${sample}.job
+qsub $prodir/bash/jobs/sym_bowtie_${sample}.job
+done
