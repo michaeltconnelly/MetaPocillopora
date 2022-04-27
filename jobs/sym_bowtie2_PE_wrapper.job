@@ -4,7 +4,7 @@ prodir="/scratch/nmnh_corals/connellym/projects/MetaPocillopora"
 study="$1"
 mkdir ${prodir}/outputs/symABCD/${study}
 files=$(ls $prodir/data/srareads/$study)
-samples=$(echo "$files" | cut -d . -f 1 | sort -u)
+samples=$(echo "$files" | cut -d _ -f 1,2 | sort -u)
 #
 for sample in $samples
 do
@@ -32,7 +32,8 @@ echo 'echo + NSLOTS = $NSLOTS' >> $prodir/bash/jobs/sym_bowtie_${sample}.job
 #
 echo "bowtie2 \
 -x /scratch/nmnh_corals/connellym/sequences/symbio/symbiosymABCDgenome \
--U /scratch/nmnh_corals/connellym/projects/MetaPocillopora/outputs/STARalign_pdam/${study}/${sample}_pdam_Unmapped.out.mate1 \
+-1 /scratch/nmnh_corals/connellym/projects/MetaPocillopora/outputs/STARalign_pdam/${study}/${sample}_pdam_Unmapped.out.mate1 \
+-2 /scratch/nmnh_corals/connellym/projects/MetaPocillopora/outputs/STARalign_pdam/${study}/${sample}_pdam_Unmapped.out.mate2 \
 --local \
 -p 8 \
 -S ${prodir}/outputs/symABCD/${study}/${sample}_pdam_symABCD.sam" >> $prodir/bash/jobs/sym_bowtie_${sample}.job
