@@ -19,8 +19,8 @@ module load bioinformatics/vcftools
 echo + `date` job $JOB_NAME started in $QUEUE with jobID=$JOB_ID on $HOSTNAME
 #
 prodir="/scratch/nmnh_corals/connellym/projects/MetaPocillopora"
-VCF_IN="${prodir}/outputs/phylotrans_pdam/metapocillopora_004.vcf.gz"
-VCF_OUT="${prodir}/outputs/phylotrans_pdam/metapocillopora_004_filtered_primary.vcf.gz"
+VCF_IN="${prodir}/outputs/phylotrans_pdam/metapocillopora_005.vcf.gz"
+VCF_OUT="${prodir}/outputs/phylotrans_pdam/metapocillopora_005_filtered_primary.vcf.gz"
 MAF="0.01"
 MISS="0.25"
 QUAL="30"
