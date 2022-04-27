@@ -15,7 +15,7 @@ echo "#$  -S /bin/sh
 #$ -q sThC.q
 #$ -l mres=64G,h_data=4G,h_vmem=4G" >> $prodir/bash/jobs/sym_bowtie_${sample}.job
 echo "#$ -j y
-#$ -N staralign_${sample}
+#$ -N symalign_${sample}
 #$ -o ${prodir}/bash/jobs/staralign_${sample}.log
 #$ -m bea
 #$ -M connellym@si.edu" >> $prodir/bash/jobs/sym_bowtie_${sample}.job
@@ -31,7 +31,7 @@ echo 'echo + NSLOTS = $NSLOTS' >> $prodir/bash/jobs/sym_bowtie_${sample}.job
 # Align trimmed non-coral reads against concatenated symbiont reference genome using Bowtie2
 #
 echo "bowtie2 \
--x /scratch/nmnh_corals/connellym/sequences/symbio/symABCDgenome \
+-x /scratch/nmnh_corals/connellym/sequences/symbio/symbiosymABCDgenome \
 -U /scratch/nmnh_corals/connellym/projects/MetaPocillopora/outputs/STARalign_pdam/${study}/${sample}_pdam_Unmapped.out.mate1 \
 --local \
 -p 8 \
