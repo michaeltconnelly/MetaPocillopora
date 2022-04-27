@@ -1,0 +1,24 @@
+# /bin/sh
+# ----------------Parameters---------------------- #
+#$  -S /bin/sh
+#$ -q sThM.q
+#$ -l mres=64G,h_data=64G,h_vmem=64G
+#$ -cwd
+#$ -j y
+#$ -N bowtie_symABCD_build
+#$ -o bowtie_symABCD_build.log
+#$ -m bea
+#$ -M connellym@si.edu
+#
+# ----------------Modules------------------------- #
+module load bioinformatics/bowtie2/
+#
+# ----------------Your Commands------------------- #
+#
+echo + `date` job $JOB_NAME started in $QUEUE with jobID=$JOB_ID on $HOSTNAME
+#
+bowtie2-build \
+/scratch/nmnh_corals/connellym/sequences/symbio/symABCDgenome.fasta \
+/scratch/nmnh_corals/connellym/sequences/symbiosymABCDgenome
+#
+echo = `date` job $JOB_NAME done
