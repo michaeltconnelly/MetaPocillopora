@@ -1,8 +1,8 @@
 # /bin/sh
 # ----------------Parameters---------------------- #
 #$  -S /bin/sh
-#$ -q sThM.q
-#$ -l mres=64G,h_data=64G,h_vmem=64G
+#$ -q sThC.q
+#$ -l mres=16G,h_data=16G,h_vmem=16G
 #$ -cwd
 #$ -j y
 #$ -N bowtie_symABCD_build
