@@ -1,0 +1,23 @@
+# /bin/sh 
+# ----------------Parameters---------------------- #
+#$  -S /bin/sh
+#$ -pe mthread 4
+#$ -q sThC.q
+#$ -l mres=32G,h_data=8G,h_vmem=8G
+#$ -cwd
+#$ -j y
+#$ -N zooxtype
+#$ -o zooxtype.log
+#$ -m bea
+#$ -M connellym@si.edu
+#
+# ----------------Modules------------------------- #
+#
+# ----------------Your Commands------------------- #
+#
+echo + `date` job $JOB_NAME started in $QUEUE with jobID=$JOB_ID on $HOSTNAME
+echo + NSLOTS = $NSLOTS
+#
+zooxtype.pl . > allcounts_meta_ACBD.txt
+#
+echo = `date` job $JOB_NAME done
