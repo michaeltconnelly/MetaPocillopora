@@ -1,0 +1,24 @@
+# /bin/sh
+# ----------------Parameters---------------------- #
+#$ -S /bin/sh
+#$ -pe mthread 24
+#$ -q lThC.q
+#$ -l mres=48G,h_data=2G,h_vmem=2G
+#$ -cwd
+#$ -j y
+#$ -m bea
+#$ -M connellym@si.edu
+#
+# ----------------Modules------------------------- #
+module load bioinformatics/beast/2.6.6
+#
+# ----------------Your Commands------------------- #
+#
+echo + `date` job $JOB_NAME started in $QUEUE with jobID=$JOB_ID on $HOSTNAME
+echo + NSLOTS = $NSLOTS
+
+#
+packagemanager -add SNAPP
+beast  -threads $NSLOTS $1
+#
+echo = `date` job $JOB_NAME done
