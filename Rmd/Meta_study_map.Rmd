@@ -29,10 +29,13 @@ library("cowplot")
 library("ggrepel")
 library("extrafont")
 library("extrafontdb")
+# 
+library("ggthemes")
+source("./R/fmars_theme.R")
 ```
 
 ```{r}
-theme_set(theme_bw())
+theme_set(theme_fmars())
 ```
 
 ## Create mapping sf data objects
@@ -65,11 +68,11 @@ study_locations$Study <- factor(study_locations$Study, levels = study_levels, or
 title <- expression(italic("Pocillopora")~"RNAseq study locations")
 ```
 ```{r}
-pdf("./outputs/figures/Fig1_study_locations_map.pdf", height = 7.5, width = 13)
+pdf("./outputs/figures/Fig1_study_locations_map.pdf", height = 114.3/25.4, width = 180/25.4)
 map <- study_locations %>% 
   filter(Include == T) %>%
   ggplot(data = .) +
-  geom_sf(data = world_pacific_center, fill = "antiquewhite") + 
+  geom_sf(data = world_pacific_center, fill = "lightgrey") + 
   # 
   geom_point(aes(x = `Longitude`, y = `Latitude`, size = `# of samples`, fill = `Study`), shape = 21, alpha = 0.8, color = "black", stroke = 0.5,
              position = position_jitter(width = 2, height = 2, seed = 3),
@@ -77,21 +80,17 @@ map <- study_locations %>%
   # scale_shape_manual(values = c(21, 24), guide = guide_legend(override.aes = list(size = 5))) +
   # scale_color_manual(values = gcolors) +
   scale_fill_manual(values = gcolors,
-                    guide = guide_legend(order = 1, override.aes = list(size = 6, shape = 21, fill = gcolors), nrow = 5, title.position = "top")) +
-  scale_size(range = c(1, 12), breaks = c(1, 12, 24, 48, 60), limits = c(0, 60),
+                    guide = guide_legend(order = 1, override.aes = list(size = 3, shape = 21, fill = gcolors), nrow = 5, title.position = "top")) +
+  scale_size(range = c(1, 8), breaks = c(1, 12, 24, 48, 60), limits = c(0, 60),
              guide = guide_legend(order = 2, override.aes = list(fill = "black"), nrow = 5, title.position = "top")) +
   # 
   coord_sf(ylim = c(-42, 42), xlim = c(20, 295), expand = F) +
   # 
-  theme(plot.title = element_text(size = 28),
-        axis.title = element_blank(),
-        axis.text = element_text(size = 20),
-        legend.title = element_text(size = 24),
-        legend.text = element_text(size = 20),
+  theme(
         legend.position = "bottom",
-        legend.spacing.y = unit(0.25, "in"),
-        panel.grid.major = element_blank(), 
-        panel.background = element_rect(fill = "aliceblue"), 
+        legend.spacing.y = unit(1, "mm"),
+        panel.grid.major = element_blank(),
+        panel.background = element_rect(fill = "white"),
         panel.border = element_rect(fill = NA)) +
   ggtitle(title)
 map
@@ -105,7 +104,7 @@ gg_color_hue <- function(n) {
 # gcolors <- gg_color_hue(n_distinct(study_locations$Study))
 gcolors <- gg_color_hue(15)
 ```
-```{r}
+```{r github readme png}
 # make PNG file for GitHub repository
 png(filename = "./outputs/figures/Fig1_study_locations_map.png", height = 600, width = 1000, units = "px")
 map <- study_locations %>% 
@@ -139,3 +138,11 @@ map <- study_locations %>%
 map
 dev.off()
 ```
+
+### Figure 1
+```{r figure 1: manuscript}
+# pdf("./outputs/figures/Fig1_study_locations_map.pdf", width = 6.5, height = 4, units = "in")
+
+# dev.off()
+```
+

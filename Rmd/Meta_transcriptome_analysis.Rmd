@@ -28,11 +28,11 @@ library("doParallel")
 # library("limma")
 # library("adegenet")
 # GO/KOG enrichment packages and other functions
-# library("KOGMWU")
+library("KOGMWU")
 # source("./R/GO_MWU/gomwu.functions.R")
 # Data visualization packages
 # library("pheatmap")
-# library("ComplexHeatmap")
+library("ComplexHeatmap")
 # library("VennDiagram")
 # library("eulerr")
 # library("UpSetR")
@@ -40,20 +40,21 @@ library("doParallel")
 # library("cowplot")
 # library("patchwork")
 # library("gridExtra")
-# library("ggthemes")
+library("ggthemes")
 # library("ggpubr")
 # library("ggrepel")
 # library("ggnewscale")
 # library("RColorBrewer")
-# library("circlize")
+library("circlize")
 # library("stringr")
 # library("extrafont")
 # library("extrafontdb")
 # extended visualization functions
 source("./R/pocillopora_meta_functions.R")
+source("./R/fmars_theme.R")
 ```
 ```{r}
-theme_set(theme_bw())
+theme_set(theme_fmars())
 ```
 
 ## Import sample metadata
@@ -172,9 +173,25 @@ gg_color_hue <- function(n) {
 vsd <- vsd_coral
 # vsd <- vsd_symbiont
 ```
+
+### Principal Components Analysis (PCA)
+```{r}
+DESeq2::plotPCA(vsd, intgroup = c("Genotype"))
+```
+```{r pca}
+ntop <- 2000
+# pdf("./outputs/figures/transcriptome_pca_control_anti.pdf")
+pca_title <- expression(paste(italic("Pocillopora"), " gene expression PCA plot", sep = ""))
+# 
+ggPCA(vsd_coral, samples, genocolors, pclab = c(1,2), ntop = ntop) +
+  # facet_wrap("Genotype") +
+  ggtitle(pca_title)
+# dev.off()
+```
+
 ## Figure 3: PCA of overall gene expression
 ```{r prepare_pca_dataframe}
-pca_df <- plotPCA.custom(vsd, intgroup = c("Study"), ntop = 500, returnData = TRUE,  pcs = c(1,2))
+pca_df <- plotPCA.custom(vsd, intgroup = c("Study"), ntop = 2000, returnData = TRUE,  pcs = c(1,2))
 # 
 pca_df<- pca_df %>% dplyr::rename("Sample" = "name") %>%
   # mutate(Sample_ID = str_replace(`Sample_ID`, "_1$", "")) %>% 
@@ -183,8 +200,8 @@ pca_df<- pca_df %>% dplyr::rename("Sample" = "name") %>%
 pca_df$Study <- factor(pca_df$Study, levels = study_levels, ordered = TRUE)
 ```
 ```{r gene expression pca figure}
-pdf("./outputs/figures/Fig3_gene_expression_pca.pdf", height = 7.5, width = 9)
-pca_title <- paste("PCA of overall gene expression (12,826 genes)", sep = "")
+pdf("./outputs/figures/Fig3_gene_expression_pca.pdf", height = 100/25.4, width = 180/25.4)
+pca_title <- paste("PCA of overall gene expression", sep = "")
 #
 PCAtmtpercentVar <- round(100 * attr(pca_df, "percentVar"), 2)
 pc1lab <- paste0( "PC", 1, ": ", PCAtmtpercentVar[1], "%")
@@ -192,51 +209,107 @@ pc2lab <- paste0( "PC", 2, ": ", PCAtmtpercentVar[2], "%")
 #
 pca_df %>%
   ggplot(., aes(PC1, PC2)) +
-  geom_point( aes(fill = Study, shape = Species), size = 6, alpha = 0.8, stroke = 0.5, color = "black") + 
+  geom_point( aes(fill = Study, shape = Species), size = 3, alpha = 0.8, stroke = 0.5, color = "black") + 
   # geom_text_repel(aes(label = Sample_ID), size = 2, max.overlaps = 100)
   scale_fill_manual(values = gg_color_hue(n_distinct(coldata$Study)), 
-                    guide = guide_legend(override.aes = list(size = 6, shape = 21, fill = gg_color_hue(n_distinct(coldata$Study))), nrow = 8, title.position = "top")) +
+                    guide = guide_legend(override.aes = list(size = 3, shape = 21, fill = gg_color_hue(n_distinct(coldata$Study))), nrow = 5, title.position = "top")) +
   scale_shape_manual(values = c(21, 24, 22, 23),
-                     guide = guide_legend(override.aes = list(size = 6, alpha = 0.8, stroke = 0.5, fill = "black"), nrow = 4, title.position = "top")) +
+                     guide = guide_legend(override.aes = list(size = 3, alpha = 0.8, stroke = 0.5, fill = "black"), nrow = 4, title.position = "top")) +
   theme_bw() +
-  coord_fixed(12.32/21.52) + 
-  theme(plot.title = element_text(size = 28),
-        axis.title = element_text(size = 24),
-        axis.text = element_blank(),
-        legend.title = element_text(size = 24),
-        legend.text = element_text(size = 20),
+  coord_fixed((PCAtmtpercentVar[2]*100)/(PCAtmtpercentVar[1]*100)) +
+  theme(
         legend.position = "bottom",
-        legend.spacing.y = unit(0.15, "in")) +
+        legend.spacing.x = unit(1, "mm"),
+        legend.spacing.y = unit(1, "mm")) +
   xlab(pc1lab) + ylab(pc2lab) +
   ggtitle(pca_title)
 dev.off()
 ```
 
-### Visualize global gene expression using PCAtools
-```{r}
-p <- pca(assay(vsd), metadata = coldata, removeVar = 0.2)
-screeplot(p, axisLabSize = 18, titleLabSize = 22)
+#### Comprehensively interrogate dataset using PCAtools
+```{r pcatools_pca}
+pca_vsd <- pca(assay(vsd), metadata = colData(dds_coral), removeVar = ((nrow(vsd) - ntop)/(nrow(vsd))))
+#
+getComponents(pca_vsd)
+#
+getVars(pca_vsd)
+#
+pca_loadings <- getLoadings(pca_vsd) %>% 
+  rownames_to_column("ID") %>% 
+  dplyr::select(ID:PC10) %>% 
+  left_join(gene_annotation_coral, by = "ID")
 ```
-```{r}
-# pdf("./outputs/figures/pca_biplot_temp.pdf", height = 9, width = 9)
-  biplot(p, showLoadings = FALSE, 
-         colby = 'Genotype',
-         shape = 'Species',
-    labSize = 1, pointSize = 2, sizeLoadingsNames = 1,
-    legendPosition = "right")
-  # dev.off()
-?biplot(
+```{r pcatools_scree}
+screeplot(pca_vsd, axisLabSize = 10, titleLabSize = 12)
+```
+```{r pca_biplot_overview}
+biplot(pca_vsd, 
+       colby = 'Study',
+       encircle = TRUE,
+       encircleFill = TRUE,
+       showLoadings = FALSE,
+       # lab = pca_vsd$metadata$,
+       labSize = 2, 
+       pointSize = 2,
+       sizeLoadingsNames = 2)
+```
+```{r pca_pairsplot}
+pairsplot(pca_vsd,
+          colby = 'Study')
+```
+```{r pca_gene_loadings}
+pdf("./outputs/figures/transcriptome_pcatools_loadings.pdf", height = 6, width = 6.5)
+plotloadings(pca_vsd, labSize = 1.5) 
+dev.off()
+```
+```{r pca_eigencor}
+# Need to account for numerical variables
+eigencorplot(pca_vsd, metavars = c("Study", "Treatment"))
+```
 
-)
+### PERMANOVA tests
+  Must choose a vsd object (coral or symbiont) to use for the analysis
+```{r transcriptome_distance_matrices}
+# obtain vst-transformed counts
+countdata_vst <- assay(vsd)
+# Convert to matrix and transpose, check dimensions
+datExpr <- t(countdata_vst)
+# Calculate Aitchinson distance matrix
+tx_dist <- vegdist(datExpr, method = "manhattan")
+# Now obtain data frame from the sample_data
+# head(sample_metadata)
+# Create factors for statistical testing
+treatments <- as.character(coldata$Treatment)
+colonies <- as.character(coldata$Genotype)
+locations <- as.character(coldata$Location)
+haplotypes <- as.character(coldata$haplotype)
 ```
-```{r}
-pdf("./outputs/figures/pca_pairsplot_all.pdf", height = 9, width = 9)
-pairsplot(p, colby = 'Study')
-dev.off
+```{r transcriptome_permanova}
+# PERMDISP tests
+# Treatment
+beta_treatment <- betadisper(tx_dist, treatments)
+permutest(beta_treatment)
+# Genotype
+beta_genotype <- betadisper(tx_dist, colonies)
+permutest(beta_genotype)
+# Adonis/PERMANOVA tests
+# Treatment
+permanova_treatment <- adonis(tx_dist ~ treatments, data = coldata)
+print(permanova_treatment)
+# Genotype
+permanova_genotype <- adonis(tx_dist ~ colonies, data = coldata)
+print(permanova_genotype)
 ```
-```{r}
-eigencorplot(p,
-    metavars = c('Study', 'Species', 'Treatment', 'Temperature'))
+```{r transcriptome_pairwise_permanova}
+# Pairwise Adonis/PERMANOVA tests
+# Treatment
+pairwise_permanova_treatment <- pairwise.adonis(tx_dist, treatments)
+print(pairwise_permanova_treatment)
+# write_csv(pairwise_permanova_treatment, "./outputs/pairwise_permanova_treatment_symbiont.csv")
+# Colony (Genotype)
+pairwise_permanova_colony <- pairwise.adonis(tx_dist, colonies)
+print(pairwise_permanova_colony)
+# write_csv(pairwise_permanova_colony, "./outputs/pairwise_permanova_colony_symbiont.csv")
 ```
 
 ## VariancePartition
@@ -322,7 +395,7 @@ dim(datExpr)
 ```{r soft_threshold}
 # Find correlation power R^N that satisfies scale free critereon (SFT.R.sq>0.9)
 sft <- pickSoftThreshold(datExpr, verbose=5)
-sft$powerEstimate
+sft$powerEstimate # 12
 ```
 ### Step-by-step network construction
 ```{r adjacency_TOM}
@@ -335,7 +408,7 @@ sft$powerEstimate
 adjacency <- adjacency(datExpr,
       # Network construction arguments:  correlation, adjacency function,  and topological overlap map options
                        corFnc = "bicor", # bimidweight correlation
-                       power = sft$powerEstimate, # 20 for coral
+                       power = sft$powerEstimate, # 12 for coral
                        type = "signed") # signed
 # 
 TOM <- TOMsimilarity(adjacency,
@@ -381,7 +454,7 @@ abline(h=MEDissThres, col = "red")
 ```{r merge_modules}
 # Call an automatic merging function
 # merge cutHeight = 0.3 because I want to group together modules with >70% similar module eigengene expression
-mergedMods <- mergeCloseModules(datExpr, dynamicColors, cutHeight = 0.3, verbose = 5)
+mergedMods <- mergeCloseModules(datExpr, dynamicColors, cutHeight = 0.3, verbose = 1)
 # The merged module colors
 mergedColors <- mergedMods$colors
 table(mergedColors) 
@@ -404,7 +477,7 @@ mergedMEs <- MEList$eigengenes
 ```{r choose_modules}
 moduleColors <- mergedColors#netColors#
 MEs1 <- mergedMEs#netMEs#
-# MEs1 <- MEs1 %>% select(-MEgrey)
+MEs1 <- MEs1 %>% select(-MEgrey)
 MEmodule_colors <- colnames(MEs1)
 module_colors <- gsub("ME", "", colnames(MEs1))
 colnames(MEs1) <- module_colors
@@ -463,3 +536,512 @@ hub_genes <- hub_genes %>%
   dplyr::select(module, ID, Gene_Info) %>% 
   dplyr::rename("hub gene" = ID, "UniProt best match" = Gene_Info) 
 ```
+
+```{r datkME}
+# Generate GeneIDs
+Genes <- colnames(datExpr)
+#this section is adapted from Rachel Wright's GitHub: https://github.com/rachelwright8/Ahya-White-Syndromes/
+colnames(MEs1) <- MEmodule_colors
+datKME <- signedKME(datExpr, MEs1, outputColumnName = "") %>% rownames_to_column(., "ID")
+genecolors <- data.frame(ID = Genes, moduleColor = moduleColors)
+genecolors_kME <- left_join(genecolors, datKME, by = "ID") 
+###
+```
+```{r kME_files}
+partner <- "coral"
+# Assemble input for WGCNA GO_MWU: dataframe with gene IDs and kME values for all genes within a module, 0 for all genes without
+for (module in uniqModules){
+modkME <- genecolors_kME %>% dplyr::select(., "ID", "moduleColor", module)#paste("kME", module, sep = ""))
+colnames(modkME) <- c("gene", "moduleColor", "kME")
+###
+modkME$kME[modkME$moduleColor!=module] <- 0  #also need to change column names for color you pick above
+# modkME$kME[modkME$moduleColor==module] <- 1 #leave commented out to keep kME values
+modkME <- modkME %>% dplyr::select(., -moduleColor)
+# write csv
+#write.csv(modkME, file = paste("./outputs/WGCNA/tables/", module,"_kme.csv",sep=""), quote=F, row.names=F)
+write.csv(modkME, file = paste("./R/GO_MWU/", module,"_kme_", partner, ".txt", sep=""), quote=F, row.names=F)
+#repeat for each module
+}
+```
+
+### Module eigengene correlations
+For this study, I can correlate against physiological data and bacteria community data.
+It's a shame there's so few modules, but they all correlate significantly to experimental traits and physiology and microbiome data!
+```{r treatment_trait_data}
+# Get sample data into tibble
+datTraits <- coldata %>%
+  rownames_to_column("Sample_ID") %>% 
+  dplyr::select(Sample_ID) %>% 
+  mutate(Control = ifelse(coldata$Treatment == "control", 1, 0),
+         Stress = ifelse(coldata$Treatment != "control", 1, 0),
+         Heat = ifelse(coldata$Treatment == "heat", 1, 0),
+         Immune = ifelse(coldata$Treatment %in% c("bacteria", "lps"), 1, 0),
+         Chemical = ifelse(coldata$Treatment %in% c("cadmium", "microplastics"), 1, 0)
+         # Panama = ifelse(coldata$Gulf == "Panama", 1, 0),
+         # Chiriqui = ifelse(coldata$Gulf == "Chiriqui", 1, 0),
+         # Cladocopium = ifelse(coldata$Symbiont_Genus == "Cladocopium", 1, 0),
+         # Durusdinium = ifelse(coldata$Symbiont_Genus == "Durusdinium", 1, 0),
+         # I = ifelse(coldata$haplotype == "I", 1, 0), 
+         # III = ifelse(coldata$haplotype == "III", 1, 0), 
+         # V = ifelse(coldata$haplotype == "V", 1, 0), 
+         # VI = ifelse(coldata$haplotype == "VI", 1, 0)
+) %>%
+  column_to_rownames(var = "Sample_ID")
+```
+```{r n_genes_samples}
+# Define numbers of genes and samples
+nGenes <- ncol(datExpr)
+nSamples <- nrow(datExpr)
+```
+```{r ME_correlations_treatments}
+# Correlate module eigengene-trait associations
+moduleTraitCor <- cor(MEs1, datTraits, use = "p")
+moduleTraitPvalue <- corPvalueStudent(moduleTraitCor, nSamples)
+moduleTraitCors <- as.data.frame(moduleTraitCor, moduleTraitPvalue)
+```
+```{r significant_modules}
+# Identify all unique and interesting modules based on trait correlations
+# Filter for all the modules that have a significant correlation to any treatment, genotype, bacteria taxa, etc.
+p_values <- moduleTraitPvalue
+
+modP <- as.data.frame(p_values) %>%
+  rownames_to_column("module") %>%
+  arrange(module) %>% 
+  filter_all(any_vars(. < 0.05)) # %>% dplyr::select(module, lps)
+#
+sigModules <- sort(setdiff(modP$module,  "grey"))
+# 
+uniqModules
+# would like to reorder the sigModules subset to match ME clustering dendrogram order
+# sigModules <- uniqModules[uniqModules %in% sigModules]
+# 
+all(sigModules %in% uniqModules) # test that all the significant modules are actually within the modules
+all(sigModules == uniqModules) # are all modules also significantly correlated to one or more traits? NO
+sigModules
+```
+
+### Module gene significance (GS) and interconnectivity (kME)
+```{r genesig}
+# calculate gene trait significance for each treatment, genotype, etc.
+geneTraitSignificance <- as.data.frame(cor(datExpr, datTraits, use = "p")) 
+traitGS <- geneTraitSignificance %>% 
+  rownames_to_column("ID")
+```
+```{r df_kME_GS}
+longKME <- datKME %>% 
+  # rename(gene = "ID") %>% 
+  pivot_longer(cols= -ID, names_to = "module", values_to = "kME")
+#
+df_gene_GS_kME <- genecolors %>%
+  # rename(gene = "ID") %>% 
+  full_join(traitGS, by = "ID") %>% 
+  full_join(longKME, by = "ID") %>%
+  filter(moduleColor == module) %>%
+  dplyr::select(-module)
+```
+```{r module_GS_kME_results_tables}
+# write output tables with gene kME statistics and trait gene significance for each module
+ for (module in uniqModules) {
+# datKME <- datKME %>% column_to_rownames("gene")
+df_mod_GS_kME <- df_gene_GS_kME %>%
+  filter(moduleColor == module) %>% 
+  dplyr::select(-moduleColor) %>% 
+  dplyr::select(ID, kME, everything()) %>% 
+  arrange(desc(kME)) %>% 
+  left_join(., gene_annotation, by = "ID")
+write_csv(df_mod_GS_kME, path = paste("./outputs/WGCNA/tables/", module, "_GS_kME.csv", sep = ""))
+}
+```
+
+### WGCNA EuKaryotic Orthologous Groups (KOG) enrichment analysis
+```{r choose_gene2kog}
+# Ensure gene KOG annotation is present, choose partner
+gene2kog <- gene2kog_coral
+# gene2kog <- gene2kog_symbiont
+```
+```{r wgcna_kog}
+# Create tibble to keep results of WGCNA module KOGMWU enrichment
+# Choose whether to use Fisher's test for module membership or MWU test of enrichment of within-module kME ranks
+modKOG <- tibble("module" = uniqModules)
+modset <- uniqModules
+for (i in seq_along(modset)) {
+module <- modset[i]
+modkME <- genecolors_kME %>% dplyr::select(., ID, moduleColor, module)
+colnames(modkME) <- c("ID", "moduleColor", "kME")
+###
+modkME$kME[modkME$moduleColor!=module] <- 0  # also need to change column names for color you pick above
+modkME$kME[modkME$moduleColor==module] <- 1 # leave uncommented for Fisher's test, comment out to keep kME values for MWU test
+modkME <- modkME %>% dplyr::select(., -moduleColor)
+modKOG$kME[i] <- list("kME" = modkME)
+###
+kogmwu_module <- kog.mwu(modkME, gene2kog) #%>% arrange("KOG_Class")
+modKOG$KOG[i] <- list("KOG" = kogmwu_module)
+#names(modKOGlist[i]) <- module
+}
+modKOG$KOG
+```
+```{r module_kog_results}
+modKOG 
+```
+```{r signed_p_function}
+signedpadj <- function(x){-1*log(x, base = 10)}
+# signedpadj(0.05)
+```
+```{r KOG_Fishers_purrr}
+# Only use this section to extract results from Fisher's exact tests in KOGMWU
+# Generate all KOG adjusted p-values (Fisher's test does not calculate delta rank)
+modkogtables_fisher <- modKOG %>%
+  unnest(KOG) %>%
+  dplyr::select(module, term, padj) %>% 
+  mutate(signedpadj = -log(padj, base = 10)) %>% 
+  dplyr::select(-padj) %>%
+  split(list(.$module), drop = TRUE) %>% 
+  map(~ spread(., module, signedpadj)) %>% 
+  map(~ column_to_rownames(., "term"))
+
+# Generate KOG adjusted p-value stars
+modkogpvals_fisher <- modKOG %>%
+  unnest(KOG) %>%
+  dplyr::select(module, term, padj) %>%
+  split(list(.$module), drop = TRUE) %>% 
+  map(~ spread(., module, padj)) %>%
+  map(~ column_to_rownames(., "term")) %>%
+  map(~ transmute_all(., gtools::stars.pval))
+# 
+modkogtable_fisher <- modKOG %>%
+  unnest(KOG) %>%
+  dplyr::select(module, term, padj) %>%
+  mutate(signedpadj = -log(padj, base = 10)) %>% 
+  dplyr::select(-padj) %>%
+  spread(module, signedpadj) %>%
+  column_to_rownames("term")
+write_csv(modkogtable_fisher, file = "./outputs/WGCNA/modkogtable_fisher_coral.csv")
+  
+modkogpadj_fisher <- modKOG %>%
+  unnest(KOG) %>%
+  dplyr::select(module, term, padj) %>% 
+  spread(module, padj) %>%
+  column_to_rownames("term") %>%
+  transmute_all(gtools::stars.pval)
+```
+```{r KOG_MWU_purrr}
+# Only use this section to extract results from gene kME MWU tests in KOGMWU
+modKOG <- modKOG %>% mutate(
+         # If a KOG term has <10 genes associated with it, set delta rank to zero
+         KOG = map(KOG, ~ mutate(., delta.rank = ifelse(nseqs < 10, 0, delta.rank))))
+
+# Generate all KOG delta rank tables
+modkogtables_mwu <- modKOG %>%
+  unnest(KOG) %>%
+  dplyr::select(module, term, delta.rank) %>% 
+  split(list(.$module), drop = TRUE) %>% 
+  map(~ spread(., module, delta.rank)) %>% 
+  map(~ column_to_rownames(., "term"))
+
+# Generate KOG adjusted p-value stars
+modkogpvals_mwu <- modKOG %>%
+  unnest(KOG) %>%
+  dplyr::select(module, term, padj) %>%
+  split(list(.$module), drop = TRUE) %>% 
+  map(~ spread(., module, padj)) %>%
+  map(~ column_to_rownames(., "term")) %>%
+  map(~ transmute_all(., gtools::stars.pval))
+
+#
+modkogtable_mwu <- modKOG %>%
+  unnest(KOG) %>%
+  dplyr::select(module, term, padj) %>%
+  mutate(signedpadj = -log(padj, base = 10)) %>% 
+  dplyr::select(-padj) %>%
+  spread(module, signedpadj) #%>%
+  # column_to_rownames("term") 
+write_csv(modkogtable_mwu, file = "./outputs/WGCNA/modkogtable_mwu_coral.csv")
+  
+modkogpadj_mwu <- modKOG %>%
+  unnest(KOG) %>%
+  dplyr::select(module, term, padj) %>% 
+  spread(module, padj) %>%
+  column_to_rownames("term") %>%
+  transmute_all(gtools::stars.pval)
+```
+
+### WGCNA Gene Ontology (GO) enrichment analysis
+```{r module_GO_MWU}
+# Run GO_MWU for any given module for Biological Process (BP) GO terms
+commandArgs <- function(...) c("green_kme_symbiont.txt", "BP", "cladocopium_gene2go.tab") #"pdam_emapper_gene2go.tab"
+source("./R/GO_MWU/GO_MWU_WGCNA.R")
+
+# Run GO_MWU for Heat vs. control for Molecular Function GO terms
+commandArgs <- function(...) c("brown_kme.txt", "MF", "pdam_emapper_gene2go.tab") #"cladocopium_gene2go.tab"
+source("./R/GO_MWU/GO_MWU_WGCNA.R")
+
+# Run GO_MWU for Heat vs. control for Cellular Component (CC) GO terms
+commandArgs <- function(...) c("salmon_kme.txt", "CC", "pdam_emapper_gene2go.tab")
+source("./R/GO_MWU/GO_MWU.R")
+```
+```{r module GO_MWU plot}
+# Plot GO_MWU results
+commandArgs <- function(...) c("salmon_kme.txt", "BP", "GO_MWU.salmon.png")
+source("./R/GO_MWU/GO_MWU_WGCNA_plot.R")
+commandArgs <- function(...) c("salmon_kme.txt", "MF", "GO_MWU.salmon.png")
+source("./R/GO_MWU/GO_MWU_WGCNA_plot.R")
+commandArgs <- function(...) c("salmon_kme.txt", "CC", "GO_MWU.salmon.png")
+source("./R/GO_MWU/GO_MWU_WGCNA_plot.R")
+```
+```{r module_GO_MWU_loop}
+kMEfiles <- list.files(path = "./R/GO_MWU/", pattern = "_kme_coral.txt$")
+kMEfiles 
+###
+partner <- "coral"
+intModules_coral <- c("lightyellow","cyan", "magenta", "darkturquoise", "orange", "lightgreen", "darkorange")
+# intModules_symbiont <- c("green", "brown", "grey60", "magenta", "darkgrey", "darkturquoise", "purple", "darkgreen")
+#
+for (module in intModules_coral){
+  print(module)
+### command for GO_MWU analysis
+  #input file name
+tab <- paste(module, "_kme_", partner, ".txt", sep = "")
+  print(tab)
+  commandArgs <- function(...) c(tab, "BP", "pdam_emapper_gene2go.tab")
+  source("./R/GO_MWU/GO_MWU_WGCNA.R")
+}
+```
+```{r module_GO_results}
+# find results files for GO_MWU enrichments
+module_fisher_file <- "./R/GO_MWU/MWU_BP_greenyellow_kme_coral.txt"
+module_fisher_file
+module_fisher <- read.table(module_fisher_file, header = T)
+module_fisher %>%
+  filter(p.adj < 0.1) %>%
+  View()
+```
+```{r all_modules_GO_results}
+module_mwu_files <- str_c("./R/GO_MWU/MWU_", "BP_", intModules_coral, "_kme_", partner, ".txt", sep = "")
+names(module_mwu_files) <- intModules_coral
+module_mwu_files
+# read in GO_MWU results
+modules_GO <- as.list(module_mwu_files) %>%
+  map(read.table, header = T) %>%
+  bind_rows(.id = "module") %>%
+  as_tibble()
+```
+```{r}
+# save module enrichment
+modules_GO_symbiont <- modules_GO
+```
+```{r}
+# filter only significantly enriched GO terms
+module_GO_terms <- modules_GO %>%
+  dplyr::select(module, delta.rank, p.adj, name, nseqs, level, term) %>%
+  filter(module %in% intModules_coral) %>%
+  filter(p.adj < 0.05)
+#
+module_GO_terms$module <- factor(module_GO_terms$module, levels = intModules_coral, ordered = TRUE)
+   
+module_GO_terms %>% 
+  arrange(module, p.adj) %>% 
+  write_excel_csv(path = "./outputs/WGCNA/modules_GO_coral.csv")
+#
+module_GO_counts <- modules_GO %>%
+  filter(p.adj < 0.05) %>%
+  # filter(module %in% intModules) %>%
+  dplyr::count(module) %>% 
+  arrange(desc(n))
+# 
+enrichedModules <- module_GO_counts$module
+```
+```{r GO_MWU_figures}
+# keyModules <- c("darkgrey", "midnightblue", "darkorange", "darkgreen", "ivory")
+module <- "yellow"
+# for (module in enrichedModules){
+###
+tab <- paste(module, "_kme_", partner, ".txt", sep = "")
+fig <- as.character(paste("GO_MWU_", module, ".pdf", sep = ""))
+levs <- c(0.05, 1e-10, 1e-15)
+##01
+commandArgs <- function(...) c(tab, "BP", fig, module, 0.05, 0.01, 0.001, 1.0)
+source("./R/GO_MWU/GO_MWU_WGCNA_plot.R")
+# }
+```
+
+### WGCNA correlation heatmaps
+```{r heatmap_tests}
+Heatmap(moduleTraitCor)
+```
+
+#### Create heatmap annotations
+```{r ComplexHeatmap_annotation_WGCNA_modules}
+# row labels as module names and number of genes in parentheses
+module_labels <- data.frame(table(moduleColors)) %>%
+  filter(moduleColors != "grey") %>%
+  # arrange(desc(Freq)) %>% 
+  dplyr::mutate(freq_string = str_c("(", Freq ,")")) %>%
+  dplyr::select(-Freq) %>% 
+  unite(col = "module_label", moduleColors, freq_string, sep = "  ")
+module_labels <- as.character(module_labels$module_label)
+
+# annotation to include rectangles with module colors
+moddf <- data.frame(module_colors)
+module_anno  <- module_colors
+names(module_anno) <- module_colors
+module_sizes <- data.frame(table(moduleColors)) %>% filter(moduleColors != "grey") %>% arrange(desc(Freq))
+colnames(module_sizes) <- c("module_colors", "module_size")
+moddf <- left_join(moddf, module_sizes, by = "module_colors")
+module_annotation <- HeatmapAnnotation(modules = moddf$module_colors,
+                                       col = list(modules = module_anno),
+                                       which = "row",
+                                       annotation_name_rot = 0,
+                                       gp = gpar(col = "black", lwd = 0.5),
+                                       show_legend = FALSE,
+                                       show_annotation_name = FALSE
+                                       )
+#
+cn = colnames(moduleTraitCor)
+```
+```{r ComplexHeatmap_color_lists}
+# Create colony and condition annotation colors list
+# anno_colors <- list(
+  # Treatment = c(Control = treatcolors[2],  Antibiotics = treatcolors[3])#,
+  # Bacteria = bac_colors
+  # )
+
+# ComplexHeatmap colors
+# col_fun_ge <- function(mat) {
+#   colorRamp2(c(max(mat), max(mat)/2, mean(mat), min(mat)/2, min(mat)), c("red", "yellow", "grey10", "cyan", "blue"))
+# }
+col_fun_cor <- colorRamp2(c(1, 0, -1), c("red", "white", "blue"))
+col_fun_KOG_fisher <- colorRamp2(c(80, 0), c("red", "white"))
+```
+
+#### Create text matrices
+```{r treatment_text_matrix}
+# Create text matrix to display module-treatment correlations and their p-values
+# Only displays correlation coefficients for significant correlations p < 0.05
+textMatrix_treatment <- character()
+for (i in 1:length(moduleTraitPvalue)){
+  # reviewer request: add p-value to cell text
+  if(moduleTraitPvalue[i] < 0.05){ text <- paste(signif(moduleTraitCor[i], 2),
+                                                "\n", "(",
+                                                 signif(moduleTraitPvalue[i], 2),
+                                                 ")", sep = "")} else { text <- "" }
+  textMatrix_treatment[i] <- text
+}
+dim(textMatrix_treatment) <- dim(moduleTraitCor)
+# textMatrix_treatment
+```
+
+#### Create individual heatmaps
+```{r ComplexHeatmap_treatment}
+# pdf(file = "./outputs/figures/ME_complexheatmap_treatments.pdf", width = 6.5, height = 5)
+# 
+me_treatment_heatmap <- Heatmap(moduleTraitCor,
+                      col = col_fun_cor,
+                      cell_fun = function(j, i, x, y, width, height, fill) {grid.text(sprintf("%s", textMatrix_treatment[i, j]), x, y, gp = gpar(fontsize = 6))},
+                      cluster_rows = hclustME,
+                      # top_annotation = treatment_annotation,
+                      left_annotation = module_annotation,
+                      # right_annotation = module_barplot,
+                      # bottom_annotation = HeatmapAnnotation(text = anno_text(cn,
+                      #                                                        rot = 330,
+                      #                                                        offset = unit(1, "npc"),
+                      #                                                        just = "left"),
+                      #                                       annotation_height = max_text_width(cn)),
+                      # row_split = 3,
+                      # bottom_annotation = treatment_annotation,
+                      border = FALSE,
+                      rect_gp = gpar(col = "black", lwd = 0.5),
+                      column_order = colnames(datTraits),
+                      show_column_names = TRUE,
+                      column_names_rot = 270,
+                      column_names_side = "bottom",
+                      column_names_centered = TRUE,
+                      column_names_gp = gpar(fontsize = 8, fontface = "plain"),
+                      # column_title = "Treatments",
+                      # column_title_gp = gpar(fontsize = 12, fontface = "plain"),
+                      # row_title = "Cluster %s",
+                      row_labels = module_labels,
+                      row_title_gp = gpar(fontsize = 10, fontface = "plain"),
+                      row_dend_width = unit(20, "mm"),
+                      row_names_side = "left",
+                      row_names_gp = gpar(fontsize = 8, fontface = "plain", just = "left"),
+                      row_title_rot = 0,
+                      show_heatmap_legend = FALSE,
+                      heatmap_legend_param = list(title = "Module eigengene correlation",
+                                                  direction = "horizontal",
+                                                  # title_position = "leftcenter-rot",
+                                                  legend_height = unit(1.0, "cm"),
+                      width = unit(2, "cm"))
+                      )
+draw(me_treatment_heatmap,
+     show_annotation_legend = FALSE, heatmap_legend_side = "left"
+     )
+# dev.off()
+```
+
+#### Module KOG enrichment heatmap (Supplemental Figure)
+```{r ME_KOG_ComplexHeatmap_annotation}
+# annotation to include module colors
+module_annotation_col <- HeatmapAnnotation(modules = moddf$module_colors,
+                                       col = list(modules = module_anno),
+                                       which = "col",
+                                       annotation_name_rot = 0,
+                                       show_legend = FALSE
+                                       )
+# text matrix annotation for cell text
+ cell_fun <- function(j, i, x, y, width, height, fill) {
+        grid.text(sprintf("%.1f", t(modkogpadj_fisher)[i, j]), x, y, gp = gpar(fontsize = 6))
+ }
+ # barplot annotation of module sizes
+# module_barplot <- HeatmapAnnotation("# genes" = anno_barplot(moddf$module_size,
+#                                                   gp = gpar(fill = as.character(moddf$module_colors)),
+#                                                   bar_width = 0.8,
+#                                                   axis_param = list(side = "top",
+#                                                       #at = c(0, 1000, 2000, 3000, 4000, 5000),
+#                                                       # labels = c("zero", "half", "one"),
+#                                                       labels_rot = 45)),
+#                                     #module_sizes$moduleColors)),
+#                                     which = "row",
+#                                     show_legend = FALSE,
+#                                     annotation_name_side = "top",
+#                                     annotation_name_rot = "0",
+#                                     annotation_name_gp = gpar(fontsize = 12, fontface = "plain"),
+#                                     width = unit(2.5, "cm")
+#                                     )
+```
+```{r ME_KOG_ComplexHeatmap}
+me_kog_heatmap_fisher <- Heatmap(t(modkogtable_fisher),
+                      col = col_fun_KOG_fisher,
+                      cell_fun = function(j, i, x, y, width, height, fill) {grid.text(sprintf("%s", t(modkogpadj_fisher)[i, j]), x, y, gp = gpar(fontsize = 10))},
+                      cluster_rows = hclustME,
+                      # right_annotation = module_barplot,
+                      row_split = NULL,
+                      border = FALSE,
+                      rect_gp = gpar(col = "black", lwd = 0.5),
+                      column_order = rownames(modkogtable_fisher),
+                      column_names_rot = 60,
+                      column_names_side = "bottom",
+                      # column_names_centered = TRUE,
+                      column_names_gp = gpar(fontsize = 8, fontface = "plain", vjust = 1, hjust = 0),
+                      column_title = "KOG enrichments",
+                      column_title_gp = gpar(fontsize = 10, fontface = "plain"),
+                      row_labels = paste(hub_genes$`hub gene`, hub_genes$`UniProt best match`, sep = ": "),
+                      row_names_gp = gpar(fontsize = 6, fontface = "plain"),
+                      show_heatmap_legend = FALSE,
+                      heatmap_legend_param = list(title = "KOG class -log(padj)",
+                                                  direction = "vertical",
+                                                  title_position = "leftcenter-rot",
+                                                  legend_height = unit(1.0, "cm"),
+                       width = unit(4, "cm")
+                      ))
+# 
+draw(me_kog_heatmap_fisher, 
+     show_annotation_legend = FALSE, heatmap_legend_side = "left"
+     )
+```
+
+```{r}
+pdf("~/Desktop/poc_meta_wgcna_kogfisher_hub_heatmap.pdf", width = 14, height = 10)
+me_treatment_heatmap + me_kog_heatmap_fisher
+dev.off()
+```
+

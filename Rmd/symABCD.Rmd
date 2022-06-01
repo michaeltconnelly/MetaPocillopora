@@ -1,0 +1,138 @@
+---
+title: "symABCD"
+author: "Mike Connelly"
+date: "4/28/2022"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+knitr::opts_knit$set(root.dir = rprojroot::find_rstudio_root_file())
+options(stringsAsFactors = FALSE)
+```
+```{r}
+library(tidyverse) # for data wrangling and plotting
+library(RColorBrewer) # for colors
+```
+```{r}
+# Import sample metadata 
+samples <- read_csv("data/SampleData_MetaPocillopora_012722.csv") %>% 
+  dplyr::filter(Include_SNPs == TRUE) %>% 
+  dplyr::mutate("Sample_ID" = str_c(`Study`, `Sample`, sep = "_"))
+# 
+```
+Plot the proportion of reads mapping to A, B, C, and D in Pocillopora corals
+```{r}
+read_tsv("./outputs/symABCD/allcounts_symABCD.txt")
+```
+```{r}
+abcd_pdam <- read.delim("./outputs/symABCD/allcounts_symABCD.txt")
+
+df_abcd_pdam <- abcd_pdam %>% 
+  select(sample, fracA, fracB, fracC, fracD) %>% 
+  gather(clade, frac, fracA:fracD) %>% 
+  dplyr::mutate(Sample_ID = str_extract(sample, "^.*_SRR[[:digit:]]*")) %>%
+  left_join(samples, by = "Sample_ID")
+
+plot_abcd_pdam <- df_abcd_pdam %>% 
+  ggplot() + 
+  geom_bar(aes(y = frac, x = sample, fill = clade), stat="identity")+
+  facet_wrap(~Genotype, scales = "free") +
+  scale_fill_brewer(palette="Spectral")+
+  theme_classic()+
+  ylab("Proportion of Symbiont Reads")+
+  xlab("Pocillopora Samples")+
+  theme(axis.text.x=element_blank(),
+        axis.ticks.x=element_blank())
+```
+```{r}
+pdf("./outputs/figures/FigS#_symbiont_proportions.pdf", width = 6.5, height = 6.5)
+print(plot_abcd_pdam)
+dev.off()
+```
+
+```{r}
+df_abcd_pdam %>% 
+  group_by(clade, Study) %>% 
+  summarise(mean_composition = mean(frac)) 
+```
+
+## Scatterpie plot
+```{r}
+study_locations <- read_csv("./data/StudyGeography.csv") 
+study_locations$Longitude <- ifelse(study_locations$Longitude < 0, (study_locations$Longitude + 360), (study_locations$Longitude)) 
+# study_locations$Study <- factor(study_locations$Study, levels = study_levels, ordered = TRUE)
+
+# left_join(study_locations, by = "Study") %>%
+genotype_locations <- data.frame("Genotype" = unique(samples$Genotype)) %>%
+  left_join(samples, by = "Genotype") %>% 
+  group_by(Study, Genotype) %>%
+  distinct(Study, Genotype) %>% 
+  left_join(study_locations, by = "Study") %>% 
+  filter(!(grepl('OM', Genotype) & Latitude < 0)) %>% 
+  filter(!(grepl('NC', Genotype) & Latitude > 0)) %>% 
+  dplyr::select(-n, -Include)
+
+study_genotype_abcd_counts <- abcd_pdam %>%
+  mutate(Sample_ID = str_extract(sample, "^.*_SRR[[:digit:]]*")) %>% 
+  dplyr::select(Sample_ID, countA:countD) %>% 
+  pivot_longer(cols = countA:countD, names_to = "symbiont", values_to = "count") %>%
+  mutate(symbiont = str_replace(symbiont, "count", "")) %>% 
+  left_join(samples, by = "Sample_ID") %>%
+  group_by(Genotype, symbiont) %>%
+  # group_by(Study, symbiont) %>%
+  summarise(total_count = sum(count))
+
+genotype_abcd_map_counts <- left_join(study_genotype_abcd_counts, genotype_locations, by = "Genotype") %>% 
+  pivot_wider(names_from = symbiont, values_from = total_count) %>% 
+  mutate("radius" = 4)
+  # mutate("radius" = (`A`+`B`+`C`+`D`)/1000000)
+
+# locations_mtorfs <- genotypes %>% 
+#   group_by(Gulf, mtORF) %>% 
+#   dplyr::count() %>% 
+#   pivot_wider(names_from = mtORF, values_from = n, values_fill = 0) %>% 
+#   dplyr::rename("Type 1" = Type_1, "Type 3" = Type_3) %>% 
+#   mutate("radius" = (`Type 1` + `Type 3`)/20) %>% 
+#   left_join(coordinates, by = "Gulf")
+
+location_abcd_map_counts <- left_join(study_genotype_abcd_counts, genotype_locations, by = "Genotype") %>%
+  group_by(Study, Latitude, Longitude, symbiont) %>% 
+  summarise(total_location_count = sum(total_count)) %>% 
+  pivot_wider(names_from = symbiont, values_from = total_location_count) %>% 
+  mutate("radius" = 6)
+
+
+```
+
+```{r}
+pdf("./outputs/figures/symbiont_associations_map.pdf", width = 6.5, height = 4.5)
+title <- expression(italic("Pocillopora")~"symbiont associations")
+map <- ggplot() +
+  geom_sf(data = world_pacific_center, fill = "antiquewhite") + 
+  coord_sf(ylim = c(-42, 42), xlim = c(20, 295), expand = F) +
+  theme(panel.grid.major = element_blank(), 
+        panel.background = element_rect(fill = "aliceblue"), 
+        panel.border = element_rect(fill = NA)) + 
+  # 
+  # geom_point(aes(x = `Longitude`, y = `Latitude`, size = `# of samples`, fill = `Study`), shape = 21, alpha = 0.8, color = "black", stroke = 0.5,
+  #            position = position_jitter(width = 2, height = 2, seed = 3),
+  #            show.legend = T) +
+  # new_scale_fill() +
+  geom_scatterpie(aes(x = Longitude, y = Latitude, group = Study, r = radius),
+                    data = location_abcd_map_counts, cols = c("A", "B", "C", "D"), alpha = .8) +
+    scale_fill_brewer(palette="Spectral") +
+  # scale_fill_manual(values = c("darkorange1", "turquoise2"), name = "mtORF Type") +
+  #
+  # 
+  coord_sf(ylim = c(-42, 42), xlim = c(20, 295), expand = F) +
+  # 
+  theme(legend.position = "bottom",
+        panel.grid.major = element_blank(),
+        panel.background = element_rect(fill = "aliceblue"),
+        panel.border = element_rect(fill = NA)) +
+  ggtitle(title)
+map
+dev.off()
+```
+

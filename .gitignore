@@ -10,3 +10,4 @@ hs_err*
 .Rproj.user/
 .RData
 data/*.xlsx
+R/GO_MWU/

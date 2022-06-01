@@ -1,7 +1,7 @@
 ---
 title: "Pocillopora meta-tree visualization"
 author: "Mike Connelly"
-date: "2/9/2022"
+date: "5/3/2022"
 output: html_document
 ---
 
@@ -51,15 +51,21 @@ gg_color_hue <- function(n) {
 gcolors <- gg_color_hue(n_distinct(samples$Study))
 ```
 
-## Import tree
-```{r}
+## IQ-TREE
+### Import tree files
+```{r iqtree}
 # file <- 
 # tree <- read.newick("./outputs/raxml/raxml_run_001/metapocillopora_004_filtered_strict.raxml.support")
 # tree <- read.newick("./outputs/phylotrans_pdam/metapocillopora_004_filtered_strict.min4.phy.treefile")
 # tree <- read.newick("./outputs/iqtree/iqtree_run_002/metapocillopora_004_filtered_strict.treefile")
 tree <- read.newick("./outputs/iqtree/iqtree_run_003/metapocillopora_004_filtered_strict.contree")
 # tree <- read.newick("./outputs/iqtree/iqtree_run_004/metapocillopora_004_filtered_strict.treefile")
-
+```
+```{r snapp}
+tree <- read.newick("./outputs/snapp/snapp_run_001/meta.snap.out.tree")
+tree <- read.nexus("./outputs/snapp/snapp_run_001/meta.snap.out.tree")
+```
+```{r}
 # inspect phylogenetic tree
 tree$tip.label <- str_replace(tree$tip.label, "_1$", "")
 ```
@@ -79,7 +85,7 @@ df_tip_data$Study <- factor(df_tip_data$Study, levels = study_levels, ordered = 
 ```{r}
 ggtree(tree, layout = "circular", branch.length = "none") %<+% df_tip_data + 
   geom_treescale(x = 0.1, width = 0.05) +
-  geom_text(aes(label=node), hjust=-.3)
+  geom_text(aes(label=node), hjust=-.3) +
   # geom_nodelab(aes(label=tree$node.label)) + 
   # geom_tiplab(size = 3, hjust = -0.05) +
   geom_tippoint(aes(fill = Study, shape = Species), size = 3, alpha = 0.8, stroke = 0.5, color = "black", show.legend = TRUE) +
@@ -215,6 +221,42 @@ gtree %<+% df_tip_data +
   ggtitle(tree_title)
 dev.off()
 ```
+
+## SNAPP 
+```{r snapp}
+# tree <- read.newick("./outputs/snapp/snapp_run_001/meta.snap.out.tree")
+tree <- read.nexus("./outputs/snapp/snapp_run_001/meta.snap.out.tree")
+beast <- read.beast("./outputs/snapp/snapp_run_001/meta.snap.out.tree")
+tree
+```
+```{r}
+# inspect phylogenetic tree
+tree$tip.label <- str_replace(tree$tip.label, "_$", "")
+tree$tip.label <- str_replace(tree$tip.label, "_1$", "")
+tree$tip.label
+```
+```{r}
+tree$edge.length
+```
+
+```{r}
+ggtree(tree)
+```
+```{r}
+tree$tip.label %in% samples$Sample_ID
+# 
+samples <- samples %>% dplyr::filter(Sample_ID %in% tree$tip.label)
+df_tip_data <- samples[order(match(tree$tip.label,samples$Sample_ID)), ] %>% 
+  relocate(Sample_ID, .before = Study)
+df_tip_data$Study <- factor(df_tip_data$Study, levels = study_levels, ordered = TRUE)
+```
+```{r}
+ggtree(beast) + 
+  geom_tiplab(align=TRUE, linetype='dashed', linesize=.3) + 
+  geom_range("length_0.95_HPD", color='red', size=2, alpha=.5) +
+  geom_text2(aes(label=round(as.numeric(posterior), 2), 
+                 subset=as.numeric(posterior) > 0.25, 
+                 x=branch), vjust=0)
 ```
 
 

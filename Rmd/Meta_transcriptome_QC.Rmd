@@ -36,6 +36,7 @@ QC_summary_data <- read_csv("./data/MultiQCs_MetaPocillopora_012022.csv") #%>%
 sum(QC_summary_data$`Raw`)
 # 5.21 billion reads as of 02/04/2022
 ```
+
 ```{r tidy_QC_data}
 QC_summary_select <- QC_summary_data %>% 
   dplyr::select(-`Study`, -`BioProject`) %>% 
@@ -51,6 +52,24 @@ QC_summary$pipeline_step <- factor(QC_summary$pipeline_step, levels = c("Raw", "
 #
 QC_summary <- QC_summary %>% 
   arrange(`Study`)
+```
+
+```{r}
+# find sample with most aligned reads for each genotype in each study
+ top_aligned_samples <- QC_summary_select %>%
+  group_by(Study, Genotype) %>% 
+  slice_max(Aligned) %>%
+  arrange(desc(Aligned)) %>% 
+  mutate(Sample_ID = str_c(Study, Sample, sep = "_"))
+#
+ top_aligned_samples <- QC_summary_select %>%
+   filter(Treatment == "control") %>% 
+  group_by(Study, Genotype) %>% 
+  slice_max(Aligned) %>%
+  arrange(desc(Aligned)) %>% 
+  mutate(Sample_ID = str_c(Study, Sample, sep = "_"))
+# 32 samples 
+top_samples <- top_aligned_samples$Sample_ID
 ```
 
 ## Exploratory plots of sample read depth
