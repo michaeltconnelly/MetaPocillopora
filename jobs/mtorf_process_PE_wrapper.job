@@ -14,7 +14,7 @@ echo "#$  -S /bin/sh
 #$ -q sThC.q
 #$ -l mres=64G,h_data=4G,h_vmem=4G" >> $prodir/bash/jobs/mtorf_process_${sample}.job
 echo "#$ -j y
-#$ -N staralign_${sample}
+#$ -N mtorf_process_${sample}
 #$ -o ${prodir}/bash/jobs/mtorf_process_${sample}.log
 #$ -m bea
 #$ -M connellym@si.edu" >> $prodir/bash/jobs/mtorf_process_${sample}.job
