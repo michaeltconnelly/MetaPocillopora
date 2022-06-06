@@ -38,7 +38,7 @@ echo "/home/connellym/programs/ncbi-magicblast-1.6.0/bin/magicblast \
 -out ${prodir}/outputs/mtorf/${study}/${sample}_mtorf.sam" >> $prodir/bash/jobs/mtorf_process_${sample}.job
 #
 # Obtain sequences of the ATP6-ORF region for each individual
-echo "python sam2consensus.py \
+echo "python ${prodir}/bash/sam2consensus.py \
 -i ${prodir}/outputs/mtorf/${study}/${sample}_mtorf.sam \
 -o ${prodir}/outputs/mtorf/consensus_seqs \
 -p ${sample} \
