@@ -15,7 +15,7 @@ echo "#$  -S /bin/sh
 #$ -l mres=64G,h_data=4G,h_vmem=4G" >> $prodir/bash/jobs/mtorf_process_${sample}.job
 echo "#$ -j y
 #$ -N staralign_${sample}
-#$ -o ${prodir}/bash/jobs/staralign_mt_${sample}.log
+#$ -o ${prodir}/bash/jobs/mtorf_process_${sample}.log
 #$ -m bea
 #$ -M connellym@si.edu" >> $prodir/bash/jobs/mtorf_process_${sample}.job
 #
@@ -42,7 +42,7 @@ echo "python ${prodir}/bash/sam2consensus.py \
 -i ${prodir}/outputs/mtorf/${study}/${sample}_mtorf.sam \
 -o ${prodir}/outputs/mtorf/consensus_seqs \
 -p ${sample} \
--m 1"
+-m 1" >> $prodir/bash/jobs/mtorf_process_${sample}.job
 
 echo 'echo = `date` job $JOB_NAME done' >> $prodir/bash/jobs/mtorf_process_${sample}.job
 qsub $prodir/bash/jobs/mtorf_process_${sample}.job
