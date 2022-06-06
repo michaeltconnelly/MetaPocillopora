@@ -29,14 +29,14 @@ echo 'echo + NSLOTS = $NSLOTS' >> $prodir/bash/jobs/mtorf_process_${sample}.job
 echo "mkdir ${prodir}/outputs/mtorf/${study}" >> $prodir/bash/jobs/mtorf_process_${sample}.job
 # Align trimmed reads against mtORF consensus sequence using MagicBlast
 echo "/home/connellym/programs/ncbi-magicblast-1.6.0/bin/magicblast \
--query /scratch/nmnh_corals/connellym/projects/MetaPocillopora/outputs/trimmedreads/${study}/${sample}_1P_trimmed.fastq.gz \ \
+-query /scratch/nmnh_corals/connellym/projects/MetaPocillopora/outputs/trimmedreads/${study}/${sample}_1P_trimmed.fastq.gz \
 -query_mate /scratch/nmnh_corals/connellym/projects/MetaPocillopora/outputs/trimmedreads/${study}/${sample}_2P_trimmed.fastq.gz \
 -db ${prodir}/data/mtorf/mtORFdb \
 -infmt fastq \
 -paired \
 -num_threads $NSLOTS \
--no_unaligned \
 -out ${prodir}/outputs/mtorf/${study}/${sample}_mtorf.sam" >> $prodir/bash/jobs/mtorf_process_${sample}.job
+# -no_unaligned \
 #
 # Obtain sequences of the ATP6-ORF region for each individual
 echo "python ${prodir}/bash/sam2consensus.py \
