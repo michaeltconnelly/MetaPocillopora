@@ -33,6 +33,7 @@ echo "/home/connellym/programs/ncbi-magicblast-1.6.0/bin/magicblast \
 -query_mate /scratch/nmnh_corals/connellym/projects/MetaPocillopora/outputs/trimmedreads/${study}/${sample}_2P_trimmed.fastq.gz \
 -db ${prodir}/data/mtorf/mtORFdb \
 -infmt fastq \
+-paired \
 -num_threads $NSLOTS \
 -no_unaligned \
 -out ${prodir}/outputs/mtorf/${study}/${sample}_mtorf.sam" >> $prodir/bash/jobs/mtorf_process_${sample}.job
