@@ -34,7 +34,7 @@ echo "/home/connellym/programs/ncbi-magicblast-1.6.0/bin/magicblast \
 -db ${prodir}/data/mtorf/mtORFdb \
 -infmt fastq \
 -paired \
--num_threads $NSLOTS \
+-num_threads 4 \
 -out ${prodir}/outputs/mtorf/${study}/${sample}_mtorf.sam" >> $prodir/bash/jobs/mtorf_process_${sample}.job
 # -no_unaligned \
 #
