@@ -1,0 +1,49 @@
+#!/bin/bash
+
+prodir="/scratch/nmnh_corals/connellym/projects/MetaPocillopora"
+study="$1"
+files=$(ls $prodir/data/srareads/$study)
+samples=$(echo "$files" | cut -d _ -f 1,2 | sort -u)
+#
+for sample in $samples
+do
+echo "# /bin/sh" > $prodir/bash/jobs/mtorf_process_${sample}.job
+echo "# ----------------Parameters---------------------- #" >> $prodir/bash/jobs/mtorf_process_${sample}.job
+echo "#$  -S /bin/sh
+#$ -pe mthread 4
+#$ -q sThC.q
+#$ -l mres=64G,h_data=4G,h_vmem=4G" >> $prodir/bash/jobs/mtorf_process_${sample}.job
+echo "#$ -j y
+#$ -N staralign_${sample}
+#$ -o ${prodir}/bash/jobs/staralign_mt_${sample}.log
+#$ -m bea
+#$ -M connellym@si.edu" >> $prodir/bash/jobs/mtorf_process_${sample}.job
+#
+echo "# ----------------Modules------------------------- #" >> $prodir/bash/jobs/mtorf_process_${sample}.job
+#
+echo "# ----------------Your Commands------------------- #" >> $prodir/bash/jobs/mtorf_process_${sample}.job
+#
+echo 'echo + `date` job $JOB_NAME started in $QUEUE with jobID=$JOB_ID on $HOSTNAME' >> $prodir/bash/jobs/mtorf_process_${sample}.job
+echo 'echo + NSLOTS = $NSLOTS' >> $prodir/bash/jobs/mtorf_process_${sample}.job
+#
+echo "mkdir ${prodir}/outputs/mtorf/${study}" >> $prodir/bash/jobs/mtorf_process_${sample}.job
+# Align trimmed reads against mtORF consensus sequence using MagicBlast
+echo "/home/connellym/programs/ncbi-magicblast-1.6.0/bin/magicblast \
+-query /scratch/nmnh_corals/connellym/projects/MetaPocillopora/outputs/trimmedreads/${study}/${sample}_1P_trimmed.fastq.gz \ \
+-query_mate /scratch/nmnh_corals/connellym/projects/MetaPocillopora/outputs/trimmedreads/${study}/${sample}_2P_trimmed.fastq.gz \
+-db ${prodir}/data/mtorf/mtORFdb \
+-infmt fastq \
+-num_threads $NSLOTS \
+-no_unaligned \
+-out ${prodir}/outputs/mtorf/${study}/${sample}_mtorf.sam" >> $prodir/bash/jobs/mtorf_process_${sample}.job
+#
+# Obtain sequences of the ATP6-ORF region for each individual
+echo "python sam2consensus.py \
+-i ${prodir}/outputs/mtorf/${study}/${sample}_mtorf.sam \
+-o ${prodir}/outputs/mtorf/consensus_seqs \
+-p ${sample} \
+-m 1"
+
+echo 'echo = `date` job $JOB_NAME done' >> $prodir/bash/jobs/mtorf_process_${sample}.job
+qsub $prodir/bash/jobs/mtorf_process_${sample}.job
+done
