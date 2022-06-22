@@ -240,7 +240,50 @@ java -jar /share/apps/bioinformatics/gatk/3.8.1.0/GenomeAnalysisTK.jar \
 --variant ${prodir}/outputs/phylotrans_pdam/Grupstra2022/Grupstra2022_SRR16897912_pdam.g.vcf.gz \
 --variant ${prodir}/outputs/phylotrans_pdam/Grupstra2022/Grupstra2022_SRR16897913_pdam.g.vcf.gz \
 --variant ${prodir}/outputs/phylotrans_pdam/Grupstra2022/Grupstra2022_SRR16897914_pdam.g.vcf.gz \
---out ${prodir}/outputs/phylotrans_pdam/metapocillopora_004.g.vcf.gz
+--variant ${prodir}/outputs/phylotrans_pdam/Becker2021/Becker2021_SRR15101688_pdam.g.vcf.gz \
+--variant ${prodir}/outputs/phylotrans_pdam/Becker2021/Becker2021_SRR15101689_pdam.g.vcf.gz \
+--variant ${prodir}/outputs/phylotrans_pdam/Becker2021/Becker2021_SRR15101690_pdam.g.vcf.gz \
+--variant ${prodir}/outputs/phylotrans_pdam/Becker2021/Becker2021_SRR15101691_pdam.g.vcf.gz \
+--variant ${prodir}/outputs/phylotrans_pdam/Becker2021/Becker2021_SRR15101692_pdam.g.vcf.gz \
+--variant ${prodir}/outputs/phylotrans_pdam/Becker2021/Becker2021_SRR15101693_pdam.g.vcf.gz \
+--variant ${prodir}/outputs/phylotrans_pdam/Becker2021/Becker2021_SRR15101694_pdam.g.vcf.gz \
+--variant ${prodir}/outputs/phylotrans_pdam/Becker2021/Becker2021_SRR15101695_pdam.g.vcf.gz \
+--variant ${prodir}/outputs/phylotrans_pdam/Becker2021/Becker2021_SRR15101696_pdam.g.vcf.gz \
+--variant ${prodir}/outputs/phylotrans_pdam/Becker2021/Becker2021_SRR15101697_pdam.g.vcf.gz \
+--variant ${prodir}/outputs/phylotrans_pdam/Becker2021/Becker2021_SRR15101699_pdam.g.vcf.gz \
+--variant ${prodir}/outputs/phylotrans_pdam/Becker2021/Becker2021_SRR15101700_pdam.g.vcf.gz \
+--variant ${prodir}/outputs/phylotrans_pdam/Becker2021/Becker2021_SRR15101701_pdam.g.vcf.gz \
+--variant ${prodir}/outputs/phylotrans_pdam/Becker2021/Becker2021_SRR15101702_pdam.g.vcf.gz \
+--variant ${prodir}/outputs/phylotrans_pdam/Becker2021/Becker2021_SRR15101703_pdam.g.vcf.gz \
+--variant ${prodir}/outputs/phylotrans_pdam/Becker2021/Becker2021_SRR15101704_pdam.g.vcf.gz \
+--variant ${prodir}/outputs/phylotrans_pdam/Becker2021/Becker2021_SRR15101705_pdam.g.vcf.gz \
+--variant ${prodir}/outputs/phylotrans_pdam/Becker2021/Becker2021_SRR15101706_pdam.g.vcf.gz \
+--variant ${prodir}/outputs/phylotrans_pdam/Becker2021/Becker2021_SRR15101707_pdam.g.vcf.gz \
+--variant ${prodir}/outputs/phylotrans_pdam/Becker2021/Becker2021_SRR15101708_pdam.g.vcf.gz \
+--variant ${prodir}/outputs/phylotrans_pdam/Becker2021/Becker2021_SRR15101710_pdam.g.vcf.gz \
+--variant ${prodir}/outputs/phylotrans_pdam/Becker2021/Becker2021_SRR15101711_pdam.g.vcf.gz \
+--variant ${prodir}/outputs/phylotrans_pdam/Becker2021/Becker2021_SRR15101712_pdam.g.vcf.gz \
+--variant ${prodir}/outputs/phylotrans_pdam/Becker2021/Becker2021_SRR15101713_pdam.g.vcf.gz \
+--variant ${prodir}/outputs/phylotrans_pdam/Becker2021/Becker2021_SRR15101715_pdam.g.vcf.gz \
+--variant ${prodir}/outputs/phylotrans_pdam/Becker2021/Becker2021_SRR15101718_pdam.g.vcf.gz \
+--variant ${prodir}/outputs/phylotrans_pdam/Becker2021/Becker2021_SRR15101719_pdam.g.vcf.gz \
+--variant ${prodir}/outputs/phylotrans_pdam/Becker2021/Becker2021_SRR15101720_pdam.g.vcf.gz \
+--variant ${prodir}/outputs/phylotrans_pdam/Becker2021/Becker2021_SRR15101721_pdam.g.vcf.gz \
+--variant ${prodir}/outputs/phylotrans_pdam/Becker2021/Becker2021_SRR15101722_pdam.g.vcf.gz \
+--variant ${prodir}/outputs/phylotrans_pdam/Becker2021/Becker2021_SRR15101723_pdam.g.vcf.gz \
+--variant ${prodir}/outputs/phylotrans_pdam/Becker2021/Becker2021_SRR15101724_pdam.g.vcf.gz \
+--variant ${prodir}/outputs/phylotrans_pdam/Zhu2021/Zhu2021_SRR12710856_pdam.g.vcf.gz \
+--variant ${prodir}/outputs/phylotrans_pdam/Zhu2021/Zhu2021_SRR12710862_pdam.g.vcf.gz \
+--variant ${prodir}/outputs/phylotrans_pdam/Zhu2021/Zhu2021_SRR12710863_pdam.g.vcf.gz \
+--variant ${prodir}/outputs/phylotrans_pdam/Zhu2021/Zhu2021_SRR12710864_pdam.g.vcf.gz \
+--variant ${prodir}/outputs/phylotrans_pdam/Zhu2021/Zhu2021_SRR12710867_pdam.g.vcf.gz \
+--variant ${prodir}/outputs/phylotrans_pdam/Zhu2021/Zhu2021_SRR12786902_pdam.g.vcf.gz \
+--variant ${prodir}/outputs/phylotrans_pdam/Zhu2021/Zhu2021_SRR12786905_pdam.g.vcf.gz \
+--variant ${prodir}/outputs/phylotrans_pdam/Zhu2021/Zhu2021_SRR12786906_pdam.g.vcf.gz \
+--variant ${prodir}/outputs/phylotrans_pdam/Zhu2021/Zhu2021_SRR12904788_pdam.g.vcf.gz \
+--variant ${prodir}/outputs/phylotrans_pdam/Zhu2021/Zhu2021_SRR12904789_pdam.g.vcf.gz \
+--variant ${prodir}/outputs/phylotrans_pdam/Zhu2021/Zhu2021_SRR12904790_pdam.g.vcf.gz \
+--out ${prodir}/outputs/phylotrans_pdam/metapocillopora_006.g.vcf.gz
 #
 echo = `date` job $JOB_NAME done
 qsub ${prodir}/jobs/gatk_genotype_gvcfs_all.job
