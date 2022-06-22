@@ -240,7 +240,6 @@ java -jar /share/apps/bioinformatics/gatk/3.8.1.0/GenomeAnalysisTK.jar \
 --variant ${prodir}/outputs/phylotrans_pdam/Grupstra2022/Grupstra2022_SRR16897912_pdam.g.vcf.gz \
 --variant ${prodir}/outputs/phylotrans_pdam/Grupstra2022/Grupstra2022_SRR16897913_pdam.g.vcf.gz \
 --variant ${prodir}/outputs/phylotrans_pdam/Grupstra2022/Grupstra2022_SRR16897914_pdam.g.vcf.gz \
---variant ${prodir}/outputs/phylotrans_pdam/Becker2021/Becker2021_SRR15101688_pdam.g.vcf.gz \
 --variant ${prodir}/outputs/phylotrans_pdam/Becker2021/Becker2021_SRR15101689_pdam.g.vcf.gz \
 --variant ${prodir}/outputs/phylotrans_pdam/Becker2021/Becker2021_SRR15101690_pdam.g.vcf.gz \
 --variant ${prodir}/outputs/phylotrans_pdam/Becker2021/Becker2021_SRR15101691_pdam.g.vcf.gz \
@@ -289,3 +288,4 @@ echo = `date` job $JOB_NAME done
 qsub ${prodir}/jobs/gatk_genotype_gvcfs_all.job
 
 #--variant ${prodir}/outputs/phylotrans_pdam/Vidal-Dupiol2014/Vidal-Dupiol2014_SRR988551_pdam.g.vcf.gz \
+#--variant ${prodir}/outputs/phylotrans_pdam/Becker2021/Becker2021_SRR15101688_pdam.g.vcf.gz \
