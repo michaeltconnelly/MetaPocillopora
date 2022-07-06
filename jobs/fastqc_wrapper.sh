@@ -22,13 +22,13 @@ echo "module load bioinformatics/fastqc" >> $prodir/bash/jobs/fastqc_${study}.jo
 echo "#
 # ----------------Your Commands------------------- #
 #" >> $prodir/bash/jobs/fastqc_${study}.job
-echo "echo + `date` job $JOB_NAME started in $QUEUE with jobID=$JOB_ID on $HOSTNAME" >> $prodir/bash/jobs/fastqc_${study}.job
-echo "echo + NSLOTS = $NSLOTS" >> $prodir/bash/jobs/fastqc_${study}.job
+echo 'echo + `date` job $JOB_NAME started in $QUEUE with jobID=$JOB_ID on $HOSTNAME' >> $prodir/bash/jobs/fastqc_${study}.job
+echo 'echo + NSLOTS = $NSLOTS' >> $prodir/bash/jobs/fastqc_${study}.job
 echo "#" >> $prodir/bash/jobs/fastqc_${study}.job
 #
 echo "fastqc \
-${prodir}/data/srareads/${study}/* \
---threads $NSLOTS \
+${prodir}/data/srareads/${study}/*.fastq* \
+--threads 16 \
 -o ${prodir}/outputs/QCs/fastqcs/" >> $prodir/bash/jobs/fastqc_${study}.job
 #
 echo "echo = `date` job $JOB_NAME done" >> $prodir/bash/jobs/fastqc_${study}.job
