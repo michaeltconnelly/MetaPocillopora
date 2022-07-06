@@ -12,7 +12,7 @@ echo "# /bin/sh
 #$ -cwd
 #$ -j y
 #$ -N fastqc_${study}
-#$ -o fastqc_${study}.log
+#$ -o ${prodir}/bash/jobs/fastqc_${study}.log
 #$ -m bea
 #$ -M connellym@si.edu" > $prodir/bash/jobs/fastqc_${study}.job
 #
@@ -27,7 +27,7 @@ echo "echo + NSLOTS = $NSLOTS" >> $prodir/bash/jobs/fastqc_${study}.job
 echo "#" >> $prodir/bash/jobs/fastqc_${study}.job
 #
 echo "fastqc \
-${prodir}/data/srareads/Brener-Raffali2018/* \
+${prodir}/data/srareads/${study}/* \
 --threads $NSLOTS \
 -o ${prodir}/outputs/QCs/fastqcs/" >> $prodir/bash/jobs/fastqc_${study}.job
 #
