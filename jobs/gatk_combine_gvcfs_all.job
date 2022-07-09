@@ -23,7 +23,6 @@ prodir="/scratch/nmnh_corals/connellym/projects/MetaPocillopora"
 java -jar /share/apps/bioinformatics/gatk/3.8.1.0/GenomeAnalysisTK.jar \
 -T CombineGVCFs \
 -R /home/connellym/sequences/pdam_scaffolds.fasta \
---variant ${prodir}/outputs/phylotrans_pdam/Becker2021/Becker2021_SRR15101688_pdam.g.vcf.gz \
 --variant ${prodir}/outputs/phylotrans_pdam/Becker2021/Becker2021_SRR15101689_pdam.g.vcf.gz \
 --variant ${prodir}/outputs/phylotrans_pdam/Becker2021/Becker2021_SRR15101690_pdam.g.vcf.gz \
 --variant ${prodir}/outputs/phylotrans_pdam/Becker2021/Becker2021_SRR15101691_pdam.g.vcf.gz \
@@ -411,3 +410,5 @@ java -jar /share/apps/bioinformatics/gatk/3.8.1.0/GenomeAnalysisTK.jar \
 #
 echo = `date` job $JOB_NAME done
 qsub ${prodir}/jobs/gatk_genotype_gvcfs_all.job
+
+# --variant ${prodir}/outputs/phylotrans_pdam/Becker2021/Becker2021_SRR15101688_pdam.g.vcf.gz \
