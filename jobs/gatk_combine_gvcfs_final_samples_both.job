@@ -6,8 +6,8 @@
 #$ -l mres=64G,h_data=8G,h_vmem=8G
 #$ -cwd
 #$ -j y
-#$ -N gatk_combine_gvcfs_top
-#$ -o gatk_combine_gvcfs_top.log
+#$ -N gatk_combine_gvcfs_final_samples_both
+#$ -o gatk_combine_gvcfs_final_samples_both.log
 #$ -m bea
 #$ -M connellym@si.edu
 #
@@ -84,4 +84,4 @@ java -jar /share/apps/bioinformatics/gatk/3.8.1.0/GenomeAnalysisTK.jar \
 --out ${prodir}/outputs/phylotrans_pdam/metapocillopora_final_samples_both.g.vcf.gz
 #
 echo = `date` job $JOB_NAME done
-qsub ${prodir}/jobs/gatk_genotype_gvcfs_top.job
+qsub ${prodir}/jobs/gatk_genotype_gvcfs_final_samples_both.job

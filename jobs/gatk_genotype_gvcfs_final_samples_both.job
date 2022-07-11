@@ -26,4 +26,7 @@ java -jar /share/apps/bioinformatics/gatk/3.8.1.0/GenomeAnalysisTK.jar \
 -V ${prodir}/outputs/phylotrans_pdam/metapocillopora_final_samples_both.g.vcf.gz \
 -o ${prodir}/outputs/phylotrans_pdam/metapocillopora_final_samples_both.vcf.gz
 #
+
+qsub ${prodir}/jobs/vcftools_filtering.job metapocillopora_final_samples_both
+
 echo = `date` job $JOB_NAME done
