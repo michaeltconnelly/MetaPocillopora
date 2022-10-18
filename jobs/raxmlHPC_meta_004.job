@@ -26,7 +26,7 @@ raxmlHPC \
 -m GTRGAMMA \
 -b 123476 \
 -# 1000 \
--T $NSLOTS
+-T $NSLOTS \
 -p 12345 \
 -s ${prodir}/outputs/nexus-phylips/vcf_meta_0.95_unlinked.vcf.min0.phy \
 -w ${prodir}/outputs/raxml/raxml_run_004/ \
