@@ -22,7 +22,7 @@ echo + NSLOTS = $NSLOTS
 prodir="/scratch/nmnh_corals/connellym/projects/MetaPocillopora"
 #
 raxmlHPC \
--f a
+-f a \
 -m GTRGAMMA \
 -b 123476 \
 -# 1000 \
