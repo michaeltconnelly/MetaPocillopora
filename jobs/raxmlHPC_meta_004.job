@@ -25,7 +25,7 @@ raxmlHPC \
 -s ${prodir}/outputs/nexus-phylips/vcf_meta_0.95_unlinked.vcf.min0.phy \
 -w ${prodir}/outputs/raxml/raxml_run_004/ \
 -n vcf_meta_0.95_unlinked \
--m GTR+G \
+-m GTRGAMMA \
 --tree pars{25},rand{25} \
 --bs-trees 200
 --all \
