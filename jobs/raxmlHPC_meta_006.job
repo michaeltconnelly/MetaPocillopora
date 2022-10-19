@@ -29,7 +29,7 @@ raxmlHPC \
 -T $NSLOTS \
 -p 12345 \
 -s ${prodir}/outputs/nexus-phylips/vcf_meta_0.95_unlinked.vcf.min0.phy \
--w ${prodir}/outputs/raxml/raxml_run_004/ \
+-w ${prodir}/outputs/raxml/raxml_run_006/ \
 -n vcf_meta_0.95_unlinked
 #
 echo = `date` job $JOB_NAME done
