@@ -6,6 +6,8 @@
 #$ -l mres=48G,h_data=2G,h_vmem=2G
 #$ -cwd
 #$ -j y
+#$ -N snapp_run
+#$ -o snapp_run.log
 #$ -m bea
 #$ -M connellym@si.edu
 #
@@ -16,7 +18,7 @@ module load bioinformatics/beast/2.6.6
 #
 echo + `date` job $JOB_NAME started in $QUEUE with jobID=$JOB_ID on $HOSTNAME
 echo + NSLOTS = $NSLOTS
-
+# note - call the qsub command from the intended output directory
 #
 packagemanager -add SNAPP
 beast  -threads $NSLOTS $1
