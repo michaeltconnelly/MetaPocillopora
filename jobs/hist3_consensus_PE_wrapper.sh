@@ -29,7 +29,7 @@ echo 'echo + NSLOTS = $NSLOTS' >> $prodir/bash/jobs/hist3_consensus_${sample}.jo
 # Obtain sequences of the histone 3 region for each individual
 echo "python ${prodir}/bash/sam2consensus.py \
 -i ${prodir}/outputs/hist3/${study}/${sample}_hist3.sam \
--c 0.5 \
+-c 0.25 \
 -o ${prodir}/outputs/hist3/consensus_seqs \
 -p ${sample} \
 -m 1 \

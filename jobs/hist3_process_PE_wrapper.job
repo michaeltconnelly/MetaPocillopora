@@ -41,7 +41,7 @@ echo "/home/connellym/programs/ncbi-magicblast-1.6.0/bin/magicblast \
 # Obtain sequences of the ATP6-ORF region for each individual
 echo "python ${prodir}/bash/sam2consensus.py \
 -i ${prodir}/outputs/hist3/${study}/${sample}_hist3.sam \
--c 0.5 \
+-c 0.25 \
 -o ${prodir}/outputs/hist3/consensus_seqs \
 -p ${sample} \
 -m 1 \
