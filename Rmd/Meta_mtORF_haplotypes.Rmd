@@ -1,0 +1,236 @@
+---
+title: "Pocillopora mtORF consensus sequence analysis"
+author: "Mike Connelly"
+date: "06/04/2022"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+knitr::opts_knit$set(root.dir = rprojroot::find_rstudio_root_file())
+```
+```{r packages}
+library("tidyverse")
+library("ape")
+library("pegas")
+```
+```{r genotype_metadata}
+# genotypes <- read_csv("data/genotypes.csv")
+# genotype_colors <- read_csv("data/genotype_colors.csv") # color names csv corresponding to excel sheet colors
+```
+## Pocillopora corals from RNAseq studies
+## Import sample metadata
+```{r factor levels}
+# study_levels <- c("Mayfield2014", "Vidal-Dupiol2014", "Yuan2017", "Zhou2017", "Brener-Raffali2018", "Delgadillo-Nuno2018", "Tang2018", "Wecker2018", "Zhou2018", "Poquita-Du2019", "Zhou2019", "Buitrago-Lopez2020", "Connelly2020", "Chuang-Mitarai2020", "Li2020", "Connelly2022", "Grupstra2022")
+
+study_levels <- c("Mayfield2014", "Vidal-Dupiol2014", "Yuan2017", "Zhou2017", "Brener-Raffali2018", "Delgadillo-Nuno2018", "Tang2018", "Wecker2018", "Zhou2018", "Poquita-Du2019", "Zhou2019", "Buitrago-Lopez2020", "Chuang-Mitarai2020", "Li2020", "ConnellyEAPSI", "Grupstra2022", "Becker2021", "Zhu2021")
+```
+```{r}
+# Import sample metadata 
+samples <- read_csv("data/SampleData_MetaPocillopora_AllBioProjects.csv") %>% 
+  dplyr::filter(Include_SNPs == TRUE) %>% 
+  dplyr::mutate("Sample_ID" = str_c(`Study`, `Sample`, sep = "_"))
+# 
+```
+### Import mtORF sequence alignment 
+```{r import_alignment}
+data <- read.dna("./outputs/mtorf/consensus_seqs/mtorf_cons_aligned.fasta", format = "fasta")
+# 34 nucleotides ahead of 828bp region, 829 - 906 also overhang
+data <- read.dna("./outputs/mtorf/mtorf_consensus_aligned_828bp.fas", format = "fasta")
+#
+data <- read.dna("./outputs/mtorf/consensus_seqs/final_samples_mtorf_seqs828_aligned.clipped.fasta", format = "fasta")
+# final samples both
+data <- read.dna("./outputs/mtorf/final_filtered_samples_both_mtorf_aligned.fasta", format = "fasta")
+
+# most complete alignment after Gelin et al. 2017 - from Scott Burgess
+data <- read.dna("./outputs/mtorf/Burgess_Gelin_mtORF_alignment.fasta", format = "fasta")
+
+# selected mtORF haplotypes from Gelin et al. 2017 - based on suspected matches
+data <- read.dna("./data/mtorf_seqs/mtorf_refs_aligned.fasta", format = "fasta")
+
+# final samples both with reference haplotypes 
+data <-  read.dna("./outputs/mtorf/final_filtered_samples_both_mtorf_ref_aligned.fasta", format = "fasta")
+
+# final samples both with reference haplotypes, only above 900 bp (38 seqs)
+data <-  read.dna("./outputs/mtorf/msa/elite_samples_refs_aligned.fasta", format = "fasta")
+
+# final samples both WITHOUT reference haplotypes, only above 900 bp (38 seqs)
+  
+checkAlignment(data)
+
+# 361 sequences, 742 sites
+attributes(data)
+dimnames(data)[[1]]
+```
+```{r trim_alignment}
+data.mat <- as.matrix(data)
+data_trim <- data.mat[,48:888]
+#
+write.dna(data_trim, file="./outputs/mtorf/msa/elite_samples_refs_aligned_trimmed.fasta", format="fasta", nbcol=-1, colsep="")
+#
+checkAlignment(data_trim)
+```
+
+```{r clean_alignment}
+# remove all sequences with gaps > 3?
+# data.mat <- as.matrix(data)
+# row.names(data.mat)
+
+# data <- data.mat[c(3:12, 30:35),]
+data
+```
+
+```{r}
+data <- data_trim
+```
+```{r haplotypes}
+dataHaplo <- haplotype(data)
+dataHaplo
+# 54 unique haplotypes
+
+# 928-bp cleaned alignment:
+#     Number of haplotypes: 16 
+#          Sequence length: 928 
+# 
+# Haplotype labels and frequencies:
+# 
+#    I   II  III   IV    V   VI  VII VIII   IX    X   XI  XII XIII  XIV   XV  XVI 
+#   20    1    1    1    2    1    1    1    2    1    1    9    1    1    3    1 
+
+summary(dataHaplo)
+```
+```{r extract haplotypes and build network}
+dataHaplo <- sort(dataHaplo, what = "labels")
+# attributes(dataHaplo)
+dataNet <- haploNet(dataHaplo)
+```
+```{r extract sequence labels}
+seq_labels <- dimnames(data)[[1]]
+seq_labels
+#
+```
+```{r}
+sample_names <- gsub("\\|c.{2}.*$", "", seq_labels)
+sample_names <- gsub("_1", "", sample_names)
+#
+sample_names
+```
+```{r countHap}
+countHap <- function(hap = h, dna = x){
+  with(
+    stack(setNames(attr(hap, "index"), rownames(hap))),
+    table(haplotype = ind, Genotype = attr(dna, "dimnames")[[1]][values])
+  )
+}
+```
+```{r genotype haplotype matches}
+df <- as.data.frame(countHap(dataHaplo, data))
+good <- df %>% filter(Freq == 1)
+# 
+# genotypes <- left_join(genotypes, good, by = "Genotype") %>% 
+#   dplyr::select(-Freq) %>% 
+#   mutate(mtORF = ifelse(haplotype %in% c("II", "IV"), "Type_3", "Type_1"))
+```
+```{r}
+samples_select <- samples %>% 
+  filter(`Sample_ID` %in% sample_names)
+```
+
+```{r genotype sort and colors}
+# genotypes <- genotypes %>% arrange(Genotype, seq_labels)
+# genocolors <- genotype_colors %>% arrange(Genotype, seq_labels) %>% dplyr::select(color)
+```
+
+### Plot haplotype networks
+```{r basic haplotype net}
+plot(dataNet)
+```
+```{r blank haplotype net}
+# pdf(file="~/Desktop/mtORF_meta_haplotypes_network.pdf", width = 8, height = 10, pointsize = 10)
+
+plot(dataNet,
+     size = attr(dataNet, "freq"),
+     # scale.ratio = 1,
+     show.mutation = 1,
+     labels = TRUE)
+# dev.off()
+```
+### Plot haplotype networks with sample metadata
+```{r metadata haplotype frequencies}
+Species <- haploFreq(data, samples_select$Species, haplo = dataHaplo)
+Study <- haploFreq(data, samples_select$Study, haplo = dataHaplo)
+
+# Gulf <- haploFreq(data, genotypes$Gulf, haplo = dataHaplo)
+# Loc <- haploFreq(data, genotypes$Location, haplo = dataHaplo)
+# Type <- haploFreq(data, genotypes$mtORF, haplo = dataHaplo)
+# Geno <- haploFreq(data, genotypes$Genotype, haplo = dataHaplo)
+```
+
+```{r colored haplonet}
+pdf(file="./outputs/figures/mtORF_haplotypes_species.pdf", width = 6.5, height = 5, pointsize = 6)
+plot(dataNet,
+     size = attr(dataNet, "freq"),
+     pie = Species,
+     # bg = genocolors$color,
+     show.mutation = 1,
+     labels = FALSE,
+     legend = c(25,40))
+dev.off()
+```
+```{r}
+pdf(file="./outputs/figures/mtORF_haplotypes_gulf.pdf", width = 4, height = 5, pointsize = 6)
+plot(dataNet,
+     size = attr(dataNet, "freq"),
+     pie = Study,
+     bg = gcolors,
+     show.mutation = 1,
+     labels = FALSE,
+     legend = c(25,40))
+dev.off()
+```
+```{r}
+pdf(file="./outputs/figures/mtORF_haplotypes_type.pdf", width = 4, height = 5, pointsize = 6)
+plot(dataNet,
+     size = attr(dataNet, "freq"),
+     pie = Type,
+     # bg = c("orange","blue"),
+     show.mutation = 1,
+     labels = TRUE,
+     legend = c(-3,18))
+dev.off()
+```
+
+
+## Pocillopora corals from previous studies
+```{r mtORF sequences}
+mtorf_sequences <- read_csv("./data/mtorf/mtorf_sequences.csv")
+```
+### Import mtORF sequence alignments
+```{r import published data}
+# RSMAS genotypes + Pinzon & LaJeunesse 2011 unique haplotypes
+data_2 <- read.dna("./data/mtorf/mtorf_alignment_828bp_pinzon2011.fasta", format = "fasta")
+checkAlignment(data_2)
+#18 sequences, 828 sites
+```
+```{r haplotypes}
+dataHaplo <- haplotype(data_2)
+dataHaplo
+# 9 unique haplotypes
+   # I   II  III   IV    V   VI  VII VIII   IX 
+   # 4    3    1    2    2    3    1    1    1 
+```
+```{r}
+dataHaplo <- sort(dataHaplo, what = "labels")
+dataNet <- haploNet(dataHaplo)
+```
+
+### Plot haplotype networks
+```{r blank haplotype net}
+# pdf(file="~/Desktop/mtORF_haplotypes_sites.pdf", width = 8, height = 10, pointsize = 10)
+plot(dataNet,
+     size = attr(dataNet, "freq"),
+     show.mutation = 3,
+     labels = FALSE,
+     legend = c(-20,20))
+# dev.off()
+```
