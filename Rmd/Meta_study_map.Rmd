@@ -58,7 +58,7 @@ ggplot() +
 
 ### Map of Pocillopora RNAseq study locations
 ```{r factor levels}
-study_levels <- c("Mayfield2014", "Vidal-Dupiol2014", "Yuan2017", "Zhou2017", "Brener-Raffali2018", "Delgadillo-Nuno2018", "Tang2018", "Wecker2018", "Zhou2018", "Poquita-Du2019", "Zhou2019", "Buitrago-Lopez2020", "Chuang-Mitarai2020", "Li2020", "ConnellyEAPSI", "Grupstra2022")
+study_levels <- c("Vidal-Dupiol2013", "Mayfield2014", "Vidal-Dupiol2014", "Yuan2017", "Zhou2017", "Brener-Raffali2018", "Delgadillo-Nuno2018", "RSMAS2018", "Tang2018", "Wecker2018", "Zhou2018", "Poquita-Du2019", "Zhou2019", "Buitrago-Lopez2020", "Chuang-Mitarai2020", "Li2020", "Becker2021", "Rutgers2021", "Stephens2021", "Zhu2021", "ConnellyEAPSI", "Grupstra2022")
 ```
 ```{r study_locations}
 study_locations <- read_csv("./data/StudyGeography.csv") %>%
@@ -68,9 +68,17 @@ study_locations$Study <- factor(study_locations$Study, levels = study_levels, or
 title <- expression(italic("Pocillopora")~"RNAseq study locations")
 ```
 ```{r}
-pdf("./outputs/figures/Fig1_study_locations_map.pdf", height = 114.3/25.4, width = 180/25.4)
+gg_color_hue <- function(n) {
+  hues = seq(15, 375, length = n + 1)
+  hcl(h = hues, l = 65, c = 100)[1:n]
+}
+gcolors <- gg_color_hue(n_distinct(study_locations$Study))
+# gcolors <- gg_color_hue(19)
+```
+```{r}
+# pdf("./outputs/figures/Fig1_study_locations_map.pdf", height = 114.3/25.4, width = 180/25.4)
 map <- study_locations %>% 
-  filter(Include == T) %>%
+  # filter(Include == T) %>%
   ggplot(data = .) +
   geom_sf(data = world_pacific_center, fill = "lightgrey") + 
   # 
@@ -80,9 +88,9 @@ map <- study_locations %>%
   # scale_shape_manual(values = c(21, 24), guide = guide_legend(override.aes = list(size = 5))) +
   # scale_color_manual(values = gcolors) +
   scale_fill_manual(values = gcolors,
-                    guide = guide_legend(order = 1, override.aes = list(size = 3, shape = 21, fill = gcolors), nrow = 5, title.position = "top")) +
-  scale_size(range = c(1, 8), breaks = c(1, 12, 24, 48, 60), limits = c(0, 60),
-             guide = guide_legend(order = 2, override.aes = list(fill = "black"), nrow = 5, title.position = "top")) +
+                    guide = guide_legend(order = 1, override.aes = list(size = 3, shape = 21, fill = gcolors), nrow = 6, title.position = "top")) +
+  scale_size(range = c(1, 10), breaks = c(1, 10, 100), limits = c(0, 120),
+             guide = guide_legend(order = 2, override.aes = list(fill = "black"), nrow = 6, title.position = "top")) +
   # 
   coord_sf(ylim = c(-42, 42), xlim = c(20, 295), expand = F) +
   # 
@@ -94,15 +102,7 @@ map <- study_locations %>%
         panel.border = element_rect(fill = NA)) +
   ggtitle(title)
 map
-dev.off()
-```
-```{r}
-gg_color_hue <- function(n) {
-  hues = seq(15, 375, length = n + 1)
-  hcl(h = hues, l = 65, c = 100)[1:n]
-}
-# gcolors <- gg_color_hue(n_distinct(study_locations$Study))
-gcolors <- gg_color_hue(15)
+# dev.off()
 ```
 ```{r github readme png}
 # make PNG file for GitHub repository
@@ -119,8 +119,8 @@ map <- study_locations %>%
   # scale_color_manual(values = gcolors) +
   scale_fill_manual(values = gcolors,
                     guide = guide_legend(order = 1, override.aes = list(size = 6, shape = 21, fill = gcolors), nrow = 5, title.position = "top")) +
-  scale_size(range = c(1, 12), breaks = c(1, 12, 24, 48, 60), limits = c(0, 60),
-             guide = guide_legend(order = 2, override.aes = list(fill = "black"), nrow = 5, title.position = "top")) +
+scale_size(range = c(0.5, 10), breaks = c(1, 10, 100), limits = c(0, 120),
+             guide = guide_legend(order = 2, override.aes = list(fill = "black"), nrow = 6, title.position = "top")) +
   # 
   coord_sf(ylim = c(-42, 42), xlim = c(20, 295), expand = F) +
   # 
@@ -141,8 +141,8 @@ dev.off()
 
 ### Figure 1
 ```{r figure 1: manuscript}
-# pdf("./outputs/figures/Fig1_study_locations_map.pdf", width = 6.5, height = 4, units = "in")
-
-# dev.off()
+pdf("./outputs/figures/Fig1_study_locations_map.pdf", width = 6.5, height = 6.5)
+print(map)
+dev.off()
 ```
 

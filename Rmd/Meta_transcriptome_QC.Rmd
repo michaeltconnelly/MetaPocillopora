@@ -23,18 +23,21 @@ library("patchwork")
 
 ## Import sample metadata
 ```{r factor levels}
-study_levels <- c("Mayfield2014", "Vidal-Dupiol2014", "Yuan2017", "Zhou2017", "Brener-Raffali2018", "Delgadillo-Nuno2018", "Tang2018", "Wecker2018", "Zhou2018", "Poquita-Du2019", "Zhou2019", "Buitrago-Lopez2020", "Chuang-Mitarai2020", "Li2020", "ConnellyEAPSI", "Grupstra2022")
+study_levels <- c("Mayfield2014", "Vidal-Dupiol2014", "Yuan2017", "Zhou2017", "Brener-Raffali2018", "Delgadillo-Nuno2018", "Tang2018", "Wecker2018", "Zhou2018", "Poquita-Du2019", "Zhou2019", "Buitrago-Lopez2020", "Chuang-Mitarai2020", "Li2020", "Becker2021", "Rutgers2021", "Stephens2021", "Zhu2021", "ConnellyEAPSI", "Grupstra2022")
 ```
 ```{r sample_data, echo=TRUE}
 # Import sample metadata 
-samples <- read_csv("data/SampleData_MetaPocillopora_012722.csv") 
+samples <- read_csv("data/SampleData_MetaPocillopora_AllBioProjects.csv") 
 ```
 
 ## Import and tidy transcriptome pipeline QC data
 ```{r QC_data}
-QC_summary_data <- read_csv("./data/MultiQCs_MetaPocillopora_012022.csv") #%>%
+QC_summary_data <- read_csv("./data/MultiQCs_MetaPocillopora_AllBioProjects.csv") #%>%
 sum(QC_summary_data$`Raw`)
-# 5.21 billion reads as of 02/04/2022
+# 8.56 billion reads as of 07/07/2022
+range(QC_summary_data$`Raw`)
+mean(QC_summary_data$`Raw`)
+sd(QC_summary_data$`Raw`)
 ```
 
 ```{r tidy_QC_data}
@@ -80,6 +83,10 @@ gg_color_hue <- function(n) {
 }
 gcolors <- gg_color_hue(n_distinct(QC_summary$Study))
 ```
+```{r shapes}
+spshapes <- c(21, 24, 22, 23, 23, 25)
+```
+
 ```{r}
 FASTQCg <- QC_summary %>% 
   filter(pipeline_step == "Raw") %>%
@@ -90,7 +97,7 @@ FASTQCg <- QC_summary %>%
 FASTQCg + 
   geom_point(aes(fill = Study, shape = Species), color = "black") + 
   scale_fill_manual(values = gcolors) +
-  scale_shape_manual(values = c(21, 24, 22, 23)) +
+  scale_shape_manual(values = spshapes) +
   theme(axis.text.x = element_text(angle = 90))
   #geom_text_repel(data = FASTQC_summary[1:15, ], aes(label = GNomExID), color = "black", size = 3, box.padding = unit(0.5, "lines")
 ```
@@ -105,7 +112,7 @@ pipeQC_counts <- QC_summary %>%
   # facet_grid(.~Study, scales = "free") +
   scale_y_continuous(limits = c(0, 1.25e8)) +
   scale_color_manual(values = gcolors) +
-  scale_shape_manual(values = c(21, 24, 22, 23)) +
+  scale_shape_manual(values = spshapes) +
   scale_fill_manual(values = gcolors) +
   theme_bw() +
     theme(plot.title = element_text(size = 24),
@@ -125,8 +132,34 @@ pipeQC_counts
 ```{r proportions}
 QC_summary <- QC_summary %>% 
   dplyr::group_by(Sample) %>%
-  mutate(proportion = read_count / read_count[pipeline_step == "Raw"])
+  mutate(proportion = read_count / read_count[pipeline_step == "Raw"],
+         proportion_trimmed = read_count / read_count[pipeline_step == "Trimmed"])
 ```
+```{r trimming_stats}
+QC_summary %>% 
+  group_by(pipeline_step) %>% 
+  # filter(pipeline_step == "Trimmed") %>% 
+  summarise(mean = mean(proportion, na.rm = T), 
+            sd = sd(proportion, na.rm = T))
+# 
+range(QC_summary$proportion[QC_summary$pipeline_step == "Trimmed"], na.rm = T)
+# 
+hist(QC_summary$proportion[QC_summary$pipeline_step == "Trimmed"], breaks = seq(0,1,0.01))
+```
+```{r alignment_stats}
+QC_summary %>% 
+  group_by(pipeline_step) %>% 
+  # filter(pipeline_step == "Trimmed") %>% 
+  summarise(mean = mean(proportion_trimmed, na.rm = T), 
+            sd = sd(proportion_trimmed, na.rm = T))
+# 
+range(QC_summary$proportion_trimmed[QC_summary$pipeline_step == "Aligned"], na.rm = T)
+# 
+hist(QC_summary$proportion_trimmed[QC_summary$pipeline_step == "Aligned"], breaks = seq(0,1,0.01))
+#
+QC_summary$proportion_trimmed[QC_summary$pipeline_step == "Aligned"] < 0.25
+```
+
 ```{r}
 pipeQC_props <- QC_summary %>%
   dplyr::filter(pipeline_step != "Input Reads" & pipeline_step != "Assigned Reads") %>%
@@ -136,10 +169,10 @@ pipeQC_props <- QC_summary %>%
   # facet_grid(.~Study, scales = "free") +
   scale_y_continuous(limits = c(0, 1), labels = scales::percent) +
   scale_color_manual(values = gcolors) +
-  scale_shape_manual(values = c(21, 24, 22, 23)) +
+  scale_shape_manual(values = spshapes) +
   scale_fill_manual(values = gcolors) +
   guides(fill = guide_legend(order = 1, override.aes = list(fill = gcolors, shape = 21, stroke = 0.5)),
-         shape = guide_legend(order = 2, override.aes = list(shape = c(21, 24, 22, 23), alpha = 0.8, stroke = 0.5, fill = "black")),
+         shape = guide_legend(order = 2, override.aes = list(shape = spshapes, alpha = 0.8, stroke = 0.5, fill = "black")),
          color = "none") +
   theme_bw() +
   theme(plot.title = element_text(size = 24),
@@ -155,7 +188,7 @@ pipeQC_props <- QC_summary %>%
   ggtitle("read proportions")
 pipeQC_props
 ```
-```{r}
+```{r fig2}
 qcfig <- (pipeQC_counts | pipeQC_props) + 
   plot_annotation(tag_levels = "A",
                   title = "RNAseq read depth, trimming, and alignment rates") &
@@ -163,6 +196,16 @@ qcfig <- (pipeQC_counts | pipeQC_props) +
         plot.title = element_text(size = 28))
 # qcfig + ggtitle("RNAseq read depth, trimming, and alignment rates")
 #   theme(plot.title = element_text(size = 24))
-ggsave(qcfig, filename = "./outputs/figures/Fig2_pipelineQC_all.pdf", width = 13, height = 7, units = "in", device = "pdf")
+ggsave(qcfig, filename = "./outputs/figures/Fig2_pipelineQC_all.pdf", width = 13, height = 8.5, units = "in", device = "pdf")
 ```
 
+```{r fig2}
+qcfig <- (pipeQC_counts | pipeQC_props) + 
+  plot_annotation(tag_levels = "A",
+                  title = "RNAseq read depth, trimming, and alignment rates") &
+  theme(plot.tag = element_text(size = 14),
+        plot.title = element_text(size = 14))
+# qcfig + ggtitle("RNAseq read depth, trimming, and alignment rates")
+#   theme(plot.title = element_text(size = 24))
+ggsave(qcfig, filename = "./outputs/figures/Fig2_pipelineQC_all.pdf", width = 6.5, height = 4.25, units = "in", device = "pdf")
+```
